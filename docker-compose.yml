@@ -1,0 +1,53 @@
+
+services:
+  db:
+    image: postgres:15
+    env_file:
+      - ./backend/.env  # ← これを追加
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: md5
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./backend:/app
+    ports:
+      - "3001:3000"
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - db
+    command: >
+      bash -c "
+        until pg_isready -h db -p 5432 -U postgres; do
+          echo 'Waiting for PostgreSQL...'
+          sleep 2
+        done
+        echo 'PostgreSQL is ready!'
+        bundle exec rails db:create db:migrate
+        bundle exec rails server -b 0.0.0.0 -p 3000
+      "
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./frontend:/app
+       - /app/node_modules
+    ports:
+      - "3000:3000"
+    env_file:
+      - backend/.env
+    depends_on:
+      - backend
+    command: npm run dev
+
+volumes:
+  db_data:
