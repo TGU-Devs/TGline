@@ -166,6 +166,7 @@ docker compose up --build
 ### 4. ブラウザ表示
 
 こんな感じで出ればしっかりバックエンドとフロントエンド繋がって成功してます!
+<img width="1440" height="900" alt="Image" src="https://github.com/user-attachments/assets/cb0f54db-47c8-406c-91f5-0334057e6a0a" />
 
 
 ## アプリケーションの起動
