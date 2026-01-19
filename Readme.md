@@ -163,6 +163,11 @@ docker compose up --build
 - `backend-1`: `Listening on http://0.0.0.0:3000`
 - `frontend-1`: `Ready in X.Xs` と `Local: http://localhost:3000`
 
+### 4. ブラウザ表示
+
+こんな感じで出ればしっかりバックエンドとフロントエンド繋がって成功してます!
+
+
 ## アプリケーションの起動
 
 ### 初回起動後
