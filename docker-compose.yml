@@ -39,8 +39,8 @@ services:
       context: ./frontend
       dockerfile: Dockerfile.dev
     volumes:
-      - ./frontend:/app
-       - /app/node_modules
+      - ./frontend:/app:delegated 
+      - /app/node_modules
     ports:
       - "3000:3000"
     env_file:
