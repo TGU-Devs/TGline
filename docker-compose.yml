@@ -43,6 +43,9 @@ services:
       - /app/node_modules
     ports:
       - "3000:3000"
+    environment:
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
     env_file:
       - backend/.env
     depends_on:
