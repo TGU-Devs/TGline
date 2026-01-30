@@ -21,6 +21,29 @@ JWT（JSON Web Token）を使用したトークンベース認証。
 
 #### 認証ヘッダーの例
 
+```
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+#### トークンの有効期限
+
+* アクセストークン: 7日（1週間）
+* リフレッシュトークン: v0では実装しない
+
+**注意**: v0ではリフレッシュトークンがないため、7日経過後は再ログインが必要。
+
+トークンが期限切れの場合：
+
+```json
+{
+  "error": "token_expired"
+}
+```
+
+ステータスコード: 401 Unauthorized
+
+---
+
 ## 共通仕様
 
 ### 認証エラー
@@ -67,7 +90,8 @@ JWT（JSON Web Token）を使用したトークンベース認証。
 
 #### 概要
 
-新規ユーザー登録（サインアップ）を行う。
+新規ユーザー登録（サインアップ）を行う。  
+成功時、JWTトークンを返す。
 
 #### リクエスト
 
@@ -99,9 +123,12 @@ JWT（JSON Web Token）を使用したトークンベース認証。
     "display_name": "太郎",
     "role": "user"
   },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "message": "Signed up successfully"
 }
 ```
+
+**重要**: フロントエンドは`token`を保存し（localStorage等）、以降のAPIリクエストで使用する。
 
 エラー時：
 
@@ -121,7 +148,8 @@ JWT（JSON Web Token）を使用したトークンベース認証。
 
 #### 概要
 
-ログインを行う。
+ログインを行う。  
+成功時、JWTトークンを返す。
 
 #### リクエスト
 
@@ -144,9 +172,12 @@ JWT（JSON Web Token）を使用したトークンベース認証。
     "display_name": "太郎",
     "role": "user"
   },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "message": "Signed in successfully"
 }
 ```
+
+**重要**: フロントエンドは`token`を保存し（cookie等）、以降のAPIリクエストで使用する。
 
 エラー時（401 Unauthorized）：
 
@@ -162,11 +193,22 @@ JWT（JSON Web Token）を使用したトークンベース認証。
 
 #### 概要
 
-ログアウトを行う。
+ログアウトを行う。  
+JWTの場合は、クライアント側でトークンを削除する。  
+（v0ではサーバー側でのトークン無効化は実装しない）
+
+#### リクエストヘッダー
+
+```
+Authorization: Bearer <token>
+```
 
 #### レスポンス
 
 成功時：204 No Content
+
+**注意**: JWTはステートレスなため、サーバー側での無効化は難しい。  
+v0では、クライアント側でトークンを削除するだけで十分。
 
 エラー時：
 
@@ -184,7 +226,15 @@ JWT（JSON Web Token）を使用したトークンベース認証。
 
 現在ログインしているユーザーの情報を取得する。
 
+#### リクエストヘッダー
+
+```
+Authorization: Bearer <token>
+```
+
 #### レスポンス
+
+成功時（200 OK）：
 
 ```json
 {
@@ -196,7 +246,7 @@ JWT（JSON Web Token）を使用したトークンベース認証。
 }
 ```
 
-エラー時（未ログイン）：
+エラー時（401 Unauthorized）：
 
 ```json
 {
@@ -212,7 +262,13 @@ JWT（JSON Web Token）を使用したトークンベース認証。
 
 現在ログインしているユーザーのプロフィールを更新する。
 
-#### リクエスト
+#### リクエストヘッダー
+
+```
+Authorization: Bearer <token>
+```
+
+#### リクエストボディ
 
 ```json
 {
@@ -256,7 +312,15 @@ JWT（JSON Web Token）を使用したトークンベース認証。
 
 指定されたユーザーの公開情報を取得する。
 
+#### リクエストヘッダー
+
+```
+Authorization: Bearer <token>
+```
+
 #### レスポンス
+
+成功時（200 OK）：
 
 ```json
 {
@@ -268,12 +332,22 @@ JWT（JSON Web Token）を使用したトークンベース認証。
 
 ※ emailは公開情報に含めない
 
-エラー時（ユーザーが存在しない、または削除済み）：
+エラー時（401 Unauthorized）：
+
+```json
+{
+  "error": "unauthorized"
+}
+```
+
+エラー時（404 Not Found - ユーザーが存在しない、または削除済み）：
 
 ```json
 {
   "errors": ["User not found"]
 }
+```
+
 ---
 
 ## 投稿（Posts）
@@ -282,8 +356,14 @@ JWT（JSON Web Token）を使用したトークンベース認証。
 
 #### 概要
 
-投稿一覧を取得する。
+投稿一覧を取得する。  
 論理削除された投稿は含めない。
+
+#### リクエストヘッダー
+
+```
+Authorization: Bearer <token>
+```
 
 #### クエリ（任意）
 
@@ -323,7 +403,13 @@ JWT（JSON Web Token）を使用したトークンベース認証。
 
 投稿を作成する。
 
-#### リクエスト
+#### リクエストヘッダー
+
+```
+Authorization: Bearer <token>
+```
+
+#### リクエストボディ
 
 ```json
 {
@@ -370,6 +456,12 @@ JWT（JSON Web Token）を使用したトークンベース認証。
 
 投稿詳細を取得する。
 
+#### リクエストヘッダー
+
+```
+Authorization: Bearer <token>
+```
+
 #### レスポンス
 
 GET /posts と同形式。
@@ -381,6 +473,12 @@ GET /posts と同形式。
 #### 概要
 
 自分の投稿を論理削除する。
+
+#### リクエストヘッダー
+
+```
+Authorization: Bearer <token>
+```
 
 #### 制約
 
@@ -408,6 +506,12 @@ GET /posts と同形式。
 #### 概要
 
 投稿にいいねを付与する。
+
+#### リクエストヘッダー
+
+```
+Authorization: Bearer <token>
+```
 
 #### 制約
 
@@ -440,6 +544,12 @@ GET /posts と同形式。
 
 いいねを解除する。
 
+#### リクエストヘッダー
+
+```
+Authorization: Bearer <token>
+```
+
 #### レスポンス
 
 ```json
@@ -470,6 +580,12 @@ GET /posts と同形式。
 #### 概要
 
 タグ一覧を取得する。
+
+#### リクエストヘッダー
+
+```
+Authorization: Bearer <token>
+```
 
 #### クエリ（任意）
 
@@ -504,7 +620,13 @@ GET /posts と同形式。
 
 コメントを作成する。
 
-#### リクエスト
+#### リクエストヘッダー
+
+```
+Authorization: Bearer <token>
+```
+
+#### リクエストボディ
 
 ```json
 {
@@ -550,6 +672,12 @@ GET /posts と同形式。
 #### 概要
 
 コメント一覧を取得する。
+
+#### リクエストヘッダー
+
+```
+Authorization: Bearer <token>
+```
 
 #### レスポンス
 
