@@ -3,12 +3,23 @@
 ## 前提
 
 - バックエンド：Rails 7（APIモード）
-- 認証：Devise
+- 認証：Devise＋JWT
 - 全APIはログイン必須
 - 削除はすべて論理削除
 - 管理者機能・DM機能は v0 では実装しない
 
 ---
+### 認証方式
+
+JWT（JSON Web Token）を使用したトークンベース認証。
+
+#### 認証フロー
+
+1. **サインアップ/ログイン**: `POST /users/sign_up` または `POST /users/sign_in` でJWTトークンを取得
+2. **APIリクエスト**: 取得したトークンを `Authorization` ヘッダーに含めてリクエスト
+3. **トークン形式**: `Authorization: Bearer <token>`
+
+#### 認証ヘッダーの例
 
 ## 共通仕様
 
