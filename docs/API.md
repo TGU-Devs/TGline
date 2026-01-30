@@ -46,7 +46,223 @@
   "errors": ["エラーメッセージ"]
 }
 ```
+```
 
+---
+
+## 認証・ユーザー（Authentication & Users）
+
+### POST /users/sign_up
+
+#### 概要
+
+新規ユーザー登録（サインアップ）を行う。
+
+#### リクエスト
+
+```json
+{
+  "email": "user@example.com",
+  "password": "password123",
+  "password_confirmation": "password123",
+  "display_name": "太郎"
+}
+```
+
+#### バリデーション
+
+* email：必須、有効なメールアドレス形式、一意
+* password：必須、最小6文字
+* password_confirmation：必須、passwordと一致
+* display_name：必須
+
+#### レスポンス
+
+成功時（201 Created）：
+
+```json
+{
+  "user": {
+    "id": 1,
+    "email": "user@example.com",
+    "display_name": "太郎",
+    "role": "user"
+  },
+  "message": "Signed up successfully"
+}
+```
+
+エラー時：
+
+```json
+{
+  "errors": {
+    "email": ["has already been taken"],
+    "password": ["is too short (minimum is 6 characters)"],
+    "display_name": ["can't be blank"]
+  }
+}
+```
+
+---
+
+### POST /users/sign_in
+
+#### 概要
+
+ログインを行う。
+
+#### リクエスト
+
+```json
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+```
+
+#### レスポンス
+
+成功時（200 OK）：
+
+```json
+{
+  "user": {
+    "id": 1,
+    "email": "user@example.com",
+    "display_name": "太郎",
+    "role": "user"
+  },
+  "message": "Signed in successfully"
+}
+```
+
+エラー時（401 Unauthorized）：
+
+```json
+{
+  "error": "Invalid Email or password"
+}
+```
+
+---
+
+### DELETE /users/sign_out
+
+#### 概要
+
+ログアウトを行う。
+
+#### レスポンス
+
+成功時：204 No Content
+
+エラー時：
+
+```json
+{
+  "error": "unauthorized"
+}
+```
+
+---
+
+### GET /users/me
+
+#### 概要
+
+現在ログインしているユーザーの情報を取得する。
+
+#### レスポンス
+
+```json
+{
+  "id": 1,
+  "email": "user@example.com",
+  "display_name": "太郎",
+  "role": "user",
+  "created_at": "2026-01-01T12:00:00Z"
+}
+```
+
+エラー時（未ログイン）：
+
+```json
+{
+  "error": "unauthorized"
+}
+```
+
+---
+
+### PATCH /users/me
+
+#### 概要
+
+現在ログインしているユーザーのプロフィールを更新する。
+
+#### リクエスト
+
+```json
+{
+  "display_name": "新しい名前"
+}
+```
+
+#### バリデーション
+
+* display_name：任意（更新する場合のみ）
+
+#### レスポンス
+
+成功時：
+
+```json
+{
+  "id": 1,
+  "email": "user@example.com",
+  "display_name": "新しい名前",
+  "role": "user",
+  "created_at": "2026-01-01T12:00:00Z"
+}
+```
+
+エラー時：
+
+```json
+{
+  "errors": {
+    "display_name": ["can't be blank"]
+  }
+}
+```
+
+---
+
+### GET /users/:id
+
+#### 概要
+
+指定されたユーザーの公開情報を取得する。
+
+#### レスポンス
+
+```json
+{
+  "id": 2,
+  "display_name": "花子",
+  "created_at": "2026-01-01T12:00:00Z"
+}
+```
+
+※ emailは公開情報に含めない
+
+エラー時（ユーザーが存在しない、または削除済み）：
+
+```json
+{
+  "errors": ["User not found"]
+}
 ---
 
 ## 投稿（Posts）
