@@ -20,7 +20,7 @@ const Sidebar = () => {
 
     return (
         <>
-            <aside className="hidden md:flex w-64 bg-purple-50 border-r border-gray-200 h-screen flex-col sticky top-0">
+            <aside className="hidden lg:flex w-64 bg-purple-50 border-r border-gray-200 h-screen flex-col sticky top-0">
                 <div className="text-center border-b border-gray-200">
                     <div className="p-4">
                         <div className="w-20 h-20 bg-purple-600 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl text-white font-bold shadow-lg">
@@ -69,7 +69,7 @@ const Sidebar = () => {
                 </div>
             </aside>
 
-            <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
+            <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
                 <ul className="flex justify-around items-center h-16">
                     {menuList.map((menu) => (
                         <li key={menu.path} className="flex-1">
