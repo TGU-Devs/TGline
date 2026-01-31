@@ -8,7 +8,7 @@ export default function RootLayout({
   return (
     <div className="flex">
         <Sidebar />
-        <main>
+        <main className="flex-1 pb-16 md:pb-0">
             {children}
         </main>
     </div>
