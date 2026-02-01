@@ -25,7 +25,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_22_154458) do
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    # インデックスを3つのカラムに追加（データを検索しやすくするため）
     t.index ["deleted_at"], name: "index_users_on_deleted_at"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true

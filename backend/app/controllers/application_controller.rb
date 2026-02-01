@@ -1,5 +1,8 @@
 class ApplicationController < ActionController::API
-  # concerns/authenticable.rbにあるモジュールを読み込む
+  # 認証モジュール（concerns/authenticable.rb）
   include Authenticable
-  # TODO: 認可のモジュールを追加する
+  # 認可モジュール（concerns/authorizable.rb）
+  include Authorizable
+  # cookie許可
+  include ActionController::Cookies
 end

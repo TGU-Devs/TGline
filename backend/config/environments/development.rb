@@ -74,4 +74,5 @@ Rails.application.configure do
   # config.generators.apply_rubocop_autocorrect_after_generate!
   config.logger = ActiveSupport::Logger.new(STDOUT)
   config.log_formatter = ::Logger::Formatter.new
+
 end
