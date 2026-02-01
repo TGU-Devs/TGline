@@ -13,5 +13,15 @@ Rails.application.routes.draw do
   # root "posts#index"
   namespace :api do
     get "time", to: "time#index"
+
+    # 認証・ユーザー関連
+    namespace :users do
+      post "sign_up", to: "registrations#create"
+      post "sign_in", to: "sessions#create"
+      delete "sign_out", to: "sessions#destroy"
+      get "me", to: "me#show"
+      patch "me", to: "me#update"
+    end
+    resources :users, only: [:index, :show]
   end
 end

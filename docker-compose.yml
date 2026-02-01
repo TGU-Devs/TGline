@@ -18,7 +18,7 @@ services:
     volumes:
       - ./backend:/app
     ports:
-      - "3001:3000"
+      - "3001:3000" # [ホスト側]:[コンテナ側]
     env_file:
       - ./backend/.env
     depends_on:
@@ -30,6 +30,7 @@ services:
           sleep 2
         done
         echo 'PostgreSQL is ready!'
+        bundle install
         bundle exec rails db:create db:migrate
         bundle exec rails server -b 0.0.0.0 -p 3000
       "
@@ -41,10 +42,15 @@ services:
     volumes:
       - ./frontend:/app:delegated 
       - /app/node_modules
+      - /app/.next
+      - /app/next-env.d.ts  # 自動生成ファイルを保護
+    environment:
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+      - CHOKIDAR_INTERVAL=500
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
     ports:
       - "3000:3000"
-    env_file:
-      - backend/.env
     depends_on:
       - backend
     command: npm run dev
