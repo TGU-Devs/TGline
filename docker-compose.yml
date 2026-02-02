@@ -43,7 +43,6 @@ services:
       - ./frontend:/app:delegated 
       - /app/node_modules
       - /app/.next
-      - /app/next-env.d.ts  # 自動生成ファイルを保護
     environment:
       - WATCHPACK_POLLING=true
       - CHOKIDAR_USEPOLLING=true
