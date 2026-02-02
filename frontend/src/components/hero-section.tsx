@@ -28,7 +28,7 @@ export function HeroSection() {
 
             {/* Main heading */}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground text-balance">
-              学生のための
+              東北学院大学生のための
               <span className="text-primary">情報共有プラットフォーム</span>
             </h1>
 
