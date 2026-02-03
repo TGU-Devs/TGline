@@ -62,7 +62,7 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
         setFormValues({ ...formValues, [name]: value });
     };
 
-    const submitHandler = async(e: FormEvent<HTMLFormElement>) => {
+    const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         const errors = validata(formValues);
@@ -75,9 +75,9 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
 
         try {
             if (isRegister) {
-                const response = await fetch('/api/auth/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type' : 'application/json' },
+                const response = await fetch("/api/auth/register", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         username: formValues.username,
                         email: formValues.email,
@@ -91,18 +91,44 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
                     if (data.errors) {
                         setFormErrors(data.errors);
                     } else {
-                        setFormErrors({ main: '登録に失敗しました' });
+                        setFormErrors({ main: "登録に失敗しました" });
                     }
                     return;
                 }
 
-                router.push('/login');
+                router.push("/login");
             } else {
                 //ログイン処理
+                const response = await fetch("/api/auth/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        email: formValues.email,
+                        password: formValues.password,
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    if (data.errors) {
+                        setFormErrors(data.errors);
+                    } else {
+                        setFormErrors({ main: "ログインに失敗しました" });
+                    }
+                    return;
+                }
+
+                if (data.token) {
+                    localStorage.setItem("authToken", data.token);
+                }
+
+                // router.push("/");
+                console.log("ログイン成功:", data);
             }
         } catch (error) {
-            console.error('AuthForm error:', error);
-            setFormErrors({ main: 'サーバーエラーが発生しました' });
+            console.error("AuthForm error:", error);
+            setFormErrors({ main: "サーバーエラーが発生しました" });
         } finally {
             setIsLoading(false);
         }
@@ -185,7 +211,9 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
                     </div>
                 )}
                 <div>{formErrors.main}</div>
-                <button>{isLoading ? '処理中...' : isRegister ? "登録" : "ログイン"}</button>
+                <button>
+                    {isLoading ? "処理中..." : isRegister ? "登録" : "ログイン"}
+                </button>
                 <div>
                     <p>
                         {isRegister
