@@ -2,6 +2,7 @@
 
 import { ArrowRight, Bell, Calendar, MapPin, Heart, MessageCircle, Share2, ChevronLeft, Home, Search, User, PenSquare, BookOpen, Users, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export function HeroSection() {
   return (
@@ -67,6 +68,7 @@ export function HeroSection() {
                 <PenSquare className="mr-2 h-5 w-5" />
                 投稿してみる
               </Button>
+              <Link href="/posts">
               <Button
                 size="lg"
                 variant="outline"
@@ -75,6 +77,7 @@ export function HeroSection() {
                 投稿を見る
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
+              </Link>
             </div>
 
             {/* Stats */}
