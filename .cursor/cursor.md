@@ -44,7 +44,6 @@ deleted_at
 - ログインユーザーのみ投稿可能
 - 投稿者は自分の投稿を削除可能
 - 削除は論理削除
-- 匿名投稿が可能
 - 管理者UIはv0では作らない（DB操作で対応）
 
 ### Post
@@ -57,7 +56,6 @@ user_id (FK -> users.id)
 title
 body
 
-is_anonymous (boolean)
 
 created_at
 
@@ -72,7 +70,6 @@ deleted_at
 - フラット構造（返信機能なし）
 - 削除は論理削除
 - 編集不可
-- 匿名コメント可
 
 ### Comment
 
@@ -85,8 +82,6 @@ post_id (FK -> posts.id)
 user_id (FK -> users.id)
 
 body
-
-is_anonymous (boolean)
 
 created_at
 
