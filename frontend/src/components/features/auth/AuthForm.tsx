@@ -55,13 +55,14 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
 
     const [formValues, setFormValues] = useState(initFormValues);
     const [formErrors, setFormErrors] = useState<Errors>({});
+    const [isLoading, setIsLoading] = useState(false);
 
     const onchangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormValues({ ...formValues, [name]: value });
     };
 
-    const submitHandler = (e: FormEvent<HTMLFormElement>) => {
+    const submitHandler = async(e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         const errors = validata(formValues);
@@ -70,6 +71,41 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
             return;
         }
         setFormErrors({});
+        setIsLoading(true);
+
+        try {
+            if (isRegister) {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type' : 'application/json' },
+                    body: JSON.stringify({
+                        username: formValues.username,
+                        email: formValues.email,
+                        password: formValues.password,
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    if (data.errors) {
+                        setFormErrors(data.errors);
+                    } else {
+                        setFormErrors({ main: '登録に失敗しました' });
+                    }
+                    return;
+                }
+
+                router.push('/login');
+            } else {
+                //ログイン処理
+            }
+        } catch (error) {
+            console.error('AuthForm error:', error);
+            setFormErrors({ main: 'サーバーエラーが発生しました' });
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const validata = (values: FormValues) => {
@@ -83,9 +119,9 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
             errors.email = "正しいメールアドレスを入力してください";
         }
         if (!values.password) {
-            errors.password = "パスワードを入力してくさい";
+            errors.password = "パスワードを入力してください";
         } else if (values.password.length < 6) {
-            errors.password = "6文字以上のパスワードを入力してくさい";
+            errors.password = "6文字以上のパスワードを入力してください";
         }
 
         if (isRegister) {
@@ -149,7 +185,7 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
                     </div>
                 )}
                 <div>{formErrors.main}</div>
-                <button>{isRegister ? "登録" : "ログイン"}</button>
+                <button>{isLoading ? '処理中...' : isRegister ? "登録" : "ログイン"}</button>
                 <div>
                     <p>
                         {isRegister
