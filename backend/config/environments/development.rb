@@ -75,4 +75,8 @@ Rails.application.configure do
   config.logger = ActiveSupport::Logger.new(STDOUT)
   config.log_formatter = ::Logger::Formatter.new
 
+  ## 開発環境ではホストをクリアして、任意のホスト(フロント)からのリクエストを許可する cors対応
+  config.hosts.clear
+
+
 end
