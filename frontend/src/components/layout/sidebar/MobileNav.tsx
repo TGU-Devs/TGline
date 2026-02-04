@@ -15,7 +15,7 @@ const MobileNav = ({ menuList, pathname }: MobileNavProps) => {
                         <li key={menu.path} className="flex-1">
                             <Link
                                 href={menu.path}
-                                className={`flex flex-col items-center justify-center h-full ${pathname === menu.path ? "text-purple-600" : "text-gray-600"}`}
+                                className={`flex flex-col items-center justify-center h-full ${pathname === menu.path ? "text-sky-600" : "text-gray-600"}`}
                             >
                                 <menu.icon className="w-6 h-6" />
                                 <span className="text-sm mt-1">{menu.name}</span>
