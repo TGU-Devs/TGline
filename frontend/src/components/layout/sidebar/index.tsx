@@ -9,7 +9,7 @@ import MobileNav from "./MobileNav";
 import type { MenuItem } from "./types";
 
 const menuList: MenuItem[] = [
-    { name: "投稿一覧", path: "/post", icon: Home },
+    { name: "投稿一覧", path: "/posts", icon: Home },
     { name: "通知", path: "/notifications", icon: Bell },
     { name: "設定", path: "/settings", icon: Settings },
 ];
