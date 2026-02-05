@@ -170,18 +170,19 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
     return (
         <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
             <form className="space-y-4" onSubmit={(e) => submitHandler(e)}>
-                <h1 className="text-center font-bold text-2xl text-slate-800">{isRegister ? "新規登録" : "ログイン"}</h1>
+                <h1 className="text-center font-bold text-xl text-slate-800">{isRegister ? "新規登録" : "ログイン"}</h1>
                 {isRegister && (
-                    <div>
-                        <label htmlFor="username">ユーザー名</label>
+                    <div className="flex flex-col">
+                        <label htmlFor="username" className="font-medium text-sm text-slate-700 mb-1">ユーザー名</label>
                         <input
                             type="text"
                             name="username"
                             placeholder="ユーザー名"
                             value={formValues.username}
                             onChange={(e) => onchangeHandler(e)}
+                            className="border-solid border-2 border-gray-100 rounded-md p-1 placeholder:text-slate-400"
                         />
-                        {formErrors.username && <p>{formErrors.username}</p>}
+                        {formErrors.username && <p className="text-red-500 text-sm mt-1">{formErrors.username}</p>}
                     </div>
                 )}
                 {formItem.map((item) => (
@@ -194,8 +195,8 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
                     />
                 ))}
                 {isRegister && (
-                    <div>
-                        <label htmlFor="confirmPassword">
+                    <div className="flex flex-col">
+                        <label htmlFor="confirmPassword" className="font-medium text-sm text-slate-700 mb-1">
                             パスワード確認用
                         </label>
                         <input
@@ -204,9 +205,10 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
                             placeholder="パスワード確認用"
                             value={formValues.confirmPassword}
                             onChange={(e) => onchangeHandler(e)}
+                            className="border-solid border-2 border-gray-100 rounded-md p-1 placeholder:text-slate-400"
                         />
                         {formErrors.confirmPassword && (
-                            <p>{formErrors.confirmPassword}</p>
+                            <p className="text-red-500 text-sm mt-1">{formErrors.confirmPassword}</p>
                         )}
                     </div>
                 )}
