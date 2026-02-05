@@ -4,6 +4,7 @@ class JwtService
   SECRET_KEY = Rails.application.credentials.secret_key_base || 'your-secret-key-change-in-production'
 
   # トークンの有効期限（7日）
+  # TODO: 今はAccessTokenだけしか実装していないので今後リフレッシュトークンも使う。
   EXPIRATION_TIME = 7.days
 
   # JWTトークンを生成
