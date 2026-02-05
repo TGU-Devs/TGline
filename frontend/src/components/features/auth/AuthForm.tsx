@@ -2,8 +2,11 @@
 
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
+
 import Link from "next/link";
 import FormItem from "./FormItem";
+
+import { User, Mail, KeyRound, RotateCcwKey } from "lucide-react";
 
 type AuthFormProps = {
     isRegister: boolean;
@@ -28,6 +31,7 @@ export type FormItemType = {
     id: keyof FormValues;
     label: string;
     type: "email" | "password";
+    icon: React.ComponentType;
 };
 
 const formItem: FormItemType[] = [
@@ -35,11 +39,13 @@ const formItem: FormItemType[] = [
         id: "email",
         label: "メールアドレス",
         type: "email",
+        icon: Mail,
     },
     {
         id: "password",
         label: "パスワード",
         type: "password",
+        icon: KeyRound,
     },
 ];
 
@@ -174,14 +180,19 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
                 {isRegister && (
                     <div className="flex flex-col">
                         <label htmlFor="username" className="font-medium text-sm text-slate-700 mb-1">ユーザー名</label>
+                        <div className="relative">
+                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                                <User size={18} />
+                            </div>
                         <input
                             type="text"
                             name="username"
                             placeholder="ユーザー名"
                             value={formValues.username}
                             onChange={(e) => onchangeHandler(e)}
-                            className="border-solid border-2 border-gray-100 rounded-md p-1 placeholder:text-slate-400"
+                            className="border-solid border-2 border-gray-100 rounded-md p-1 pl-10 w-full placeholder:text-slate-400"
                         />
+                        </div>
                         {formErrors.username && <p className="text-red-500 text-sm mt-1">{formErrors.username}</p>}
                     </div>
                 )}
@@ -190,6 +201,7 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
                         key={item.id}
                         item={item}
                         value={formValues[item.id]}
+                        icon={item.icon}
                         onchangeHandler={onchangeHandler}
                         error={formErrors[item.id]}
                     />
@@ -199,14 +211,19 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
                         <label htmlFor="confirmPassword" className="font-medium text-sm text-slate-700 mb-1">
                             パスワード確認用
                         </label>
+                        <div className="relative">
+                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                                <RotateCcwKey size={18} />
+                            </div>
                         <input
                             type="password"
                             name="confirmPassword"
                             placeholder="パスワード確認用"
                             value={formValues.confirmPassword}
                             onChange={(e) => onchangeHandler(e)}
-                            className="border-solid border-2 border-gray-100 rounded-md p-1 placeholder:text-slate-400"
+                            className="border-solid border-2 border-gray-100 rounded-md p-1 pl-10 w-full placeholder:text-slate-400"
                         />
+                        </div>
                         {formErrors.confirmPassword && (
                             <p className="text-red-500 text-sm mt-1">{formErrors.confirmPassword}</p>
                         )}
