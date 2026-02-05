@@ -57,13 +57,13 @@ export default function PostNewPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f0f8ff] py-8">
-      <div className="max-w-4xl mx-auto px-4">
+    <div className="min-h-screen bg-[#f0f8ff] py-4 sm:py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6">
         {/* 戻るボタン */}
         <Button
           asChild
           variant="ghost"
-          className="mb-6 text-slate-600 hover:text-slate-800"
+          className="mb-4 sm:mb-6 text-slate-600 hover:text-slate-800"
         >
           <Link href="/posts">
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -72,8 +72,8 @@ export default function PostNewPage() {
         </Button>
 
         {/* 新規投稿フォーム */}
-        <div className="bg-[#fefefe] rounded-lg shadow-sm border border-slate-200 p-8">
-          <h1 className="text-2xl font-bold text-slate-800 mb-6">新規投稿</h1>
+        <div className="bg-[#fefefe] rounded-lg shadow-sm border border-slate-200 p-4 sm:p-6 lg:p-8">
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-800 mb-4 sm:mb-6">新規投稿</h1>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* タイトル */}
@@ -115,19 +115,20 @@ export default function PostNewPage() {
             </div>
 
             {/* ボタン */}
-            <div className="flex gap-4 justify-end">
+            <div className="flex flex-col-reverse sm:flex-row gap-3 sm:gap-4 justify-end">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => router.back()}
                 disabled={isCreating}
+                className="w-full sm:w-auto"
               >
                 キャンセル
               </Button>
               <Button
                 type="submit"
                 disabled={isCreating}
-                className="bg-sky-500 hover:bg-sky-600 text-white"
+                className="bg-sky-500 hover:bg-sky-600 text-white w-full sm:w-auto"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 {isCreating ? "作成中..." : "投稿する"}

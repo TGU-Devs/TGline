@@ -72,7 +72,7 @@ export function HeroSection() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-primary/30 text-foreground hover:bg-primary/10 px-8 py-6 text-base font-semibold bg-transparent transition-all hover:scale-105"
+                className="border-primary/30 text-foreground px-8 py-6 text-base font-semibold bg-transparent transition-all hover:scale-105"
               >
                 投稿を見る
                 <ArrowRight className="ml-2 h-5 w-5" />

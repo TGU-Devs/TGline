@@ -80,12 +80,12 @@ export default function PostsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f0f8ff] py-8">
-      <div className="max-w-4xl mx-auto px-4">
+    <div className="min-h-screen bg-[#f0f8ff] py-4 sm:py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6">
         {/* ヘッダー */}
-        <div className="mb-8 flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-slate-800">投稿一覧</h1>
-          <Button asChild className="bg-sky-500 hover:bg-sky-600 text-white">
+        <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-800">投稿一覧</h1>
+          <Button asChild className="bg-sky-500 hover:bg-sky-600 text-white w-full sm:w-auto">
             <Link href="/posts/new">
               <Plus className="h-4 w-4 mr-2" />
               新規投稿
@@ -109,21 +109,21 @@ export default function PostsPage() {
                 href={`/posts/${post.id}`}
                 className="block"
               >
-                <div className="bg-[#fefefe] rounded-lg shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow cursor-pointer">
-                  <h2 className="text-xl font-semibold text-slate-800 mb-3 line-clamp-2">
+                <div className="bg-[#fefefe] rounded-lg shadow-sm border border-slate-200 p-4 sm:p-6 hover:shadow-md transition-shadow cursor-pointer">
+                  <h2 className="text-lg sm:text-xl font-semibold text-slate-800 mb-2 sm:mb-3 line-clamp-2">
                     {post.title}
                   </h2>
-                  <p className="text-slate-600 mb-4 line-clamp-3">
+                  <p className="text-sm sm:text-base text-slate-600 mb-3 sm:mb-4 line-clamp-3">
                     {post.body}
                   </p>
-                  <div className="flex items-center gap-4 text-sm text-slate-500">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-slate-500">
                     <div className="flex items-center gap-1">
                       <User className="h-4 w-4" />
                       <span>{post.user?.display_name || "匿名"}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      <span>{formatDate(post.created_at)}</span>
+                      <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="break-all">{formatDate(post.created_at)}</span>
                     </div>
                   </div>
                 </div>

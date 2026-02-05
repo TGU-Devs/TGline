@@ -118,13 +118,13 @@ export default function PostDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f0f8ff] py-8">
-      <div className="max-w-4xl mx-auto px-4">
+    <div className="min-h-screen bg-[#f0f8ff] py-4 sm:py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6">
         {/* 戻るボタン */}
         <Button
           asChild
           variant="ghost"
-          className="mb-6 text-slate-600 hover:text-slate-800"
+          className="mb-4 sm:mb-6 text-slate-600 hover:text-slate-800"
         >
           <Link href="/posts">
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -133,51 +133,52 @@ export default function PostDetailPage() {
         </Button>
 
         {/* 投稿カード */}
-        <div className="bg-[#fefefe] rounded-lg shadow-sm border border-slate-200 p-8">
+        <div className="bg-[#fefefe] rounded-lg shadow-sm border border-slate-200 p-4 sm:p-6 lg:p-8">
           {/* ヘッダー */}
-          <div className="flex items-start justify-between mb-6">
-            <div className="flex-1">
-              <h1 className="text-3xl font-bold text-slate-800 mb-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-start justify-between mb-4 sm:mb-6 gap-4">
+            <div className="flex-1 w-full sm:w-auto">
+              <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-3 sm:mb-4 wrap-break-words">
                 {post.title}
               </h1>
-              <div className="flex items-center gap-4 text-sm text-slate-500">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-slate-500">
                 <div className="flex items-center gap-1">
-                  <User className="h-4 w-4" />
+                  <User className="h-3 w-3 sm:h-4 sm:w-4" />
                   <span>{post.user?.display_name || "匿名"}</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Calendar className="h-4 w-4" />
-                  <span>{formatDate(post.created_at)}</span>
+                  <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="break-all">{formatDate(post.created_at)}</span>
                 </div>
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 w-full sm:w-auto">
               <Button
                 asChild
                 variant="outline"
-                className="border-sky-300 text-sky-600 hover:bg-sky-50"
+                className="border-sky-300 text-sky-600 hover:bg-sky-50 flex-1 sm:flex-initial"
               >
                 <Link href={`/posts/${post.id}/edit`}>
                   <Edit className="h-4 w-4 mr-2" />
-                  編集
+                  <span className="hidden sm:inline">編集</span>
                 </Link>
               </Button>
               <Button
                 variant="destructive"
                 onClick={handleDelete}
                 disabled={isDeleting}
+                className="flex-1 sm:flex-initial"
               >
-                <Trash2 className="h-4 w-4 mr-2" />
-                {isDeleting ? "削除中..." : "削除"}
+                <Trash2 className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">{isDeleting ? "削除中..." : "削除"}</span>
               </Button>
             </div>
           </div>
 
           {/* 本文 */}
           <div className="prose max-w-none">
-            <p className="text-slate-700 leading-relaxed whitespace-pre-wrap">
+            <p className="text-sm sm:text-base text-slate-700 leading-relaxed whitespace-pre-wrap wrap-break-words">
               {post.body}
-            </p>
+            </p>  
           </div>
         </div>
       </div>
