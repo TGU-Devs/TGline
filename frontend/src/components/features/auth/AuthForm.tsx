@@ -123,7 +123,7 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
                     localStorage.setItem("authToken", data.token);
                 }
 
-                // router.push("/");
+                router.push("/posts");
                 console.log("ログイン成功:", data);
             }
         } catch (error) {
