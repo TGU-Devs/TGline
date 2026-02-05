@@ -168,9 +168,9 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
     };
 
     return (
-        <div>
-            <form onSubmit={(e) => submitHandler(e)}>
-                <h1>{isRegister ? "新規登録" : "ログイン"}</h1>
+        <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
+            <form className="space-y-4" onSubmit={(e) => submitHandler(e)}>
+                <h1 className="text-center font-bold text-2xl text-slate-800">{isRegister ? "新規登録" : "ログイン"}</h1>
                 {isRegister && (
                     <div>
                         <label htmlFor="username">ユーザー名</label>
@@ -211,16 +211,16 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
                     </div>
                 )}
                 <div>{formErrors.main}</div>
-                <button>
+                <button className="w-full bg-sky-600 text-white py-2 rounded-md hover:bg-sky-700 transition-colors" type="submit">
                     {isLoading ? "処理中..." : isRegister ? "登録" : "ログイン"}
                 </button>
-                <div>
-                    <p>
+                <div className="flex justify-center gap-2 text-sm">
+                    <p className="text-slate-700">
                         {isRegister
                             ? "すでにアカウントをお持ちの方は"
                             : "新規登録は"}
                     </p>
-                    <Link href={isRegister ? "/login" : "/register"}>
+                    <Link href={isRegister ? "/login" : "/register"} className="text-sky-700 hover:underline ">
                         こちら
                     </Link>
                 </div>
