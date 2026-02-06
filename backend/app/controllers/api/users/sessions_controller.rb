@@ -26,10 +26,10 @@ module Api
           
           render json: {
             user: user_response(user),
-            message: 'Signed in successfully'
+            message: 'サインインに成功しました!'
           }, status: :ok
         else
-          render json: { error: 'Invalid Email or password' }, status: :unauthorized
+          render json: { error: 'メールアドレスまたはパスワードが正しくありません' }, status: :unauthorized
         end
       end
 
