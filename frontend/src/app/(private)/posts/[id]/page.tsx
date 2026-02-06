@@ -155,7 +155,7 @@ export default function PostDetailPage() {
               <Button
                 asChild
                 variant="outline"
-                className="border-sky-300 text-sky-600 hover:bg-sky-50 flex-1 sm:flex-initial"
+                className="border-sky-300 text-sky-600 hover:bg-sky-500 flex-1 sm:flex-initial"
               >
                 <Link href={`/posts/${post.id}/edit`}>
                   <Edit className="h-4 w-4 mr-2" />
