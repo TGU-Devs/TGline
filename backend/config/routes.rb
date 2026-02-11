@@ -23,5 +23,8 @@ Rails.application.routes.draw do
       patch "me", to: "me#update"
     end
     resources :users, only: [:index, :show]
+
+    # 投稿関連
+    resources :posts, only: [:index, :show, :create, :update, :destroy]
   end
 end

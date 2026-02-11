@@ -4,6 +4,7 @@ class User < ApplicationRecord
   # Devise設定
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
+  has_many :posts, dependent: :destroy
 
   # バリデーション
   validates :display_name, presence: true

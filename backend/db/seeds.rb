@@ -55,3 +55,36 @@ users_data.each do |user_data|
 end
 
 puts "Created #{User.count} users!"
+
+puts "Creating dummy posts..."
+
+posts_data = [
+  {
+    title: "投稿1",
+    body: "これは投稿1の内容です",
+    user: User.first
+  },
+  { title: "投稿2",
+    body: "これは投稿2の内容です",
+    user: User.second
+  },
+  { title: "投稿3",
+    body: "これは投稿3の内容です",
+    user: User.third,
+    deleted_at: Time.current
+  },
+  { title: "投稿4",
+    body: "これは投稿4の内容です",
+    user: User.fourth,
+  }
+]
+
+posts_data.each do |post_data|
+  post = Post.find_or_create_by!(title: post_data[:title]) do |p|
+    p.body = post_data[:body]
+    p.user = post_data[:user]
+  end
+  puts "Created/Updated post: #{post.title} (#{post.user.display_name})"
+end
+
+puts "Created #{Post.count} posts!"

@@ -1,7 +1,7 @@
 # JWTトークンの生成・検証を行うサービスクラス
 class JwtService
-  # シークレットキー（本番環境では環境変数から取得）
-  SECRET_KEY = Rails.application.credentials.secret_key_base || 'your-secret-key-change-in-production'
+  # シークレットキー（環境ごとにRailsが自動解決: dev=自動生成, prod=credentials or ENV["SECRET_KEY_BASE"]）
+  SECRET_KEY = Rails.application.secret_key_base
 
   # トークンの有効期限（7日）
   # TODO: 今はAccessTokenだけしか実装していないので今後リフレッシュトークンも使う。
