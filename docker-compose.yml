@@ -2,7 +2,7 @@ services:
     db:
         image: postgres:15
         env_file:
-            - ./backend/.env # ← これを追加
+            - .env.local
         environment:
             POSTGRES_HOST_AUTH_METHOD: md5
         ports:
@@ -19,7 +19,7 @@ services:
         ports:
             - "3001:3000" # [ホスト側]:[コンテナ側]
         env_file:
-            - ./backend/.env
+            - .env.local
         depends_on:
             - db
         command: >
@@ -49,11 +49,10 @@ services:
             - CHOKIDAR_USEPOLLING=true
             - CHOKIDAR_INTERVAL=100
             - NEXT_TELEMETRY_DISABLED=1
-            - NEXT_PUBLIC_API_URL=http://localhost:3001
         ports:
             - "3000:3000"
         env_file:
-            - backend/.env
+            - .env.local
         depends_on:
             - backend
         command: npm run dev
