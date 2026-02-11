@@ -50,23 +50,9 @@ module Authenticable
 
   private
 
-  # トークンを取得（cookie優先、なければAuthorizationヘッダーから）
+  # cookieからトークンを取得
   # @return [String, nil] トークン、存在しない場合はnil
   def extract_token
-    # 1. cookieから取得（優先）
-    return cookies[:jwt_token] if cookies[:jwt_token].present?
-
-    # 2. Authorizationヘッダーから取得（フォールバック）
-    extract_token_from_header
-  end
-
-  # Authorizationヘッダーからトークンを抽出
-  # @return [String, nil] トークン、存在しない場合はnil
-  def extract_token_from_header
-    auth_header = request.headers['Authorization']
-    return nil unless auth_header
-
-    # "Bearer <token>" の形式からトークンを抽出
-    auth_header.split(' ').last if auth_header.start_with?('Bearer ')
+    cookies[:jwt_token] if cookies[:jwt_token].present?
   end
 end

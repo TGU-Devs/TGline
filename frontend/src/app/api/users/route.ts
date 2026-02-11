@@ -1,3 +1,5 @@
+  // BFF を置いて SameSite=Lax + HttpOnly Cookie を守る設計にしました
+
 import { NextRequest, NextResponse } from "next/server";
 
 const BACKEND_URL = process.env.BACKEND_URL || "http://backend:3000";

@@ -1,4 +1,5 @@
 import { SquarePen } from "lucide-react";
+import Link from "next/link";
 
 const currentUser = {
     id: "taro_1225",
@@ -17,7 +18,7 @@ const UserProfile = () => {
                 </h2>
                 <button className="flex items-center justify-center w-full p-3 bg-sky-600 text-white font-medium rounded-3xl cursor-pointer hover:bg-sky-700 transition-colors">
                     <SquarePen className="w-5 h-5 mr-2" />
-                    新規投稿
+                    <Link href="/posts/new">新規投稿</Link>
                 </button>
             </div>
         </div>
