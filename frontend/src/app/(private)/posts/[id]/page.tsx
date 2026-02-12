@@ -92,10 +92,10 @@ export default function PostDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#f0f8ff] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-500 mx-auto"></div>
-          <p className="mt-4 text-slate-600">読み込み中...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">読み込み中...</p>
         </div>
       </div>
     );
@@ -103,9 +103,9 @@ export default function PostDetailPage() {
 
   if (error || !post) {
     return (
-      <div className="min-h-screen bg-[#f0f8ff] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-500 mb-4">{error || "投稿が見つかりません"}</p>
+          <p className="text-destructive mb-4">{error || "投稿が見つかりません"}</p>
           <Button asChild variant="outline">
             <Link href="/posts">
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -118,13 +118,13 @@ export default function PostDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f0f8ff] py-4 sm:py-8">
+    <div className="min-h-screen bg-background py-4 sm:py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         {/* 戻るボタン */}
         <Button
           asChild
           variant="ghost"
-          className="mb-4 sm:mb-6 text-slate-600 hover:text-slate-800"
+          className="mb-4 sm:mb-6 text-muted-foreground hover:text-foreground"
         >
           <Link href="/posts">
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -133,16 +133,18 @@ export default function PostDetailPage() {
         </Button>
 
         {/* 投稿カード */}
-        <div className="bg-[#fefefe] rounded-lg shadow-sm border border-slate-200 p-4 sm:p-6 lg:p-8">
+        <div className="bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6 lg:p-8">
           {/* ヘッダー */}
           <div className="flex flex-col sm:flex-row items-start sm:items-start justify-between mb-4 sm:mb-6 gap-4">
             <div className="flex-1 w-full sm:w-auto">
-              <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-3 sm:mb-4 wrap-break-words">
+              <h1 className="text-2xl sm:text-3xl font-bold text-card-foreground mb-3 sm:mb-4 wrap-break-words">
                 {post.title}
               </h1>
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-slate-500">
-                <div className="flex items-center gap-1">
-                  <User className="h-3 w-3 sm:h-4 sm:w-4" />
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-5 h-5 bg-primary/15 rounded-full flex items-center justify-center">
+                    <User className="h-3 w-3 text-primary" />
+                  </div>
                   <span>{post.user?.display_name || "匿名"}</span>
                 </div>
                 <div className="flex items-center gap-1">
@@ -155,7 +157,7 @@ export default function PostDetailPage() {
               <Button
                 asChild
                 variant="outline"
-                className="border-sky-300 text-sky-600 hover:bg-sky-500 flex-1 sm:flex-initial"
+                className="flex-1 sm:flex-initial"
               >
                 <Link href={`/posts/${post.id}/edit`}>
                   <Edit className="h-4 w-4 mr-2" />
@@ -176,9 +178,9 @@ export default function PostDetailPage() {
 
           {/* 本文 */}
           <div className="prose max-w-none">
-            <p className="text-sm sm:text-base text-slate-700 leading-relaxed whitespace-pre-wrap wrap-break-words">
+            <p className="text-sm sm:text-base text-foreground leading-relaxed whitespace-pre-wrap wrap-break-words">
               {post.body}
-            </p>  
+            </p>
           </div>
         </div>
       </div>
