@@ -1,0 +1,13 @@
+# Production environment secrets
+.env
+
+
+# Legacy env files (now consolidated to root)
+backend/.env
+frontend/.env
+
+# OS files
+.DS_Store
+
+# Node
+node_modules/
