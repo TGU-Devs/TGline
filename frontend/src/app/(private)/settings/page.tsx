@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import SaveToast from "@/components/features/settings/SaveToast";
 import Header from "@/components/features/settings/Header";
@@ -11,7 +11,6 @@ import SecuritySection from "@/components/features/settings/SecuritySection";
 import Footer from "@/components/features/settings/Footer";
 
 import { NOTIFICATION_OPTIONS, SECURITY_OPTIONS } from "@/constants/settings";
-import type { User } from "@/components/features/settings/types";
 
 import {
     CheckCircle2,
@@ -22,17 +21,41 @@ import {
     Sun,
     Moon,
     Shield,
+    Form,
 } from "lucide-react";
 
-const currentUser: User = {
-    displayName: "たろう",
-    email: "taro@example.com",
-    bio: "こんにちは、たろうです！よろしくお願いします。",
+const initFormValues = {
+    display_name: "",
+    email: "",
+}
+
+const initUser = {
+    display_name: "",
+    email: "",
 };
 
 const SettingsPage = () => {
     const [showSaveToast, setShowSaveToast] = useState(false);
     const [isDark, setIsDark] = useState(false);
+    const[currentUser, setCurrentUser] = useState(initUser);
+    const[formValues, setFormValues] = useState(initFormValues);
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            const res = await fetch("/api/users/me", { credentials: "include" });
+            if (res.ok) {
+                const data = await res.json();
+                setCurrentUser(data);
+                setFormValues({...formValues,
+                    display_name: data.display_name,
+                    email: data.email,
+                });
+            } else {
+                console.error("ユーザーデータの取得に失敗:", res.status);
+            }
+        }
+        fetchUser();
+    }, []);
 
     const themeOptions = [
         {
@@ -73,6 +96,11 @@ const SettingsPage = () => {
         setIsDark(isDarkMode);
     };
 
+    const onchangeHandler = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { id, value } = e.target;
+        setFormValues({...formValues, [id]: value });
+    };
+
     return (
         <main className="min-h-screen bg-sky-100 p-6 md:p-10 duration-300">
             <SaveToast showSaveToast={showSaveToast} icon={CheckCircle2} />
@@ -80,7 +108,7 @@ const SettingsPage = () => {
             <form onSubmit={saveHandler}>
                 <Header icon={Save} saveHandler={saveHandler} />
 
-                <ProfileSection currentUser={currentUser} icon={UserIcon} />
+                <ProfileSection currentUserName={currentUser.display_name} formValues={formValues} icon={UserIcon}  onchangeHandler={onchangeHandler}/>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <NotificationSection
                         notifications={NOTIFICATION_OPTIONS}
