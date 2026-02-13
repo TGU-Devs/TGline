@@ -1,7 +1,7 @@
 import SettingSection from "./SettingSection";
-import CommingSoonBadge from "./ComingSoonBadge";
+import ComingSoonBadge from "./ComingSoonBadge";
 import type { Notification } from "./types";
-import { LucideIcon } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 type NotificationSectionProps = {
     notifications: Notification[];
@@ -48,7 +48,7 @@ const NotificationSection = ({
                     </ul>
                 </fieldset>
             </SettingSection>
-            <CommingSoonBadge />
+            <ComingSoonBadge />
         </div>
     );
 };

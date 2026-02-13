@@ -1,5 +1,5 @@
 import SettingSection from "./SettingSection";
-import CommingSoonBadge from "./ComingSoonBadge";
+import ComingSoonBadge from "./ComingSoonBadge";
 import type { ThemeOption } from "./types";
 import type { LucideIcon } from "lucide-react";
 
@@ -35,7 +35,7 @@ const ThemeSection = ({ themeOptions, icon: Icon, changeDarkMode }: ThemeSection
                     </fieldset>
                 </div>
             </SettingSection>
-            <CommingSoonBadge />
+            <ComingSoonBadge />
         </div>
     );
 };

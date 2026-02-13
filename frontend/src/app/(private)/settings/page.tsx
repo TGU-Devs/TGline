@@ -27,7 +27,7 @@ import {
 const currentUser: User = {
     displayName: "たろう",
     email: "taro@example.com",
-    bio:"こんにちは、たろうです！よろしくお願いします。",
+    bio: "こんにちは、たろうです！よろしくお願いします。",
 };
 
 const SettingsPage = () => {
@@ -39,7 +39,7 @@ const SettingsPage = () => {
             id: "light",
             label: "ライトモード",
             Icon: Sun,
-            checked: true,
+            checked: !isDark,
             className: !isDark ? "text-sky-500" : "text-slate-500",
             btnStyle: !isDark
                 ? "border-sky-500 bg-sky-50 text-sky-700"
@@ -49,7 +49,7 @@ const SettingsPage = () => {
             id: "dark",
             label: "ダークモード",
             Icon: Moon,
-            checked: false,
+            checked: isDark,
             className: isDark ? "text-sky-400" : "text-slate-400",
             btnStyle: isDark
                 ? "border-sky-400 bg-slate-900 text-sky-400"
@@ -63,31 +63,40 @@ const SettingsPage = () => {
         setTimeout(() => setShowSaveToast(false), 3000);
     };
 
-    const changeDarkMode = (e: React.ChangeEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement>, isDarkMode: boolean) => {
+    const changeDarkMode = (
+        e:
+            | React.ChangeEvent<HTMLInputElement>
+            | React.MouseEvent<HTMLButtonElement>,
+        isDarkMode: boolean,
+    ) => {
         e.preventDefault();
-        setIsDark(!isDarkMode);
-    }
+        setIsDark(isDarkMode);
+    };
 
     return (
         <main className="min-h-screen bg-sky-100 p-6 md:p-10 duration-300">
             <SaveToast showSaveToast={showSaveToast} icon={CheckCircle2} />
 
-            <Header icon={Save} saveHandler={saveHandler} />
+            <form onSubmit={saveHandler}>
+                <Header icon={Save} saveHandler={saveHandler} />
 
-            <form>
                 <ProfileSection currentUser={currentUser} icon={UserIcon} />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <NotificationSection
                         notifications={NOTIFICATION_OPTIONS}
                         icon={Bell}
                     />
-                    <ThemeSection themeOptions={themeOptions} icon={Palette} changeDarkMode={changeDarkMode} />
+                    <ThemeSection
+                        themeOptions={themeOptions}
+                        icon={Palette}
+                        changeDarkMode={changeDarkMode}
+                    />
                 </div>
             </form>
 
             <SecuritySection icon={Shield} securityOptions={SECURITY_OPTIONS} />
 
-            <Footer />           
+            <Footer />
         </main>
     );
 };

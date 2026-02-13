@@ -1,8 +1,8 @@
-import { LucideIcon } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 type HeaderProps = {
     icon: LucideIcon;
-    saveHandler: (e: React.FormEvent) => void;
+    saveHandler: (e: React.MouseEvent<HTMLButtonElement>) => void;
 };
 
 const Header = ({ icon: Icon, saveHandler }: HeaderProps) => {

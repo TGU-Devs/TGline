@@ -1,4 +1,4 @@
-import { PcCase, Mail, Megaphone, Sun, Moon, Lock, Trash2 } from "lucide-react";
+import { PcCase, Mail, Megaphone, Lock, Trash2 } from "lucide-react";
 
 const NOTIFICATION_OPTIONS = [
     { id: "desktop", label: "デスクトップ通知", Icon: PcCase, checked: false },

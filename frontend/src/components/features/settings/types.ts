@@ -1,9 +1,9 @@
-import { LucideIcon } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 type User = {
     displayName: string;
     email: string;
-    bio?: string;
+    bio: string | null;
 };
 
 type Notification = {
