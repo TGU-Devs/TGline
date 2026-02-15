@@ -27,7 +27,7 @@ import {
 const initFormValues = {
     display_name: "",
     email: "",
-}
+};
 
 const initUser = {
     display_name: "",
@@ -37,23 +37,26 @@ const initUser = {
 const SettingsPage = () => {
     const [showSaveToast, setShowSaveToast] = useState(false);
     const [isDark, setIsDark] = useState(false);
-    const[currentUser, setCurrentUser] = useState(initUser);
-    const[formValues, setFormValues] = useState(initFormValues);
+    const [currentUser, setCurrentUser] = useState(initUser);
+    const [formValues, setFormValues] = useState(initFormValues);
 
     useEffect(() => {
         const fetchUser = async () => {
-            const res = await fetch("/api/users/me", { credentials: "include" });
+            const res = await fetch("/api/users/me", {
+                credentials: "include",
+            });
             if (res.ok) {
                 const data = await res.json();
                 setCurrentUser(data);
-                setFormValues({...formValues,
+                setFormValues({
+                    ...formValues,
                     display_name: data.display_name,
                     email: data.email,
                 });
             } else {
                 console.error("ユーザーデータの取得に失敗:", res.status);
             }
-        }
+        };
         fetchUser();
     }, []);
 
@@ -80,10 +83,34 @@ const SettingsPage = () => {
         },
     ];
 
-    const saveHandler = (e: React.FormEvent) => {
+    const saveHandler = async (e: React.FormEvent) => {
         e.preventDefault();
-        setShowSaveToast(true);
-        setTimeout(() => setShowSaveToast(false), 3000);
+        try {
+            const res = await fetch("/api/users/me", {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+                body: JSON.stringify({
+                    user: {
+                        display_name: formValues.display_name,
+                        email: formValues.email,
+                    },
+                }),
+            });
+            if (res.ok) {
+                setShowSaveToast(true);
+                const updated = await res.json();
+                setCurrentUser(updated);
+            } else {
+                console.error("ユーザーデータの更新に失敗:", res.status);
+            }
+        } catch (error) {
+            console.error("ユーザーデータの更新中にエラーが発生:", error);
+        } finally {
+            setTimeout(() => setShowSaveToast(false), 3000);
+        }
     };
 
     const changeDarkMode = (
@@ -96,9 +123,11 @@ const SettingsPage = () => {
         setIsDark(isDarkMode);
     };
 
-    const onchangeHandler = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const onchangeHandler = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    ) => {
         const { id, value } = e.target;
-        setFormValues({...formValues, [id]: value });
+        setFormValues({ ...formValues, [id]: value });
     };
 
     return (
@@ -108,7 +137,12 @@ const SettingsPage = () => {
             <form onSubmit={saveHandler}>
                 <Header icon={Save} saveHandler={saveHandler} />
 
-                <ProfileSection currentUserName={currentUser.display_name} formValues={formValues} icon={UserIcon}  onchangeHandler={onchangeHandler}/>
+                <ProfileSection
+                    currentUserName={currentUser.display_name}
+                    formValues={formValues}
+                    icon={UserIcon}
+                    onchangeHandler={onchangeHandler}
+                />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <NotificationSection
                         notifications={NOTIFICATION_OPTIONS}
