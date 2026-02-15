@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import Link from "next/link";
 import FormItem from "./FormItem";
+import { Button } from "@/components/ui/button";
 
 import { User, Mail, KeyRound, RotateCcwKey } from "lucide-react";
 
@@ -72,7 +73,7 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
     // Railsのエラー形式をフォーマット
     const formatErrors = (data: any): Errors => {
         const formattedErrors: Errors = {};
-        
+
         if (data.errors) {
             Object.keys(data.errors).forEach((key) => {
                 const errorValue = data.errors[key];
@@ -81,7 +82,7 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
                     : errorValue;
             });
         }
-        
+
         return formattedErrors;
     };
 
@@ -91,12 +92,12 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
             setFormErrors(formatErrors(data));
             return;
         }
-        
+
         if (data.error) {
             setFormErrors({ main: data.error });
             return;
         }
-        
+
         setFormErrors({ main: defaultMessage });
     };
 
@@ -216,14 +217,14 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
     };
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
+        <div className="bg-card/80 backdrop-blur-lg p-6 rounded-xl shadow-lg border border-border/50 w-full max-w-md">
             <form className="space-y-4" onSubmit={(e) => submitHandler(e)}>
-                <h1 className="text-center font-bold text-xl text-slate-800">{isRegister ? "新規登録" : "ログイン"}</h1>
+                <h1 className="text-center font-bold text-xl text-foreground">{isRegister ? "新規登録" : "ログイン"}</h1>
                 {isRegister && (
                     <div className="flex flex-col">
-                        <label htmlFor="display_name" className="font-medium text-sm text-slate-700 mb-1">ユーザー名</label>
+                        <label htmlFor="display_name" className="font-medium text-sm text-foreground mb-1">ユーザー名</label>
                         <div className="relative">
-                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                                 <User size={18} />
                             </div>
                         <input
@@ -232,11 +233,11 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
                             placeholder="ユーザー名"
                             value={formValues.display_name}
                             onChange={(e) => onchangeHandler(e)}
-                            className="border-solid border-2 border-gray-100 rounded-md p-1 pl-10 w-full placeholder:text-slate-400"
+                            className="border border-input rounded-lg p-2 pl-10 w-full bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow"
                         />
                         </div>
                         {formErrors.display_name && (
-                            <p className="text-red-500 text-sm mt-1">
+                            <p className="text-destructive text-sm mt-1">
                                 {Array.isArray(formErrors.display_name)
                                     ? formErrors.display_name[0]
                                     : formErrors.display_name}
@@ -262,11 +263,11 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
                 ))}
                 {isRegister && (
                     <div className="flex flex-col">
-                        <label htmlFor="confirmPassword" className="font-medium text-sm text-slate-700 mb-1">
+                        <label htmlFor="confirmPassword" className="font-medium text-sm text-foreground mb-1">
                             パスワード確認用
                         </label>
                         <div className="relative">
-                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                                 <RotateCcwKey size={18} />
                             </div>
                         <input
@@ -275,29 +276,29 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
                             placeholder="パスワード確認用"
                             value={formValues.confirmPassword}
                             onChange={(e) => onchangeHandler(e)}
-                            className="border-solid border-2 border-gray-100 rounded-md p-1 pl-10 w-full placeholder:text-slate-400"
+                            className="border border-input rounded-lg p-2 pl-10 w-full bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow"
                         />
                         </div>
                         {formErrors.confirmPassword && (
-                            <p className="text-red-500 text-sm mt-1">{formErrors.confirmPassword}</p>
+                            <p className="text-destructive text-sm mt-1">{formErrors.confirmPassword}</p>
                         )}
                     </div>
                 )}
                 {formErrors.main && (
-                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
+                    <div className="bg-destructive/10 border border-destructive/30 text-destructive px-4 py-3 rounded-lg text-sm">
                         {formErrors.main}
                     </div>
                 )}
-                <button className="w-full bg-sky-600 text-white py-2 rounded-md hover:bg-sky-700 transition-colors" type="submit">
+                <Button className="w-full" type="submit" disabled={isLoading}>
                     {isLoading ? "処理中..." : isRegister ? "登録" : "ログイン"}
-                </button>
+                </Button>
                 <div className="flex justify-center gap-2 text-sm">
-                    <p className="text-slate-700">
+                    <p className="text-muted-foreground">
                         {isRegister
                             ? "すでにアカウントをお持ちの方は"
                             : "新規登録は"}
                     </p>
-                    <Link href={isRegister ? "/login" : "/register"} className="text-sky-700 hover:underline ">
+                    <Link href={isRegister ? "/login" : "/register"} className="text-primary hover:underline font-medium">
                         こちら
                     </Link>
                 </div>
