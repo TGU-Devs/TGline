@@ -1,4 +1,3 @@
-// frontend/src/app/(private)/posts/new/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -138,13 +137,13 @@ export default function PostNewPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f0f8ff] py-4 sm:py-8">
+    <div className="min-h-screen bg-background py-4 sm:py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         {/* 戻るボタン */}
         <Button
           asChild
           variant="ghost"
-          className="mb-4 sm:mb-6 text-slate-600 hover:text-slate-800"
+          className="mb-4 sm:mb-6 text-muted-foreground hover:text-foreground"
         >
           <Link href="/posts">
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -153,17 +152,15 @@ export default function PostNewPage() {
         </Button>
 
         {/* 新規投稿フォーム */}
-        <div className="bg-[#fefefe] rounded-lg shadow-sm border border-slate-200 p-4 sm:p-6 lg:p-8">
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-800 mb-4 sm:mb-6">
-            新規投稿
-          </h1>
+        <div className="bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6 lg:p-8">
+          <h1 className="text-xl sm:text-2xl font-bold text-card-foreground mb-4 sm:mb-6">新規投稿</h1>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* タイトル */}
             <div>
               <label
                 htmlFor="title"
-                className="block text-sm font-medium text-slate-700 mb-2"
+                className="block text-sm font-medium text-foreground mb-2"
               >
                 タイトル
               </label>
@@ -172,7 +169,7 @@ export default function PostNewPage() {
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none bg-white text-slate-800"
+                className="w-full px-4 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground placeholder:text-muted-foreground transition-shadow"
                 placeholder="投稿のタイトルを入力"
                 required
               />
@@ -182,7 +179,7 @@ export default function PostNewPage() {
             <div>
               <label
                 htmlFor="body"
-                className="block text-sm font-medium text-slate-700 mb-2"
+                className="block text-sm font-medium text-foreground mb-2"
               >
                 本文
               </label>
@@ -191,7 +188,7 @@ export default function PostNewPage() {
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
                 rows={12}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none bg-white text-slate-800 resize-y"
+                className="w-full px-4 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground placeholder:text-muted-foreground resize-y transition-shadow"
                 placeholder="投稿の本文を入力"
                 required
               />
@@ -312,7 +309,7 @@ export default function PostNewPage() {
               <Button
                 type="submit"
                 disabled={isCreating}
-                className="bg-sky-500 hover:bg-sky-600 text-white w-full sm:w-auto"
+                className="w-full sm:w-auto"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 {isCreating ? "作成中..." : "投稿する"}

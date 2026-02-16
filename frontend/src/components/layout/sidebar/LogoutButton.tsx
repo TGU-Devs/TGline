@@ -32,8 +32,8 @@ const LogoutButton = () => {
 
     return (
         <div className="p-3">
-            <button 
-                className="flex items-center justify-center w-full p-3 text-slate-700 font-medium rounded-3xl cursor-pointer hover:bg-gray-200 transition-colors"
+            <button
+                className="flex items-center justify-center w-full p-3 text-muted-foreground font-medium rounded-xl cursor-pointer hover:bg-muted transition-colors"
                 onClick={handleLogout}
                 disabled={isLoading}
             >

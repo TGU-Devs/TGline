@@ -16,6 +16,7 @@ interface Tag {
   name: string;
   category: "faculty" | "topic";
 }
+import { Plus, Calendar, User, MessageCircle } from "lucide-react";
 
 interface Post {
   id: number;
@@ -117,11 +118,22 @@ export default function PostsPage() {
     });
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">読み込み中...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (error) {
     return (
-      <div className="min-h-screen bg-[#f0f8ff] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-500 mb-4">{error}</p>
+          <p className="text-destructive mb-4">{error}</p>
           <Button onClick={fetchPosts}>再試行</Button>
         </div>
       </div>
@@ -129,12 +141,12 @@ export default function PostsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f0f8ff] py-4 sm:py-8">
+    <div className="min-h-screen bg-background py-4 sm:py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         {/* ヘッダー */}
         <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-800">投稿一覧</h1>
-          <Button asChild className="bg-sky-500 hover:bg-sky-600 text-white w-full sm:w-auto">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">投稿一覧</h1>
+          <Button asChild className="w-full sm:w-auto">
             <Link href="/posts/new">
               <Plus className="h-4 w-4 mr-2" />
               新規投稿
@@ -227,6 +239,19 @@ export default function PostsPage() {
             <p className="text-slate-600 text-lg">まだ投稿がありません</p>
             <Button asChild className="mt-4 bg-sky-500 hover:bg-sky-600 text-white">
               <Link href="/posts/new">最初の投稿を作成</Link>
+        {/* 投稿一覧 */}
+        {posts.length === 0 ? (
+          <div className="text-center py-16">
+            <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+              <MessageCircle className="h-10 w-10 text-muted-foreground" />
+            </div>
+            <p className="text-foreground text-lg font-medium mb-2">まだ投稿がありません</p>
+            <p className="text-muted-foreground text-sm mb-6">最初の投稿を作成して、みんなと情報を共有しましょう</p>
+            <Button asChild>
+              <Link href="/posts/new">
+                <Plus className="h-4 w-4 mr-2" />
+                最初の投稿を作成
+              </Link>
             </Button>
           </div>
         ) : (
@@ -237,8 +262,8 @@ export default function PostsPage() {
                 href={`/posts/${post.id}`}
                 className="block"
               >
-                <div className="bg-[#fefefe] rounded-lg shadow-sm border border-slate-200 p-4 sm:p-6 hover:shadow-md transition-shadow cursor-pointer">
-                  <h2 className="text-lg sm:text-xl font-semibold text-slate-800 mb-2 sm:mb-3 line-clamp-2">
+                <div className="bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6 hover:shadow-md hover:border-primary/30 transition-all">
+                  <h2 className="text-lg sm:text-xl font-semibold text-card-foreground mb-2 sm:mb-3 line-clamp-2">
                     {post.title}
                   </h2>
                   {/* タグバッジ */}
@@ -264,9 +289,11 @@ export default function PostsPage() {
                   <p className="text-sm sm:text-base text-slate-600 mb-3 sm:mb-4 line-clamp-3">
                     {post.body}
                   </p>
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-slate-500">
-                    <div className="flex items-center gap-1">
-                      <User className="h-4 w-4" />
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-5 h-5 bg-primary/15 rounded-full flex items-center justify-center">
+                        <User className="h-3 w-3 text-primary" />
+                      </div>
                       <span>{post.user?.display_name || "匿名"}</span>
                     </div>
                     <div className="flex items-center gap-1">

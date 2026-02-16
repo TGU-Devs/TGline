@@ -27,14 +27,14 @@ export default function AuthLayout({
         setIsAuthenticated(false);
       });
   }, [router]);
-      
+
   // ローディング中
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-sky-50">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600 mx-auto"></div>
-          <p className="mt-4 text-slate-600">読み込み中...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">読み込み中...</p>
         </div>
       </div>
     );
@@ -44,20 +44,27 @@ export default function AuthLayout({
   if (!isAuthenticated) {
 
     return (
-      <div className='min-h-screen flex flex-col items-center justify-center p-4 bg-sky-50'>
-        <div className='text-center mb-8'>
-            <div className='bg-sky-600 text-white w-14 h-14 flex items-center justify-center mx-auto mb-4 shadow-lg rounded-2xl'>
-                <GraduationCap size={31} />
-            </div>
-            <h1 className='text-3xl font-bold text-slate-800'>TG line</h1>
-            <p className='text-sm text-slate-500 mt-2'>東北学院大学 学内共通プラットフォーム</p>
+      <div className='relative min-h-screen flex flex-col items-center justify-center p-4 bg-background overflow-hidden'>
+        {/* Background decorative elements */}
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute top-20 left-10 h-72 w-72 rounded-full bg-primary/15 blur-3xl animate-pulse" />
+          <div className="absolute bottom-20 right-10 h-96 w-96 rounded-full bg-accent/10 blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+          <div className="absolute top-1/3 right-1/4 h-48 w-48 rounded-full bg-primary/10 blur-2xl animate-pulse" style={{ animationDelay: "2s" }} />
         </div>
 
-        <main className='w-full max-w-md'>
+        <div className='text-center mb-8 animate-fade-in'>
+            <div className='bg-primary text-primary-foreground w-16 h-16 flex items-center justify-center mx-auto mb-4 shadow-lg rounded-2xl'>
+                <GraduationCap size={34} />
+            </div>
+            <h1 className='text-3xl font-bold text-foreground tracking-tight'>TGline</h1>
+            <p className='text-sm text-muted-foreground mt-2'>東北学院大学 学内共通プラットフォーム</p>
+        </div>
+
+        <main className='w-full max-w-md animate-slide-up'>
             {children}
         </main>
 
-        <div className='mt-8 text-center text-xs text-slate-400'>
+        <div className='mt-8 text-center text-xs text-muted-foreground'>
             利用規約とプライバシーポリシーをご確認の上、ご利用ください。
         </div>
     </div>

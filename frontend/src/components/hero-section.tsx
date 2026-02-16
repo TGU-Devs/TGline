@@ -161,7 +161,7 @@ function PhoneMockup() {
             {/* Header */}
             <div className="flex items-center justify-between py-3">
               <ChevronLeft className="h-5 w-5 text-muted-foreground" />
-              <span className="font-semibold text-foreground">TGUline</span>
+              <span className="font-semibold text-foreground">TGline</span>
               <Search className="h-5 w-5 text-muted-foreground" />
             </div>
 
