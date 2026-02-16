@@ -10,9 +10,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_02_03_154141) do
+ActiveRecord::Schema[7.2].define(version: 2026_02_16_091756) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "feedbacks", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "category", null: false
+    t.string "subject", null: false
+    t.text "body", null: false
+    t.string "status", default: "pending", null: false
+    t.text "admin_notes"
+    t.datetime "reviewed_at"
+    t.bigint "reviewed_by"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category"], name: "index_feedbacks_on_category"
+    t.index ["created_at"], name: "index_feedbacks_on_created_at"
+    t.index ["status"], name: "index_feedbacks_on_status"
+    t.index ["user_id"], name: "index_feedbacks_on_user_id"
+  end
 
   create_table "posts", force: :cascade do |t|
     t.string "title"
@@ -40,5 +58,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_02_03_154141) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "feedbacks", "users"
   add_foreign_key "posts", "users"
 end

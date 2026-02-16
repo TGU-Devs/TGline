@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 import SaveToast from "@/components/features/settings/SaveToast";
 import Header from "@/components/features/settings/Header";
@@ -9,6 +10,7 @@ import NotificationSection from "@/components/features/settings/NotificationSect
 import ThemeSection from "@/components/features/settings/ThemeSection";
 import SecuritySection from "@/components/features/settings/SecuritySection";
 import Footer from "@/components/features/settings/Footer";
+
 
 import { NOTIFICATION_OPTIONS, SECURITY_OPTIONS } from "@/constants/settings";
 import type { User } from "@/components/features/settings/types";
@@ -22,6 +24,7 @@ import {
     Sun,
     Moon,
     Shield,
+    MessageCircleQuestion,
 } from "lucide-react";
 
 const currentUser: User = {
@@ -95,6 +98,29 @@ const SettingsPage = () => {
             </form>
 
             <SecuritySection icon={Shield} securityOptions={SECURITY_OPTIONS} />
+
+            {/* お問い合わせセクション */}
+            <section className="rounded-3xl border bg-white border-slate-100 shadow-sm mb-6">
+                <div className="p-6 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-sky-50 text-sky-600">
+                            <MessageCircleQuestion size={20} />
+                        </div>
+                        <div>
+                            <h3 className="font-bold text-lg text-slate-800">お問い合わせ</h3>
+                            <p className="text-sm text-slate-400">
+                                バグ報告・機能要望・ご質問など
+                            </p>
+                        </div>
+                    </div>
+                    <Link
+                        href="/feedback"
+                        className="px-5 py-2.5 bg-sky-500 text-white rounded-xl hover:bg-sky-600 transition-all text-sm font-medium"
+                    >
+                        お問い合わせフォームへ
+                    </Link>
+                </div>
+            </section>
 
             <Footer />
         </main>

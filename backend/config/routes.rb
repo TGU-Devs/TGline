@@ -26,5 +26,10 @@ Rails.application.routes.draw do
 
     # 投稿関連
     resources :posts, only: [:index, :show, :create, :update, :destroy]
+    
+    # フィードバック関連
+    resources :feedbacks, only: [:create]
+    # 将来の管理画面用(コメントアウト)
+    # resources :feedbacks, only: [:index, :show, :create, :update]
   end
 end
