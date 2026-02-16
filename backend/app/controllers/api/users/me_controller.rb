@@ -23,7 +23,7 @@ module Api
       private
 
       def user_params
-        params.require(:user).permit(:display_name)
+        params.require(:user).permit(:display_name, :email)
       end
 
       def user_response(user)
