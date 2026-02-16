@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 
-import SaveToast from "@/components/features/settings/SaveToast";
+import Toast from "@/components/features/settings/Toast";
 import Header from "@/components/features/settings/Header";
 import ProfileSection from "@/components/features/settings/ProfileSection";
 import NotificationSection from "@/components/features/settings/NotificationSection";
@@ -21,7 +21,7 @@ import {
     Sun,
     Moon,
     Shield,
-    Form,
+    AlertTriangle,
 } from "lucide-react";
 
 const initFormValues = {
@@ -36,6 +36,7 @@ const initUser = {
 
 const SettingsPage = () => {
     const [showSaveToast, setShowSaveToast] = useState(false);
+    const [showErrorToast, setShowErrorToast] = useState(false);
     const [isDark, setIsDark] = useState(false);
     const [currentUser, setCurrentUser] = useState(initUser);
     const [formValues, setFormValues] = useState(initFormValues);
@@ -105,11 +106,14 @@ const SettingsPage = () => {
                 setCurrentUser(updated);
             } else {
                 console.error("ユーザーデータの更新に失敗:", res.status);
+                setShowErrorToast(true);
             }
         } catch (error) {
             console.error("ユーザーデータの更新中にエラーが発生:", error);
+            setShowErrorToast(true);
         } finally {
             setTimeout(() => setShowSaveToast(false), 3000);
+            setTimeout(() => setShowErrorToast(false), 4000);
         }
     };
 
@@ -132,7 +136,8 @@ const SettingsPage = () => {
 
     return (
         <main className="min-h-screen bg-sky-100 p-6 md:p-10 duration-300">
-            <SaveToast showSaveToast={showSaveToast} icon={CheckCircle2} />
+            <Toast showToast={showSaveToast} icon={CheckCircle2} message="設定を保存しました。" bg="bg-emerald-500" />
+            <Toast showToast={showErrorToast} icon={AlertTriangle} message="エラーが発生しました。" bg="bg-red-500" />
 
             <form onSubmit={saveHandler}>
                 <Header icon={Save} saveHandler={saveHandler} />
