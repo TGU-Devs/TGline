@@ -1,5 +1,5 @@
 class Tag < ApplicationRecord
-  enum :category, { faculty: 0, topic: 2 }
+  enum :category, { faculty: 0, topic: 1 }
 
   DEFINITIONS = {
     faculty: %w[文学部 経済学部 経営学部 法学部 工学部 情報学部 心理学部 国際学部 地域総合学部],

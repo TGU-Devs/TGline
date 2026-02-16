@@ -10,7 +10,8 @@ class Post < ApplicationRecord
   private
 
   def at_most_one_faculty_tag
-    faculty_count = tags.select { |t| t.faculty? }.size
+    faculty_tags = post_tags.map(&:tag).compact.select(&:faculty?)
+    faculty_count = faculty_tags.size
     if faculty_count > 1
       errors.add(:tags, "学部タグは最大1つまでです")
     end
