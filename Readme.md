@@ -260,6 +260,142 @@ docker compose exec frontend npm install <package-name>
 
 ## トラブルシューティング
 
+### 【個人向け】環境構築から起動までの詳細手順
+
+標準の起動手順で問題が発生する場合、以下の手順で環境をクリーンな状態から構築できます。
+
+#### 1. 環境変数ファイルの確認
+
+プロジェクト内に複数の環境変数ファイルがあります。DB接続情報が一致していることを確認してください。
+
+**確認ポイント:**
+
+- **`.env.local`**: Docker Composeが参照（DBコンテナとbackendコンテナの両方に渡される）
+- **`backend/.env`**: Rails が読み込む追加の環境変数
+
+これらのファイルで、以下の値が一致している必要があります：
+
+```bash
+# .env.local
+POSTGRES_PASSWORD=very_strong_password
+DATABASE_PASSWORD=very_strong_password
+
+# backend/.env
+DATABASE_PASSWORD=very_strong_password  # ← .env.localと同じ値にする
+```
+
+**よくある問題:** `backend/.env` の `DATABASE_PASSWORD` が `postgres` など別の値になっていると、Rails が DB に接続できず `password authentication failed` エラーが発生します。
+
+#### 2. 既存の環境をクリーンアップ（初回 or 問題がある場合）
+
+```bash
+# コンテナを停止
+docker compose down
+
+# DBボリュームの確認
+docker volume ls
+
+# DBボリュームを削除（データが消えるので注意！）
+# ボリューム名は環境により異なる（例: bulletin-board-_db_data）
+docker volume rm bulletin-board-_db_data
+
+# または、コンテナとボリュームを一度に削除
+docker compose down -v
+```
+
+#### 3. Docker Desktop の起動確認
+
+Windows の場合、タスクトレイに Docker アイコンがあり、「Docker Desktop is running」となっていることを確認してください。
+
+#### 4. アプリケーションの起動
+
+```bash
+# プロジェクトルートで実行
+docker compose up --build
+```
+
+**起動の流れ:**
+
+1. PostgreSQL（db）コンテナが起動
+2. backend コンテナが起動し、以下を自動実行:
+   - `bundle install`（gem のインストール）
+   - `rails db:prepare`（DB作成・マイグレーション）
+   - `rails db:seed`（初期データ投入）
+   - `rails server`（Rails サーバー起動）
+3. frontend コンテナが起動し、Next.js 開発サーバーを起動
+
+#### 5. 起動確認
+
+ターミナルのログで以下のメッセージを確認：
+
+- `db-1`: `database system is ready to accept connections`
+- `backend-1`: `Listening on http://0.0.0.0:3000`
+- `frontend-1`: `Ready in ...` と `Local: http://localhost:3000`
+
+**backend が起動しない場合:**
+
+```bash
+# backend のログだけを確認
+docker compose logs backend
+
+# よくあるエラー:
+# - "password authentication failed" → 環境変数ファイルのパスワード不一致
+# - "could not connect to server" → db コンテナが起動していない
+```
+
+#### 6. 管理者アカウントでログイン
+
+ブラウザで `http://localhost:3000` を開き、以下でログイン：
+
+- **メールアドレス**: `admin@tgu.ac.jp`
+- **パスワード**: `admin123`
+
+このアカウントは `rails db:seed` で自動作成されます。
+
+#### 7. Rails コマンドを手動で実行する場合
+
+PowerShell や bash で `rails` コマンドは直接使えません（Docker 内だけに Rails がインストールされているため）。
+
+**コンテナ経由で実行する:**
+
+```bash
+# DB の作成・マイグレーション・seed を手動実行
+docker compose exec backend bundle exec rails db:create db:migrate db:seed
+
+# Rails コンソールを開く
+docker compose exec backend bundle exec rails console
+
+# 既存ユーザーを管理者にする例
+docker compose exec backend bundle exec rails console
+# コンソール内で:
+# User.find_by(email: "your@email.com").update!(role: "admin")
+```
+
+#### 8. よくあるエラーと対処
+
+| エラー | 原因 | 対処 |
+|--------|------|------|
+| `password authentication failed for user "postgres"` | `.env.local` と `backend/.env` のパスワード不一致 | 両ファイルの `DATABASE_PASSWORD` を同じ値に揃える |
+| `connect ECONNREFUSED 172.20.0.x:3000` | backend が起動していない | `docker compose logs backend` でエラー確認。通常は上記の DB 認証エラーが原因 |
+| `rails: 用語として認識されません`（Windows） | Rails がホストに入っていない | `docker compose exec backend bundle exec rails ...` のようにコンテナ経由で実行 |
+| ログイン画面から `/settings` に行けない | `/api/users/me` が失敗している | backend が起動しているか、ログインできているかを確認 |
+
+#### 9. 有効な URL 一覧
+
+**フロントエンド（ブラウザで開く）:**
+
+- 認証不要: `/`, `/login`, `/register`, `/auth-test`
+- ログイン後: `/posts`, `/posts/new`, `/posts/[id]`, `/posts/[id]/edit`, `/notifications`, `/settings`
+
+**バックエンド API（http://localhost:3001）:**
+
+- ヘルスチェック: `GET /up`
+- 認証: `POST /api/users/sign_up`, `/api/users/sign_in`, `DELETE /api/users/sign_out`
+- ユーザー: `GET /api/users/me`, `PATCH /api/users/me`
+- 投稿: `GET /api/posts`, `POST /api/posts`, `GET/PATCH/DELETE /api/posts/:id`
+
+---
+
 ### ポートが既に使用されているエラー
 
 **エラーメッセージ：**
