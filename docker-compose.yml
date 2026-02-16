@@ -1,15 +1,15 @@
 
 services:
   db:
-    image: postgres:15
-    env_file:
-      - ./backend/.env # ← これを追加
-    environment:
-      POSTGRES_HOST_AUTH_METHOD: md5
-    ports:
-      - "5432:5432"
-    volumes:
-      - db_data:/var/lib/postgresql/data
+  image: postgres:15
+  ports:
+    - "127.0.0.1:5432:5432"
+  env_file:
+    - .env.local
+  environment:
+    POSTGRES_HOST_AUTH_METHOD: md5
+  volumes:
+    - db_data:/var/lib/postgresql/data
 
   backend:
     build:
