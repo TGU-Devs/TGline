@@ -1,9 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Plus, Calendar, User } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Plus, Calendar, User, ChevronDown, X } from "lucide-react";
+
+interface Tag {
+  id: number;
+  name: string;
+  category: "faculty" | "topic";
+}
 
 interface Post {
   id: number;
@@ -13,25 +25,56 @@ interface Post {
     id: number;
     display_name: string;
   } | null;
+  tags: Tag[];
   created_at: string;
   updated_at: string;
 }
 
+const CATEGORY_CONFIG = {
+  faculty: {
+    label: "学部",
+    badge: "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100",
+    badgeActive: "bg-blue-500 text-white border-blue-500",
+  },
+  topic: {
+    label: "トピック",
+    badge: "bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100",
+    badgeActive: "bg-orange-500 text-white border-orange-500",
+  },
+} as const;
+
 export default function PostsPage() {
   const [posts, setPosts] = useState<Post[]>([]);
+  const [tags, setTags] = useState<Tag[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedTagId, setSelectedTagId] = useState<number | null>(null);
+  const [openCategory, setOpenCategory] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchPosts();
-  }, []);
+  const fetchTags = async () => {
+    try {
+      const res = await fetch("/api/tags", { credentials: "include" });
+      if (res.ok) {
+        const data = await res.json();
+        setTags(data);
+      }
+    } catch {
+      // タグ取得失敗は無視
+    }
+  };
 
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
     try {
       setIsLoading(true);
-      const res = await fetch("/api/posts", {
-        credentials: "include", 
-      });
+      // フロント側でクエリパラメーターを作成してapiに渡す
+      const params = new URLSearchParams();
+      if (selectedTagId !== null) {
+        params.set("tag_id", String(selectedTagId));
+      }
+      const query = params.toString();
+      const url = query ? `/api/posts?${query}` : "/api/posts";
+      // バックエンドにリクエスト(今の場合route handlerを仲介させている)
+      const res = await fetch(url, { credentials: "include" });
 
       if (!res.ok) {
         throw new Error("投稿の取得に失敗しました");
@@ -44,7 +87,24 @@ export default function PostsPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [selectedTagId]);
+
+  useEffect(() => {
+    fetchTags();
+  }, []);
+
+  useEffect(() => {
+    fetchPosts();
+  }, [fetchPosts]);
+
+  // 選択中のタグを取得
+  const selectedTag = tags.find((t) => t.id === selectedTagId);
+
+  const groupedTags = tags.reduce<Record<string, Tag[]>>((acc, tag) => {
+    if (!acc[tag.category]) acc[tag.category] = [];
+    acc[tag.category].push(tag);
+    return acc;
+  }, {});
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -56,17 +116,6 @@ export default function PostsPage() {
       minute: "2-digit",
     });
   };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-[#f0f8ff] flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-500 mx-auto"></div>
-          <p className="mt-4 text-slate-600">読み込み中...</p>
-        </div>
-      </div>
-    );
-  }
 
   if (error) {
     return (
@@ -93,8 +142,87 @@ export default function PostsPage() {
           </Button>
         </div>
 
-        {/* 投稿一覧 */}
-        {posts.length === 0 ? (
+        {/* タグフィルター: カテゴリ別ドロップダウン */}
+        <div className="mb-6 flex flex-wrap items-center gap-2">
+          {(Object.keys(CATEGORY_CONFIG) as Array<keyof typeof CATEGORY_CONFIG>).map(
+            (category) => {
+              const config = CATEGORY_CONFIG[category];
+              const categoryTags = groupedTags[category] || [];
+              if (categoryTags.length === 0) return null;
+
+              return (
+                <Popover
+                  key={category}
+                  open={openCategory === category}
+                  onOpenChange={(open: boolean) =>
+                    setOpenCategory(open ? category : null)
+                  }
+                >
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-9 gap-1 border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                    >
+                      {config.label}
+                      <ChevronDown className="h-3.5 w-3.5 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-48 p-2" align="start">
+                    <div className="flex flex-col gap-1">
+                      {categoryTags.map((tag) => (
+                        <button
+                          key={tag.id}
+                          onClick={() => {
+                            setSelectedTagId(
+                              selectedTagId === tag.id ? null : tag.id
+                            );
+                            setOpenCategory(null);
+                          }}
+                          className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm text-left hover:text-slate-900 transition-colors ${
+                            selectedTagId === tag.id
+                              ? "bg-sky-50 text-sky-700 font-medium hover:text-slate-900 transition-colors"
+                              : "text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                          }`}
+                        >
+                          <span
+                            className={`h-2 w-2 rounded-full ${
+                              category === "faculty"
+                                ? "bg-blue-400"
+                                : "bg-orange-400"
+                            }`}
+                          />
+                          {tag.name}
+                        </button>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              );
+            }
+          )}
+
+          {/* 選択中のタグ表示 */}
+          {selectedTag && (
+            <button
+              onClick={() => setSelectedTagId(null)}
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium bg-sky-100 text-sky-700 border border-sky-200 hover:bg-sky-200 transition-colors"
+            >
+              {selectedTag.name}
+              <X className="h-3 w-3" />
+            </button>
+          )}
+        </div>
+
+        {/* ローディング */}
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-500 mx-auto"></div>
+              <p className="mt-4 text-slate-600">読み込み中...</p>
+            </div>
+          </div>
+        ) : posts.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-slate-600 text-lg">まだ投稿がありません</p>
             <Button asChild className="mt-4 bg-sky-500 hover:bg-sky-600 text-white">
@@ -113,6 +241,26 @@ export default function PostsPage() {
                   <h2 className="text-lg sm:text-xl font-semibold text-slate-800 mb-2 sm:mb-3 line-clamp-2">
                     {post.title}
                   </h2>
+                  {/* タグバッジ */}
+                  {post.tags && post.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mb-2 sm:mb-3">
+                      {post.tags.map((tag) => {
+                        const config =
+                          CATEGORY_CONFIG[
+                            tag.category as keyof typeof CATEGORY_CONFIG
+                          ];
+                        return (
+                          <Badge
+                            key={tag.id}
+                            variant="outline"
+                            className={config?.badge}
+                          >
+                            {tag.name}
+                          </Badge>
+                        );
+                      })}
+                    </div>
+                  )}
                   <p className="text-sm sm:text-base text-slate-600 mb-3 sm:mb-4 line-clamp-3">
                     {post.body}
                   </p>
@@ -123,7 +271,9 @@ export default function PostsPage() {
                     </div>
                     <div className="flex items-center gap-1">
                       <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
-                      <span className="break-all">{formatDate(post.created_at)}</span>
+                      <span className="break-all">
+                        {formatDate(post.created_at)}
+                      </span>
                     </div>
                   </div>
                 </div>
