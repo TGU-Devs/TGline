@@ -135,7 +135,7 @@ const SettingsPage = () => {
     };
 
     return (
-        <main className="min-h-screen bg-sky-100 p-6 md:p-10 duration-300">
+        <main className="min-h-screen bg-background p-6 md:p-10 duration-300">
             <Toast showToast={showSaveToast} icon={CheckCircle2} message="設定を保存しました。" bg="bg-emerald-500" />
             <Toast showToast={showErrorToast} icon={AlertTriangle} message="エラーが発生しました。" bg="bg-red-500" />
 
