@@ -23,7 +23,7 @@ services:
             - .env.local
         depends_on:
             - db
-        command: >
+        command: > # ボリュームマウント後にbundle installを実行し、ホストとコンテナの状態が一致するようにする
             bash -c "
               until pg_isready -h db -p 5432 -U postgres; do
                 echo 'Waiting for PostgreSQL...'

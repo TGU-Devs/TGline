@@ -14,7 +14,8 @@ RUN apt-get update -qq && \
 WORKDIR /app
 
 # 開発時はbind mountでホストのファイルをコンテナにマウントする形でいくからbundle installは不要
-# 理由: 設計的にホストのコードを正、依存物はコンテナ管理で行いたいので!
+# コンテナ側でホストのコード(./backend:/app)し、bundle installを実行。設計的にホストのコードを正にする。gemなどの依存物はコンテナ管理で行いたいので!
+# 理由: ホストでbundle installすると、イメージとボリュームが一致しなくなる問題がある
 COPY Gemfile Gemfile.lock ./
 
 # ───────────────────────────────────────

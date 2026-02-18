@@ -88,3 +88,27 @@ posts_data.each do |post_data|
 end
 
 puts "Created #{Post.count} posts!"
+
+# タグはマイグレーションで自動投入されるため、seedsでは不要
+# Tag::DEFINITIONS に定義あり（backend/app/models/tag.rb）
+
+# 開発用: ダミー投稿にタグを紐付け
+if Rails.env.development?
+  puts "Assigning tags to posts..."
+
+  economics_tag = Tag.find_by(name: "経済学部")
+  job_hunting_tag = Tag.find_by(name: "就活")
+  course_advice_tag = Tag.find_by(name: "履修相談")
+
+  Post.all.each_with_index do |post, i|
+    case i
+    when 0
+      post.tags << economics_tag unless post.tags.include?(economics_tag)
+      post.tags << course_advice_tag unless post.tags.include?(course_advice_tag)
+    when 3
+      post.tags << job_hunting_tag unless post.tags.include?(job_hunting_tag)
+    end
+  end
+
+  puts "Assigned tags to posts!"
+end

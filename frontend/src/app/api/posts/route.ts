@@ -6,8 +6,15 @@ export async function GET(request: NextRequest) {
   try {
     const cookie = request.headers.get("cookie") || "";
 
-    // バックエンドにリクエスト
-    const backendRes = await fetch(`${BACKEND_URL}/api/posts`, {
+    // クエリパラメーターを取得し、APIエンドポイントに渡す
+    const { searchParams } = new URL(request.url);
+    const queryString = searchParams.toString();
+    const url = queryString
+      ? `${BACKEND_URL}/api/posts?${queryString}`
+      : `${BACKEND_URL}/api/posts`;
+
+      // クエリパラメータがあれば、そのクエリパラメータをバックエンドに渡す
+    const backendRes = await fetch(url, {
       method: "GET",
       headers: {
         Cookie: cookie,

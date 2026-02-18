@@ -78,5 +78,6 @@ Rails.application.configure do
   ## 開発環境ではホストをクリアして、任意のホスト(フロント)からのリクエストを許可する cors対応
   config.hosts.clear
 
-
+  # 開発環境では credentials.yml.enc に依存せず、固定の secret_key_base を使用
+  config.secret_key_base = "dev_secret_key_base_not_for_production"
 end

@@ -24,6 +24,9 @@ Rails.application.routes.draw do
     end
     resources :users, only: [:index, :show]
 
+    # タグ関連
+    resources :tags, only: [:index]
+
     # 投稿関連
     resources :posts, only: [:index, :show, :create, :update, :destroy]
   end
