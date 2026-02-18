@@ -17,6 +17,7 @@ users_data = [
     email: "tanaka@tgu.ac.jp",
     password: "password123",
     display_name: "田中太郎",
+    description: "自己紹介",
     role: "user"
   },
   {
@@ -63,11 +64,11 @@ posts_data = [
     title: "投稿1",
     body: "これは投稿1の内容です",
     user: User.first,
-    description: "自己紹介"
   },
   { title: "投稿2",
     body: "これは投稿2の内容です",
     user: User.second
+
   },
   { title: "投稿3",
     body: "これは投稿3の内容です",
