@@ -9,14 +9,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Plus, Calendar, User, ChevronDown, X } from "lucide-react";
+import { Plus, Calendar, User, ChevronDown, X, MessageCircle } from "lucide-react";
 
 interface Tag {
   id: number;
   name: string;
   category: "faculty" | "topic";
 }
-import { Plus, Calendar, User, MessageCircle } from "lucide-react";
 
 interface Post {
   id: number;
@@ -226,19 +225,6 @@ export default function PostsPage() {
           )}
         </div>
 
-        {/* ローディング */}
-        {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-500 mx-auto"></div>
-              <p className="mt-4 text-slate-600">読み込み中...</p>
-            </div>
-          </div>
-        ) : posts.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-slate-600 text-lg">まだ投稿がありません</p>
-            <Button asChild className="mt-4 bg-sky-500 hover:bg-sky-600 text-white">
-              <Link href="/posts/new">最初の投稿を作成</Link>
         {/* 投稿一覧 */}
         {posts.length === 0 ? (
           <div className="text-center py-16">
