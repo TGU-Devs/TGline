@@ -62,7 +62,8 @@ posts_data = [
   {
     title: "投稿1",
     body: "これは投稿1の内容です",
-    user: User.first
+    user: User.first,
+    description: "自己紹介"
   },
   { title: "投稿2",
     body: "これは投稿2の内容です",

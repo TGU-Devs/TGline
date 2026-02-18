@@ -23,7 +23,7 @@ module Api
       private
 
       def user_params
-        params.require(:user).permit(:display_name)
+        params.require(:user).permit(:display_name, :description)
       end
 
       def user_response(user)
@@ -31,6 +31,7 @@ module Api
           id: user.id,
           email: user.email,
           display_name: user.display_name,
+          description: user.description,
           role: user.role,
           created_at: user.created_at.iso8601
         }
