@@ -1,3 +1,5 @@
+import { useRouter } from "next/navigation";
+
 import SettingSection from "./SettingSection";
 import type { SecurityOption } from "./types";
 import { type LucideIcon, ChevronRight } from "lucide-react";
@@ -11,6 +13,7 @@ const SecuritySection = ({
     icon: Icon,
     securityOptions,
 }: SecuritySectionProps) => {
+    const router = useRouter();
     return (
         <SettingSection title="アカウントとセキュリティ" icon={Icon}>
             <div className="space-y-2">
@@ -18,6 +21,7 @@ const SecuritySection = ({
                     <button
                         type="button"
                         key={option.id}
+                        onClick={() => router.push(option.link)}
                         className="w-full flex items-center justify-between p-4 rounded-xl transition-all group hover:bg-slate-50 cursor-pointer"
                     >
                         <div className="flex items-center gap-3">

@@ -27,6 +27,7 @@ type SecurityOption = {
     label: string;
     Icon: LucideIcon;
     changePassword: boolean;
+    link: string;
 };
 
 export type {

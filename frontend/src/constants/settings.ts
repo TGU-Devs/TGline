@@ -1,3 +1,4 @@
+import { link } from "fs";
 import { PcCase, Mail, Megaphone, Lock, Trash2 } from "lucide-react";
 
 const NOTIFICATION_OPTIONS = [
@@ -17,12 +18,14 @@ const SECURITY_OPTIONS = [
         label: "パスワード変更",
         Icon: Lock,
         changePassword: true,
+        link: "/settings/security/change-password",
     },
     {
         id: "delete_account",
         label: "アカウント削除",
         Icon: Trash2,
         changePassword: false,
+        link: "/settings/security/delete-account",
     },
 ];
 
