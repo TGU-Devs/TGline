@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 import SettingSection from "@/components/features/settings/SettingSection";
 import ReturnSettingsBtn from "@/components/features/settings/ReturnSettingsBtn";
@@ -52,6 +53,8 @@ const initFormValues: FormValues = {
 const ChangePasswordPage = () => {
     const [formValues, setFormValues] = useState<FormValues>(initFormValues);
     const [errors, setErrors] = useState<FormErrors>({});
+    
+    const router = useRouter();
 
     const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = e.target;
@@ -67,6 +70,8 @@ const ChangePasswordPage = () => {
         setErrors(errors);
         if (Object.keys(errors).length === 0) {
             // バリデーションが成功した場合、API呼び出しのロジックをここに追加
+
+            router.push("/settings?status=password_changed");
         }
     };
 

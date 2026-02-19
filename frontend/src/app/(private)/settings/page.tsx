@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import Toast from "@/components/features/settings/Toast";
 import Header from "@/components/features/settings/Header";
@@ -37,9 +38,14 @@ const initUser = {
 const SettingsPage = () => {
     const [showSaveToast, setShowSaveToast] = useState(false);
     const [showErrorToast, setShowErrorToast] = useState(false);
+    const [showPasswordChangedToast, setShowPasswordChangedToast] =
+        useState(false);
     const [isDark, setIsDark] = useState(false);
     const [currentUser, setCurrentUser] = useState(initUser);
     const [formValues, setFormValues] = useState(initFormValues);
+
+    const router = useRouter();
+    const searchParams = useSearchParams();
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -60,6 +66,26 @@ const SettingsPage = () => {
         };
         fetchUser();
     }, []);
+
+    useEffect(() => {
+        if (searchParams.get("status") === "password_changed") {
+            setShowPasswordChangedToast(true);
+            // ここで即座にURLを書き換える
+            router.replace("/settings", { scroll: false });
+        }
+    }, [searchParams, router]);
+
+    // 修正箇所 2: トーストの状態監視とタイマー処理を分離する
+    useEffect(() => {
+        if (showPasswordChangedToast) {
+            const timer = setTimeout(() => {
+                setShowPasswordChangedToast(false);
+            }, 3000);
+
+            // コンポーネントがアンマウントされた時などはタイマーを解除
+            return () => clearTimeout(timer);
+        }
+    }, [showPasswordChangedToast]);
 
     const themeOptions = [
         {
@@ -136,8 +162,24 @@ const SettingsPage = () => {
 
     return (
         <main className="min-h-screen bg-background p-6 md:p-10 duration-300">
-            <Toast showToast={showSaveToast} icon={CheckCircle2} message="設定を保存しました。" bg="bg-emerald-500" />
-            <Toast showToast={showErrorToast} icon={AlertTriangle} message="エラーが発生しました。" bg="bg-red-500" />
+            <Toast
+                showToast={showSaveToast}
+                icon={CheckCircle2}
+                message="設定を保存しました。"
+                bg="bg-emerald-500"
+            />
+            <Toast
+                showToast={showErrorToast}
+                icon={AlertTriangle}
+                message="エラーが発生しました。"
+                bg="bg-red-500"
+            />
+            <Toast
+                showToast={showPasswordChangedToast}
+                icon={CheckCircle2}
+                message="パスワードを変更しました。"
+                bg="bg-emerald-500"
+            />
 
             <form onSubmit={saveHandler}>
                 <Header icon={Save} saveHandler={saveHandler} />
