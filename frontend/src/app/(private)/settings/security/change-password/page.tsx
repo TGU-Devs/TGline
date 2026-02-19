@@ -5,26 +5,15 @@ import { useRouter } from "next/navigation";
 
 import SettingSection from "@/components/features/settings/SettingSection";
 import ReturnSettingsBtn from "@/components/features/settings/ReturnSettingsBtn";
+import SecurityFormItem from "@/components/features/settings/security/SecurityFormItem";
 
 import { Lock } from "lucide-react";
 
-type FormValues = {
-    current_password: string;
-    new_password: string;
-    confirm_new_password: string;
-};
-
-type FormItem = {
-    id: keyof FormValues;
-    label: string;
-    placeholder: string;
-};
-
-type FormErrors = {
-    current_password?: string;
-    new_password?: string;
-    confirm_new_password?: string;
-};
+import {
+    FormValues,
+    FormItem,
+    FormErrors,
+} from "@/components/features/settings/security/types";
 
 const formItems: FormItem[] = [
     {
@@ -53,7 +42,7 @@ const initFormValues: FormValues = {
 const ChangePasswordPage = () => {
     const [formValues, setFormValues] = useState<FormValues>(initFormValues);
     const [errors, setErrors] = useState<FormErrors>({});
-    
+
     const router = useRouter();
 
     const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,13 +78,15 @@ const ChangePasswordPage = () => {
         }
 
         if (!values.confirm_new_password) {
-            error.confirm_new_password = "新しいパスワード（確認）を入力してください";
+            error.confirm_new_password =
+                "新しいパスワード（確認）を入力してください";
         } else if (values.new_password !== values.confirm_new_password) {
-            error.confirm_new_password = "新しいパスワードと確認用パスワードが一致しません";
+            error.confirm_new_password =
+                "新しいパスワードと確認用パスワードが一致しません";
         }
 
         return error;
-    }
+    };
 
     return (
         <main className="min-h-screen p-6 max-w-3xl mx-auto">
@@ -105,31 +96,20 @@ const ChangePasswordPage = () => {
                     <p className="text-sm text-slate-500 mb-4">
                         アカウントを安全に保護するため、定期的なパスワードの変更をおすすめします。
                     </p>
-                    <form className="space-y-4" onSubmit={onSubmitHandler} noValidate>
+                    <form
+                        className="space-y-4"
+                        onSubmit={onSubmitHandler}
+                        noValidate
+                    >
                         {formItems.map((item) => {
                             return (
-                                <div key={item.id} className="flex flex-col">
-                                    <label
-                                        htmlFor={item.id}
-                                        className="text-sm mb-1 font-bold text-muted-foreground"
-                                    >
-                                        {item.label}
-                                    </label>
-                                    <input
-                                        type="password"
-                                        id={item.id}
-                                        placeholder={item.placeholder}
-                                        className="p-3 border border-slate-200 rounded-md bg-slate-50 focus:outline-none focus:ring-2 focus:ring-sky-500 transition-colors"
-                                        value={formValues[item.id]}
-                                        onChange={onChangeHandler}
-                                        required
-                                    />
-                                    {errors[item.id] && (
-                                        <p className="text-sm text-destructive mt-1">
-                                            {errors[item.id]}
-                                        </p>
-                                    )}
-                                </div>
+                                <SecurityFormItem
+                                    key={item.id}
+                                    item={item}
+                                    formValues={formValues}
+                                    errors={errors}
+                                    onChangeHandler={onChangeHandler}
+                                />
                             );
                         })}
                         <button
