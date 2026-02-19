@@ -44,6 +44,8 @@ const ChangePasswordPage = () => {
     const [formValues, setFormValues] =
         useState<ChangePasswordFormValues>(initFormValues);
     const [errors, setErrors] = useState<FormErrors>({});
+    
+    const router = useRouter();
 
     const router = useRouter();
 
