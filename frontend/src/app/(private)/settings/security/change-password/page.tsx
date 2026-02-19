@@ -3,19 +3,20 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-import SettingSection from "@/components/features/settings/SettingSection";
 import ReturnSettingsBtn from "@/components/features/settings/ReturnSettingsBtn";
+import SettingSection from "@/components/features/settings/SettingSection";
 import SecurityFormItem from "@/components/features/settings/security/SecurityFormItem";
+import Button from "@/components/features/settings/security/Button";
 
 import { Lock } from "lucide-react";
 
 import {
-    FormValues,
-    FormItem,
+    ChangePasswordFormValues,
+    ChangePasswordFormItem,
     FormErrors,
 } from "@/components/features/settings/security/types";
 
-const formItems: FormItem[] = [
+const formItems: ChangePasswordFormItem[] = [
     {
         id: "current_password",
         label: "現在のパスワード",
@@ -33,14 +34,14 @@ const formItems: FormItem[] = [
     },
 ];
 
-const initFormValues: FormValues = {
+const initFormValues: ChangePasswordFormValues = {
     current_password: "",
     new_password: "",
     confirm_new_password: "",
 };
 
 const ChangePasswordPage = () => {
-    const [formValues, setFormValues] = useState<FormValues>(initFormValues);
+    const [formValues, setFormValues] = useState<ChangePasswordFormValues>(initFormValues);
     const [errors, setErrors] = useState<FormErrors>({});
 
     const router = useRouter();
@@ -64,7 +65,7 @@ const ChangePasswordPage = () => {
         }
     };
 
-    const validateForm = (values: FormValues) => {
+    const validateForm = (values: ChangePasswordFormValues) => {
         const error: FormErrors = {};
 
         if (!values.current_password) {
@@ -112,12 +113,7 @@ const ChangePasswordPage = () => {
                                 />
                             );
                         })}
-                        <button
-                            type="submit"
-                            className="w-full py-3 bg-sky-600 text-white rounded-md hover:bg-sky-700 transition-colors cursor-pointer"
-                        >
-                            パスワードを変更
-                        </button>
+                        <Button text="パスワードを変更" Bg="bg-sky-600" hoverBg="hover:bg-sky-700" />
                     </form>
                 </SettingSection>
             </div>
