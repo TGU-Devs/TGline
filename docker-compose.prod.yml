@@ -1,6 +1,8 @@
 services:
     db:
         image: postgres:15
+        ports:
+            - "127.0.0.1:5432:5432" # 127.0.0.1はローカルホスト（このサーバー自身）からのみアクセス可能という意味
         env_file:
             - .env
         environment:

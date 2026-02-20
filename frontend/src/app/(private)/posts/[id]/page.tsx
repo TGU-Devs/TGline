@@ -6,6 +6,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Calendar, User, Edit, Trash2, ArrowLeft } from "lucide-react";
 
+interface Tag {
+  id: number;
+  name: string;
+  category: "faculty" | "topic";
+}
+
 interface Post {
   id: number;
   title: string;
@@ -14,9 +20,15 @@ interface Post {
     id: number;
     display_name: string;
   } | null;
+  tags: Tag[];
   created_at: string;
   updated_at: string;
 }
+
+const TAG_COLORS: Record<string, string> = {
+  faculty: "bg-blue-100 text-blue-700 border-blue-200",
+  topic: "bg-orange-100 text-orange-700 border-orange-200",
+};
 
 export default function PostDetailPage() {
   const params = useParams();
@@ -140,11 +152,24 @@ export default function PostDetailPage() {
               <h1 className="text-2xl sm:text-3xl font-bold text-card-foreground mb-3 sm:mb-4 wrap-break-words">
                 {post.title}
               </h1>
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-5 h-5 bg-primary/15 rounded-full flex items-center justify-center">
-                    <User className="h-3 w-3 text-primary" />
-                  </div>
+              {/* タグバッジ */}
+              {post.tags && post.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mb-3 sm:mb-4">
+                  {post.tags.map((tag) => (
+                    <span
+                      key={tag.id}
+                      className={`px-2.5 py-1 rounded-full text-xs font-medium border ${
+                        TAG_COLORS[tag.category] || "bg-slate-100 text-slate-600 border-slate-200"
+                      }`}
+                    >
+                      {tag.name}
+                    </span>
+                  ))}
+                </div>
+              )}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-slate-500">
+                <div className="flex items-center gap-1">
+                  <User className="h-3 w-3 sm:h-4 sm:w-4" />
                   <span>{post.user?.display_name || "匿名"}</span>
                 </div>
                 <div className="flex items-center gap-1">

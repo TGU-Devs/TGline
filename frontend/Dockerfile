@@ -1,12 +1,12 @@
 # ===================================
 # Stage 1: Build
 # ===================================
-FROM node:23-alpine AS builder
+FROM node:23-bookworm-slim AS builder
 
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm install
 
 COPY . .
 
@@ -17,7 +17,7 @@ RUN npm run build
 # ===================================
 # Stage 2: Run
 # ===================================
-FROM node:23-alpine AS runner
+FROM node:23-bookworm-slim AS runner
 
 WORKDIR /app
 

@@ -9,7 +9,20 @@ module Api
     # GET /posts
     # 投稿一覧を取得（認証必須）
     def index
-      posts = Post.active.includes(:user).order(created_at: :desc)
+      posts = Post.active.includes(:user, :tags).order(created_at: :desc)
+
+      # カテゴリで絞り込み
+      # もしクエリパラメーターがあれば、そのカテゴリの投稿を取得して上書き
+      if params[:category].present?
+        category_value = Tag.categories[params[:category]]
+        posts = posts.joins(:tags).where(tags: { category: category_value }).distinct if category_value
+      end
+
+      # もしタグ(個別タグ)がクエリパラメーターにあれば、そのタグの投稿を取得して上書き
+      if params[:tag_id].present?
+        posts = posts.joins(:tags).where(tags: { id: params[:tag_id] }).distinct
+      end
+
       render json: posts.map { |post| post_response(post) }, status: :ok
     end
 
@@ -22,7 +35,8 @@ module Api
     # POST /posts
     # 投稿を作成（認証必須、ログインユーザーのみ）
     def create
-      post = current_user.posts.build(post_params)
+      post = current_user.posts.build(post_params.except(:tag_ids))
+      post.tag_ids = post_params[:tag_ids] if post_params[:tag_ids].present?
 
       if post.save
         render json: post_response(post), status: :created
@@ -36,8 +50,10 @@ module Api
     def update
       authorize_owner!(@post)
 
-      if @post.update(post_params)
-        render json: post_response(@post), status: :ok
+      @post.tag_ids = post_params[:tag_ids] if post_params.key?(:tag_ids)
+
+      if @post.update(post_params.except(:tag_ids))
+        render json: post_response(@post.reload), status: :ok
       else
         render json: { errors: @post.errors }, status: :unprocessable_entity
       end
@@ -64,7 +80,7 @@ module Api
 
     # Strong Parameters
     def post_params
-      params.require(:post).permit(:title, :body)
+      params.require(:post).permit(:title, :body, tag_ids: [])
     end
 
     # 投稿レスポンス形式
@@ -77,6 +93,13 @@ module Api
           id: post.user.id,
           display_name: post.user.display_name
         } : nil,
+        tags: post.tags.map { |tag|
+          {
+            id: tag.id,
+            name: tag.name,
+            category: tag.category
+          }
+        },
         created_at: post.created_at.iso8601,
         updated_at: post.updated_at.iso8601
       }

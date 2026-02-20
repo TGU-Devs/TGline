@@ -9,6 +9,11 @@ import { Button } from "@/components/ui/button";
 
 import { User, Mail, KeyRound, RotateCcwKey } from "lucide-react";
 
+type RailsErrorResponse = {
+    errors?: Record<string, string | string[]>;
+    error?: string;
+  };
+
 type AuthFormProps = {
     isRegister: boolean;
 };
@@ -71,12 +76,12 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
     };
 
     // Railsのエラー形式をフォーマット
-    const formatErrors = (data: any): Errors => {
+    const formatErrors = (data: RailsErrorResponse): Errors => {
         const formattedErrors: Errors = {};
 
         if (data.errors) {
             Object.keys(data.errors).forEach((key) => {
-                const errorValue = data.errors[key];
+                const errorValue = data.errors![key];
                 formattedErrors[key as keyof Errors] = Array.isArray(errorValue)
                     ? errorValue[0]
                     : errorValue;
@@ -87,7 +92,7 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
     };
 
     // エラーハンドリング
-    const handleError = (data: any, defaultMessage: string) => {
+    const handleError = (data: RailsErrorResponse, defaultMessage: string) => {
         if (data.errors) {
             setFormErrors(formatErrors(data));
             return;

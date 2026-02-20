@@ -29,6 +29,7 @@ module Api
         render json: {
           id: user.id,
           display_name: user.display_name,
+          description: user.description,
           created_at: user.created_at.iso8601
         }, status: :ok
       else

@@ -4,6 +4,7 @@
 
 - id (PK)
 - display_name
+- description (nullable)
 - role
 - deleted_at
 

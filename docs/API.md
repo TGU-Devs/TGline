@@ -121,6 +121,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
     "id": 1,
     "email": "user@example.com",
     "display_name": "太郎",
+    "description": null,
     "role": "user"
   },
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -170,6 +171,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
     "id": 1,
     "email": "user@example.com",
     "display_name": "太郎",
+    "description": null,
     "role": "user"
   },
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -241,6 +243,7 @@ Authorization: Bearer <token>
   "id": 1,
   "email": "user@example.com",
   "display_name": "太郎",
+  "description": "経済学部3年です。就活中です。",
   "role": "user",
   "created_at": "2026-01-01T12:00:00Z"
 }
@@ -272,13 +275,15 @@ Authorization: Bearer <token>
 
 ```json
 {
-  "display_name": "新しい名前"
+  "display_name": "新しい名前",
+  "description": "自己紹介文"
 }
 ```
 
 #### バリデーション
 
 * display_name：任意（更新する場合のみ）
+* description：任意（最大200文字）
 
 #### レスポンス
 
@@ -289,6 +294,7 @@ Authorization: Bearer <token>
   "id": 1,
   "email": "user@example.com",
   "display_name": "新しい名前",
+  "description": "自己紹介文",
   "role": "user",
   "created_at": "2026-01-01T12:00:00Z"
 }
@@ -326,6 +332,7 @@ Authorization: Bearer <token>
 {
   "id": 2,
   "display_name": "花子",
+  "description": "法学部2年です。",
   "created_at": "2026-01-01T12:00:00Z"
 }
 ```
