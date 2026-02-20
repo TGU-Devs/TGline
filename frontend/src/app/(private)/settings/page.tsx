@@ -24,6 +24,7 @@ import {
     Shield,
     AlertTriangle,
 } from "lucide-react";
+import { FormValues, Errors } from "@/components/features/settings/types";
 
 const initFormValues = {
     display_name: "",
@@ -45,6 +46,7 @@ const SettingsPage = () => {
     const [isDark, setIsDark] = useState(false);
     const [currentUser, setCurrentUser] = useState(initUser);
     const [formValues, setFormValues] = useState(initFormValues);
+    const [formErrors, setFormErrors] = useState<Errors>({});
 
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -111,6 +113,13 @@ const SettingsPage = () => {
 
     const saveHandler = async (e: React.FormEvent) => {
         e.preventDefault();
+        const errors = validateForm(formValues);
+        if (Object.keys(errors).length > 0) {
+            setFormErrors(errors);
+            return;
+        }
+        setFormErrors({});
+
         try {
             const res = await fetch("/api/users/me", {
                 method: "PATCH",
@@ -130,18 +139,34 @@ const SettingsPage = () => {
                 setShowSaveToast(true);
                 const updated = await res.json();
                 setCurrentUser(updated);
+                setTimeout(() => setShowSaveToast(false), 3000);
             } else {
                 console.error("ユーザーデータの更新に失敗:", res.status);
                 setShowErrorToast(true);
+                setTimeout(() => setShowErrorToast(false), 4000);
             }
         } catch (error) {
             console.error("ユーザーデータの更新中にエラーが発生:", error);
             setShowErrorToast(true);
-        } finally {
-            setTimeout(() => setShowSaveToast(false), 3000);
             setTimeout(() => setShowErrorToast(false), 4000);
         }
     };
+
+    const validateForm = (values: FormValues) => {
+        const errors: Errors = {};
+        const emailRegex = /^[a-zA-Z0-9_.+-]+@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/;
+
+        if (!values.display_name.trim()) {
+            errors.display_name = "ユーザー名を入力してください。";
+        }
+
+        if (!values.email.trim()) {
+            errors.email = "メールアドレスを入力してください。";
+        } else if (!emailRegex.test(values.email)) {
+            errors.email = "正しいメールアドレスを入力してください。";
+        }
+        return errors;
+    }
 
     const changeDarkMode = (
         e:
@@ -171,7 +196,7 @@ const SettingsPage = () => {
             <Toast
                 showToast={showErrorToast}
                 icon={AlertTriangle}
-                message="エラーが発生しました。"
+                message="ネットワークエラーが発生しました。"
                 bg="bg-red-500"
             />
             <Toast
@@ -181,12 +206,13 @@ const SettingsPage = () => {
                 bg="bg-emerald-500"
             />
 
-            <form onSubmit={saveHandler}>
+            <form onSubmit={saveHandler} noValidate>
                 <Header icon={Save} saveHandler={saveHandler} />
 
                 <ProfileSection
                     currentUserName={currentUser.display_name}
                     formValues={formValues}
+                    formErrors={formErrors}
                     icon={UserIcon}
                     onchangeHandler={onchangeHandler}
                 />

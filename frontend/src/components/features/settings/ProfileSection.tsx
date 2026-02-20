@@ -1,10 +1,11 @@
 import SettingSection from "./SettingSection";
-import { FormValues } from "./types";
+import { FormValues, Errors } from "./types";
 import type { LucideIcon } from "lucide-react";
 
 type ProfileSectionProps = {
     currentUserName: string;
     formValues: FormValues;
+    formErrors: Errors;
     icon: LucideIcon;
     onchangeHandler: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 };
@@ -12,6 +13,7 @@ type ProfileSectionProps = {
 const ProfileSection = ({
     currentUserName,
     formValues,
+    formErrors,
     icon: Icon,
     onchangeHandler,
 }: ProfileSectionProps) => {
@@ -36,7 +38,13 @@ const ProfileSection = ({
                             value={formValues.display_name}
                             onChange={onchangeHandler}
                             className="w-full px-4 py-3 rounded-xl border bg-slate-50 border-slate-200 focus:ring-2 focus:ring-sky-500 outline-none transition-all"
+                            required
                         />
+                        {formErrors.display_name && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {formErrors.display_name}
+                            </p>
+                        )}
                     </div>
                     <div className="space-y-1">
                         <label
@@ -51,7 +59,13 @@ const ProfileSection = ({
                             value={formValues.email}
                             onChange={onchangeHandler}
                             className="w-full px-4 py-3 rounded-xl border bg-slate-50 border-slate-200 focus:ring-2 focus:ring-sky-500 outline-none transition-all"
+                            required
                         />
+                        {formErrors.email && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {formErrors.email}
+                            </p>
+                        )}
                     </div>
                     <div className="md:col-span-2 space-y-1">
                         <label

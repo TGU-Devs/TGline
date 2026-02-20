@@ -6,6 +6,11 @@ type FormValues = {
     description?: string;
 };
 
+type Errors = {
+    display_name?: string;
+    email?: string;
+}
+
 type Notification = {
     id: string;
     label: string;
@@ -32,6 +37,7 @@ type SecurityOption = {
 
 export type {
     FormValues,
+    Errors,
     Notification,
     ThemeOption,
     SecurityOption,
