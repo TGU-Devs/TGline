@@ -3,7 +3,7 @@ import type { LucideIcon } from "lucide-react";
 type FormValues = {
     display_name: string;
     email: string;
-    bio?: string;
+    description?: string;
 };
 
 type Notification = {

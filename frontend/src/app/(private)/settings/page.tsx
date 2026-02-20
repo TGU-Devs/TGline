@@ -28,11 +28,13 @@ import {
 const initFormValues = {
     display_name: "",
     email: "",
+    description: "",
 };
 
 const initUser = {
     display_name: "",
     email: "",
+    description: "",
 };
 
 const SettingsPage = () => {
@@ -59,6 +61,7 @@ const SettingsPage = () => {
                     ...prevFormValues,
                     display_name: data.display_name,
                     email: data.email,
+                    description: data.description,
                 }));
             } else {
                 console.error("ユーザーデータの取得に失敗:", res.status);
@@ -119,6 +122,7 @@ const SettingsPage = () => {
                     user: {
                         display_name: formValues.display_name,
                         email: formValues.email,
+                        description: formValues.description,
                     },
                 }),
             });
@@ -153,7 +157,7 @@ const SettingsPage = () => {
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     ) => {
         const { id, value } = e.target;
-        setFormValues({ ...formValues, [id]: value });
+        setFormValues((prevFormValues) => ({ ...prevFormValues, [id]: value }));
     };
 
     return (

@@ -55,15 +55,15 @@ const ProfileSection = ({
                     </div>
                     <div className="md:col-span-2 space-y-1">
                         <label
-                            htmlFor="bio"
+                            htmlFor="description"
                             className="text-sm font-bold text-slate-400 ml-1"
                         >
                             自己紹介
                         </label>
                         <textarea
                             rows={2}
-                            id="bio"
-                            value={formValues.bio ?? "追々実装"}
+                            id="description"
+                            value={formValues.description || ""}
                             onChange={onchangeHandler}
                             className="w-full px-4 py-3 rounded-xl border bg-slate-50 border-slate-200 focus:ring-2 focus:ring-sky-500 outline-none transition-all"
                         />
