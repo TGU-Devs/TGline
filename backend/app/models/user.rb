@@ -8,7 +8,8 @@ class User < ApplicationRecord
 
   # バリデーション
   validates :display_name, presence: true
-  validates :role, presence: true, inclusion: { in: %w[user admin] } # roleの値はuserかadminのみ
+  validates :role, presence: true, inclusion: { in: %w[user admin] }
+  validates :description, length: { maximum: 200 }, allow_nil: true # roleの値はuserかadminのみ
 
   # スコープ(クエリのショートカット)。集合検索でSQLを発行する
   # ユーザーがactiveかdeletedかを判断するメソッド的なもの。
