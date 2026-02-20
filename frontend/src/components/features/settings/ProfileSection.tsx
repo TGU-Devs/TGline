@@ -1,35 +1,40 @@
 import SettingSection from "./SettingSection";
+import { FormValues } from "./types";
 import type { LucideIcon } from "lucide-react";
 
 type ProfileSectionProps = {
+    currentUserName: string;
+    formValues: FormValues;
     icon: LucideIcon;
-    currentUser: {
-        displayName: string;
-        email: string;
-        bio: string| null;
-    };
+    onchangeHandler: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 };
 
-const ProfileSection = ({ currentUser, icon: Icon }: ProfileSectionProps) => {
+const ProfileSection = ({
+    currentUserName,
+    formValues,
+    icon: Icon,
+    onchangeHandler,
+}: ProfileSectionProps) => {
     return (
         <SettingSection title="プロフィール設定" icon={Icon}>
             <div className="flex flex-col md:flex-row gap-8 items-start">
                 <div className="w-20 h-20 bg-sky-600 rounded-full mb-4 flex items-center justify-center text-3xl text-white font-bold shadow-lg">
-                    {currentUser.displayName.charAt(0)}
+                    {currentUserName.charAt(0)}
                 </div>
 
                 <fieldset className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
                     <div className="space-y-1">
                         <label
-                            htmlFor="username"
+                            htmlFor="display_name"
                             className="text-sm font-bold text-slate-400 ml-1"
                         >
                             ユーザー名
                         </label>
                         <input
                             type="text"
-                            id="username"
-                            defaultValue={currentUser.displayName}
+                            id="display_name"
+                            value={formValues.display_name}
+                            onChange={onchangeHandler}
                             className="w-full px-4 py-3 rounded-xl border bg-slate-50 border-slate-200 focus:ring-2 focus:ring-sky-500 outline-none transition-all"
                         />
                     </div>
@@ -43,7 +48,8 @@ const ProfileSection = ({ currentUser, icon: Icon }: ProfileSectionProps) => {
                         <input
                             type="email"
                             id="email"
-                            defaultValue={currentUser.email}
+                            value={formValues.email}
+                            onChange={onchangeHandler}
                             className="w-full px-4 py-3 rounded-xl border bg-slate-50 border-slate-200 focus:ring-2 focus:ring-sky-500 outline-none transition-all"
                         />
                     </div>
@@ -57,10 +63,10 @@ const ProfileSection = ({ currentUser, icon: Icon }: ProfileSectionProps) => {
                         <textarea
                             rows={2}
                             id="bio"
+                            value={formValues.bio ?? "追々実装"}
+                            onChange={onchangeHandler}
                             className="w-full px-4 py-3 rounded-xl border bg-slate-50 border-slate-200 focus:ring-2 focus:ring-sky-500 outline-none transition-all"
-                        >
-                            {currentUser.bio ?? ""}
-                        </textarea>
+                        />
                     </div>
                 </fieldset>
             </div>

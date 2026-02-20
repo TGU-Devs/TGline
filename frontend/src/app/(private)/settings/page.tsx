@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
-import SaveToast from "@/components/features/settings/SaveToast";
+import Toast from "@/components/features/settings/Toast";
 import Header from "@/components/features/settings/Header";
 import ProfileSection from "@/components/features/settings/ProfileSection";
 import NotificationSection from "@/components/features/settings/NotificationSection";
@@ -11,7 +12,6 @@ import SecuritySection from "@/components/features/settings/SecuritySection";
 import Footer from "@/components/features/settings/Footer";
 
 import { NOTIFICATION_OPTIONS, SECURITY_OPTIONS } from "@/constants/settings";
-import type { User } from "@/components/features/settings/types";
 
 import {
     CheckCircle2,
@@ -22,17 +22,66 @@ import {
     Sun,
     Moon,
     Shield,
+    AlertTriangle,
 } from "lucide-react";
 
-const currentUser: User = {
-    displayName: "たろう",
-    email: "taro@example.com",
-    bio: "こんにちは、たろうです！よろしくお願いします。",
+const initFormValues = {
+    display_name: "",
+    email: "",
+};
+
+const initUser = {
+    display_name: "",
+    email: "",
 };
 
 const SettingsPage = () => {
     const [showSaveToast, setShowSaveToast] = useState(false);
+    const [showErrorToast, setShowErrorToast] = useState(false);
+    const [showPasswordChangedToast, setShowPasswordChangedToast] =
+        useState(false);
     const [isDark, setIsDark] = useState(false);
+    const [currentUser, setCurrentUser] = useState(initUser);
+    const [formValues, setFormValues] = useState(initFormValues);
+
+    const router = useRouter();
+    const searchParams = useSearchParams();
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            const res = await fetch("/api/users/me", {
+                credentials: "include",
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setCurrentUser(data);
+                setFormValues((prevFormValues) => ({
+                    ...prevFormValues,
+                    display_name: data.display_name,
+                    email: data.email,
+                }));
+            } else {
+                console.error("ユーザーデータの取得に失敗:", res.status);
+            }
+        };
+        fetchUser();
+    }, []);
+
+    useEffect(() => {
+        if (searchParams.get("status") === "password_changed") {
+            setShowPasswordChangedToast(true);
+            router.replace("/settings", { scroll: false });
+        }
+    }, [searchParams, router]);
+
+    useEffect(() => {
+        if (showPasswordChangedToast) {
+            const timer = setTimeout(() => {
+                setShowPasswordChangedToast(false);
+            }, 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [showPasswordChangedToast]);
 
     const themeOptions = [
         {
@@ -57,10 +106,37 @@ const SettingsPage = () => {
         },
     ];
 
-    const saveHandler = (e: React.FormEvent) => {
+    const saveHandler = async (e: React.FormEvent) => {
         e.preventDefault();
-        setShowSaveToast(true);
-        setTimeout(() => setShowSaveToast(false), 3000);
+        try {
+            const res = await fetch("/api/users/me", {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+                body: JSON.stringify({
+                    user: {
+                        display_name: formValues.display_name,
+                        email: formValues.email,
+                    },
+                }),
+            });
+            if (res.ok) {
+                setShowSaveToast(true);
+                const updated = await res.json();
+                setCurrentUser(updated);
+            } else {
+                console.error("ユーザーデータの更新に失敗:", res.status);
+                setShowErrorToast(true);
+            }
+        } catch (error) {
+            console.error("ユーザーデータの更新中にエラーが発生:", error);
+            setShowErrorToast(true);
+        } finally {
+            setTimeout(() => setShowSaveToast(false), 3000);
+            setTimeout(() => setShowErrorToast(false), 4000);
+        }
     };
 
     const changeDarkMode = (
@@ -73,14 +149,43 @@ const SettingsPage = () => {
         setIsDark(isDarkMode);
     };
 
+    const onchangeHandler = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    ) => {
+        const { id, value } = e.target;
+        setFormValues({ ...formValues, [id]: value });
+    };
+
     return (
-        <main className="min-h-screen bg-sky-100 p-6 md:p-10 duration-300">
-            <SaveToast showSaveToast={showSaveToast} icon={CheckCircle2} />
+        <main className="min-h-screen bg-background p-6 md:p-10 duration-300">
+            <Toast
+                showToast={showSaveToast}
+                icon={CheckCircle2}
+                message="設定を保存しました。"
+                bg="bg-emerald-500"
+            />
+            <Toast
+                showToast={showErrorToast}
+                icon={AlertTriangle}
+                message="エラーが発生しました。"
+                bg="bg-red-500"
+            />
+            <Toast
+                showToast={showPasswordChangedToast}
+                icon={CheckCircle2}
+                message="パスワードを変更しました。"
+                bg="bg-emerald-500"
+            />
 
             <form onSubmit={saveHandler}>
                 <Header icon={Save} saveHandler={saveHandler} />
 
-                <ProfileSection currentUser={currentUser} icon={UserIcon} />
+                <ProfileSection
+                    currentUserName={currentUser.display_name}
+                    formValues={formValues}
+                    icon={UserIcon}
+                    onchangeHandler={onchangeHandler}
+                />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <NotificationSection
                         notifications={NOTIFICATION_OPTIONS}
@@ -102,3 +207,4 @@ const SettingsPage = () => {
 };
 
 export default SettingsPage;
+

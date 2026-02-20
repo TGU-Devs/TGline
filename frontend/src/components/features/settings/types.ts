@@ -1,9 +1,9 @@
 import type { LucideIcon } from "lucide-react";
 
-type User = {
-    displayName: string;
+type FormValues = {
+    display_name: string;
     email: string;
-    bio: string | null;
+    bio?: string;
 };
 
 type Notification = {
@@ -27,10 +27,11 @@ type SecurityOption = {
     label: string;
     Icon: LucideIcon;
     changePassword: boolean;
+    link: string;
 };
 
 export type {
-    User,
+    FormValues,
     Notification,
     ThemeOption,
     SecurityOption,
