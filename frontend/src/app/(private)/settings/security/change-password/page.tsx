@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-import ReturnSettingsBtn from "@/components/features/settings/ReturnSettingsBtn";
+import ReturnSettingsBtn from "@/components/features/settings/security/ReturnSettingsBtn";
 import SettingSection from "@/components/features/settings/SettingSection";
 import SecurityFormItem from "@/components/features/settings/security/SecurityFormItem";
 import Button from "@/components/features/settings/security/Button";
@@ -41,7 +41,8 @@ const initFormValues: ChangePasswordFormValues = {
 };
 
 const ChangePasswordPage = () => {
-    const [formValues, setFormValues] = useState<ChangePasswordFormValues>(initFormValues);
+    const [formValues, setFormValues] =
+        useState<ChangePasswordFormValues>(initFormValues);
     const [errors, setErrors] = useState<FormErrors>({});
 
     const router = useRouter();
@@ -113,7 +114,11 @@ const ChangePasswordPage = () => {
                                 />
                             );
                         })}
-                        <Button text="パスワードを変更" Bg="bg-sky-600" hoverBg="hover:bg-sky-700" />
+                        <Button
+                            text="パスワードを変更"
+                            bg="bg-sky-600"
+                            hoverBg="hover:bg-sky-700"
+                        />
                     </form>
                 </SettingSection>
             </div>

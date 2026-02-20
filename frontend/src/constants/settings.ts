@@ -1,4 +1,3 @@
-import { link } from "fs";
 import { PcCase, Mail, Megaphone, Lock, Trash2 } from "lucide-react";
 
 const NOTIFICATION_OPTIONS = [

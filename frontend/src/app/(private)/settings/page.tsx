@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import Toast from "@/components/features/settings/Toast";
@@ -55,11 +55,11 @@ const SettingsPage = () => {
             if (res.ok) {
                 const data = await res.json();
                 setCurrentUser(data);
-                setFormValues({
-                    ...formValues,
+                setFormValues((prevFormValues) => ({
+                    ...prevFormValues,
                     display_name: data.display_name,
                     email: data.email,
-                });
+                }));
             } else {
                 console.error("ユーザーデータの取得に失敗:", res.status);
             }
@@ -70,19 +70,15 @@ const SettingsPage = () => {
     useEffect(() => {
         if (searchParams.get("status") === "password_changed") {
             setShowPasswordChangedToast(true);
-            // ここで即座にURLを書き換える
             router.replace("/settings", { scroll: false });
         }
     }, [searchParams, router]);
 
-    // 修正箇所 2: トーストの状態監視とタイマー処理を分離する
     useEffect(() => {
         if (showPasswordChangedToast) {
             const timer = setTimeout(() => {
                 setShowPasswordChangedToast(false);
             }, 3000);
-
-            // コンポーネントがアンマウントされた時などはタイマーを解除
             return () => clearTimeout(timer);
         }
     }, [showPasswordChangedToast]);

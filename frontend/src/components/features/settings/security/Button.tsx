@@ -1,14 +1,14 @@
 type ButtonProps = {
     text: string;
-    Bg: string;
+    bg: string;
     hoverBg: string;
 };
 
-const Button = ({ text, Bg, hoverBg }: ButtonProps) => {
+const Button = ({ text, bg, hoverBg }: ButtonProps) => {
     return (
         <button
             type="submit"
-            className={`w-full py-3 ${Bg} text-white rounded-md ${hoverBg} transition-colors cursor-pointer`}
+            className={`w-full py-3 ${bg} text-white rounded-md ${hoverBg} transition-colors cursor-pointer`}
         >
             {text}
         </button>

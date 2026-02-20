@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 import DeleteAccountModal from "@/components/features/settings/security/DeleteAccountModal";
-import ReturnSettingsBtn from "@/components/features/settings/ReturnSettingsBtn";
+import ReturnSettingsBtn from "@/components/features/settings/security/ReturnSettingsBtn";
 import SettingSection from "@/components/features/settings/SettingSection";
 import SecurityFormItem from "@/components/features/settings/security/SecurityFormItem";
 import Button from "@/components/features/settings/security/Button";
@@ -34,6 +35,8 @@ const DeleteAccountPage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
 
+    const router = useRouter();
+
     const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = e.target;
         setFormValues((formValues) => ({
@@ -54,18 +57,17 @@ const DeleteAccountPage = () => {
     const handleDeleteConfirm = async () => {
         setIsDeleting(true);
         try {
-            // ★ ここでAPIを呼び出す
+            //APIを呼び出す
             // const res = await fetch('/api/account/delete', { ... });
-            
-            console.log("アカウント削除処理を実行中...");
-            
+
             // 処理完了後のリダイレクト等はここで行う
-            // router.push("/"); 
-            
+            router.push("/");
         } catch (error) {
             console.error("削除エラー:", error);
             // エラー時はモーダルを閉じるか、エラー表示をする
-            setIsDeleting(false); 
+            setIsDeleting(false);
+        } finally {
+            setIsDeleting(false);
         }
     };
 
@@ -81,7 +83,7 @@ const DeleteAccountPage = () => {
 
     return (
         <main className="min-h-screen p-6 max-w-3xl mx-auto">
-            <DeleteAccountModal 
+            <DeleteAccountModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onDelete={handleDeleteConfirm}
@@ -126,7 +128,7 @@ const DeleteAccountPage = () => {
                         })}
                         <Button
                             text="アカウントを削除"
-                            Bg="bg-red-600"
+                            bg="bg-red-600"
                             hoverBg="hover:bg-red-700"
                         />
                     </form>
