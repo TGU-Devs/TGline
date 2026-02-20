@@ -3,6 +3,8 @@
 import { GraduationCap } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+//Google の認証に必要な設定（Client ID）を子コンポーネントに共有するReact の Context Provider
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 
 export default function AuthLayout({
@@ -61,7 +63,9 @@ export default function AuthLayout({
         </div>
 
         <main className='w-full max-w-md animate-slide-up'>
-            {children}
+            <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ''}>
+                {children}
+            </GoogleOAuthProvider>
         </main>
 
         <div className='mt-8 text-center text-xs text-muted-foreground'>
