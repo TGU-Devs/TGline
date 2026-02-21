@@ -28,6 +28,7 @@ interface Post {
   tags: Tag[];
   likes_count: number;
   current_user_liked: boolean;
+  comments_count: number;
   created_at: string;
   updated_at: string;
 }
@@ -356,6 +357,10 @@ export default function PostsPage() {
                       />
                       <span>{post.likes_count}</span>
                     </button>
+                    <div className="flex items-center gap-1">
+                      <MessageCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      <span>{post.comments_count}</span>
+                    </div>
                   </div>
                 </div>
               </Link>

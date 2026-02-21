@@ -33,6 +33,7 @@ Rails.application.routes.draw do
     # 投稿関連
     resources :posts, only: [:index, :show, :create, :update, :destroy] do
       resource :likes, only: [:create, :destroy]
+      resources :comments, only: [:index, :create, :destroy]
     end
   end
 end

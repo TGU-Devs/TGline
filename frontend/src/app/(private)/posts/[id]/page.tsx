@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Calendar, User, Edit, Trash2, ArrowLeft, Heart } from "lucide-react";
+import { Calendar, User, Edit, Trash2, ArrowLeft, Heart, MessageCircle, Send } from "lucide-react";
 
 interface Tag {
   id: number;
@@ -23,8 +23,24 @@ interface Post {
   tags: Tag[];
   likes_count: number;
   current_user_liked: boolean;
+  comments_count: number;
   created_at: string;
   updated_at: string;
+}
+
+interface Comment {
+  id: number;
+  body: string;
+  user: {
+    id: number;
+    display_name: string;
+  } | null;
+  created_at: string;
+}
+
+interface CurrentUser {
+  id: number;
+  role: string;
 }
 
 const TAG_COLORS: Record<string, string> = {
@@ -39,12 +55,30 @@ export default function PostDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [commentBody, setCommentBody] = useState("");
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
 
   useEffect(() => {
     if (params.id) {
       fetchPost(params.id as string);
+      fetchComments(params.id as string);
+      fetchCurrentUser();
     }
   }, [params.id]);
+
+  const fetchCurrentUser = async () => {
+    try {
+      const res = await fetch("/api/users/me", { credentials: "include" });
+      if (res.ok) {
+        const data = await res.json();
+        setCurrentUser(data);
+      }
+    } catch {
+      // ignore
+    }
+  };
 
   const fetchPost = async (id: string) => {
     try {
@@ -67,6 +101,72 @@ export default function PostDetailPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const fetchComments = async (id: string) => {
+    try {
+      const res = await fetch(`/api/posts/${id}/comments`, {
+        credentials: "include",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setComments(data);
+      }
+    } catch {
+      // ignore
+    }
+  };
+
+  const handleSubmitComment = async () => {
+    if (!commentBody.trim() || !params.id) return;
+
+    try {
+      setIsSubmittingComment(true);
+      const res = await fetch(`/api/posts/${params.id}/comments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ comment: { body: commentBody } }),
+      });
+
+      if (res.ok || res.status === 201) {
+        setCommentBody("");
+        fetchComments(params.id as string);
+        // コメント数を更新
+        setPost((prev) =>
+          prev ? { ...prev, comments_count: prev.comments_count + 1 } : prev
+        );
+      }
+    } catch {
+      alert("コメントの投稿に失敗しました");
+    } finally {
+      setIsSubmittingComment(false);
+    }
+  };
+
+  const handleDeleteComment = async (commentId: number) => {
+    if (!confirm("このコメントを削除しますか？")) return;
+
+    try {
+      const res = await fetch(`/api/posts/${params.id}/comments/${commentId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (res.ok || res.status === 204) {
+        setComments((prev) => prev.filter((c) => c.id !== commentId));
+        setPost((prev) =>
+          prev ? { ...prev, comments_count: prev.comments_count - 1 } : prev
+        );
+      }
+    } catch {
+      alert("コメントの削除に失敗しました");
+    }
+  };
+
+  const canDeleteComment = (comment: Comment) => {
+    if (!currentUser) return false;
+    return comment.user?.id === currentUser.id || currentUser.role === "admin";
   };
 
   const handleDelete = async () => {
@@ -266,6 +366,77 @@ export default function PostDetailPage() {
               {post.body}
             </p>
           </div>
+        </div>
+
+        {/* コメントセクション */}
+        <div className="mt-6 bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6 lg:p-8">
+          {/* コメントヘッダー */}
+          <div className="flex items-center gap-2 mb-4 sm:mb-6">
+            <MessageCircle className="h-5 w-5 text-muted-foreground" />
+            <h2 className="text-lg font-semibold text-card-foreground">
+              コメント ({post.comments_count})
+            </h2>
+          </div>
+
+          {/* コメント入力フォーム */}
+          <div className="mb-6">
+            <textarea
+              value={commentBody}
+              onChange={(e) => setCommentBody(e.target.value)}
+              placeholder="コメントを入力..."
+              rows={3}
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+            />
+            <div className="flex justify-end mt-2">
+              <Button
+                onClick={handleSubmitComment}
+                disabled={!commentBody.trim() || isSubmittingComment}
+                size="sm"
+              >
+                <Send className="h-4 w-4 mr-2" />
+                {isSubmittingComment ? "送信中..." : "送信"}
+              </Button>
+            </div>
+          </div>
+
+          {/* コメント一覧 */}
+          {comments.length === 0 ? (
+            <p className="text-center text-muted-foreground text-sm py-4">
+              まだコメントはありません
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {comments.map((comment) => (
+                <div
+                  key={comment.id}
+                  className="border border-border rounded-lg p-3 sm:p-4"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+                      <div className="w-5 h-5 bg-primary/15 rounded-full flex items-center justify-center">
+                        <User className="h-3 w-3 text-primary" />
+                      </div>
+                      <span className="font-medium text-foreground">
+                        {comment.user?.display_name || "匿名"}
+                      </span>
+                      <span>{formatDate(comment.created_at)}</span>
+                    </div>
+                    {canDeleteComment(comment) && (
+                      <button
+                        onClick={() => handleDeleteComment(comment.id)}
+                        className="text-muted-foreground hover:text-destructive transition-colors"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-sm text-foreground whitespace-pre-wrap wrap-break-words">
+                    {comment.body}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

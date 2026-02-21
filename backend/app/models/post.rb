@@ -3,6 +3,7 @@ class Post < ApplicationRecord
   has_many :post_tags, dependent: :destroy # 中間テーブルへの直接アクセス
   has_many :tags, through: :post_tags # タグへの間接アクセス
   has_many :likes, dependent: :destroy
+  has_many :comments, dependent: :destroy
 
   validates :title, presence: true
   validates :body, presence: true
