@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Calendar, User, Edit, Trash2, ArrowLeft } from "lucide-react";
+import { Calendar, User, Edit, Trash2, ArrowLeft, Heart } from "lucide-react";
 
 interface Tag {
   id: number;
@@ -21,6 +21,8 @@ interface Post {
     display_name: string;
   } | null;
   tags: Tag[];
+  likes_count: number;
+  current_user_liked: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -88,6 +90,50 @@ export default function PostDetailPage() {
       alert(err instanceof Error ? err.message : "削除に失敗しました");
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleLikeToggle = async () => {
+    if (!post) return;
+
+    const currentLiked = post.current_user_liked;
+
+    // 楽観的 UI 更新
+    setPost({
+      ...post,
+      current_user_liked: !currentLiked,
+      likes_count: currentLiked ? post.likes_count - 1 : post.likes_count + 1,
+    });
+
+    try {
+      const res = await fetch(`/api/posts/${post.id}/likes`, {
+        method: currentLiked ? "DELETE" : "POST",
+        credentials: "include",
+      });
+
+      if (!res.ok && res.status !== 201 && res.status !== 204) {
+        // 失敗時にロールバック
+        setPost((prev) =>
+          prev
+            ? {
+                ...prev,
+                current_user_liked: currentLiked,
+                likes_count: currentLiked ? prev.likes_count + 1 : prev.likes_count - 1,
+              }
+            : prev
+        );
+      }
+    } catch {
+      // 失敗時にロールバック
+      setPost((prev) =>
+        prev
+          ? {
+              ...prev,
+              current_user_liked: currentLiked,
+              likes_count: currentLiked ? prev.likes_count + 1 : prev.likes_count - 1,
+            }
+          : prev
+      );
     }
   };
 
@@ -176,6 +222,19 @@ export default function PostDetailPage() {
                   <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
                   <span className="break-all">{formatDate(post.created_at)}</span>
                 </div>
+                <button
+                  onClick={handleLikeToggle}
+                  className="flex items-center gap-1 hover:text-red-500 transition-colors"
+                >
+                  <Heart
+                    className={`h-4 w-4 sm:h-5 sm:w-5 ${
+                      post.current_user_liked
+                        ? "fill-red-500 text-red-500"
+                        : ""
+                    }`}
+                  />
+                  <span>{post.likes_count}</span>
+                </button>
               </div>
             </div>
             <div className="flex gap-2 w-full sm:w-auto">

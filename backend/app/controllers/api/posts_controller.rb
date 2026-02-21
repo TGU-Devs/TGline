@@ -9,7 +9,7 @@ module Api
     # GET /posts
     # 投稿一覧を取得（認証必須）
     def index
-      posts = Post.active.includes(:user, :tags).order(created_at: :desc)
+      posts = Post.active.includes(:user, :tags, :likes).order(created_at: :desc)
 
       # カテゴリで絞り込み
       # もしクエリパラメーターがあれば、そのカテゴリの投稿を取得して上書き
@@ -100,6 +100,8 @@ module Api
             category: tag.category
           }
         },
+        likes_count: post.likes.size,
+        current_user_liked: post.likes.any? { |l| l.user_id == current_user&.id },
         created_at: post.created_at.iso8601,
         updated_at: post.updated_at.iso8601
       }

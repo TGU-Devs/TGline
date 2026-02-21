@@ -9,7 +9,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Plus, Calendar, User, ChevronDown, X, MessageCircle } from "lucide-react";
+import { Plus, Calendar, User, ChevronDown, X, MessageCircle, Heart } from "lucide-react";
 
 interface Tag {
   id: number;
@@ -26,6 +26,8 @@ interface Post {
     display_name: string;
   } | null;
   tags: Tag[];
+  likes_count: number;
+  current_user_liked: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -105,6 +107,59 @@ export default function PostsPage() {
     acc[tag.category].push(tag);
     return acc;
   }, {});
+
+  const handleLikeToggle = async (e: React.MouseEvent, postId: number, currentLiked: boolean) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // 楽観的 UI 更新
+    setPosts((prev) =>
+      prev.map((p) =>
+        p.id === postId
+          ? {
+              ...p,
+              current_user_liked: !currentLiked,
+              likes_count: currentLiked ? p.likes_count - 1 : p.likes_count + 1,
+            }
+          : p
+      )
+    );
+
+    try {
+      const res = await fetch(`/api/posts/${postId}/likes`, {
+        method: currentLiked ? "DELETE" : "POST",
+        credentials: "include",
+      });
+
+      if (!res.ok && res.status !== 201 && res.status !== 204) {
+        // 失敗時にロールバック
+        setPosts((prev) =>
+          prev.map((p) =>
+            p.id === postId
+              ? {
+                  ...p,
+                  current_user_liked: currentLiked,
+                  likes_count: currentLiked ? p.likes_count + 1 : p.likes_count - 1,
+                }
+              : p
+          )
+        );
+      }
+    } catch {
+      // 失敗時にロールバック
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === postId
+            ? {
+                ...p,
+                current_user_liked: currentLiked,
+                likes_count: currentLiked ? p.likes_count + 1 : p.likes_count - 1,
+              }
+            : p
+        )
+      );
+    }
+  };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -288,6 +343,19 @@ export default function PostsPage() {
                         {formatDate(post.created_at)}
                       </span>
                     </div>
+                    <button
+                      onClick={(e) => handleLikeToggle(e, post.id, post.current_user_liked)}
+                      className="flex items-center gap-1 hover:text-red-500 transition-colors"
+                    >
+                      <Heart
+                        className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${
+                          post.current_user_liked
+                            ? "fill-red-500 text-red-500"
+                            : ""
+                        }`}
+                      />
+                      <span>{post.likes_count}</span>
+                    </button>
                   </div>
                 </div>
               </Link>
