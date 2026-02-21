@@ -21,8 +21,11 @@ module Api
             return
           end
         end
-
-        current_user.soft_delete
+        # soft_deleteがfalseの場合(updateが失敗)はアカウント削除に失敗したと判断してエラーを返す
+        unless current_user.soft_delete
+          render json: { error: "アカウント削除に失敗しました" }, status: :internal_server_error
+          return
+        end
 
         cookies.delete(:jwt_token, {
           httponly: true,

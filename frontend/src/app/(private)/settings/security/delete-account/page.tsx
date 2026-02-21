@@ -11,7 +11,7 @@ import Button from "@/components/features/settings/security/Button";
 
 import Toast from "@/components/features/settings/Toast";
 
-import { Check, Trash2, TriangleAlert } from "lucide-react";
+import { Check, Trash2, TriangleAlert, X } from "lucide-react";
 
 import {
     DeleteAccountFormValues,
@@ -38,6 +38,8 @@ const DeleteAccountPage = () => {
     const [isDeleting, setIsDeleting] = useState(false);
     const [isOAuthUser, setIsOAuthUser] = useState(false);
     const [showDeletedToast, setShowDeletedToast] = useState(false);
+    const [showErrorToast, setShowErrorToast] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
 
     const router = useRouter();
 
@@ -102,12 +104,25 @@ const DeleteAccountPage = () => {
             }
 
             const data = await res.json();
+            const message = data.error || "アカウント削除に失敗しました";
             setIsModalOpen(false);
-            setErrors({ current_password: data.error || "アカウント削除に失敗しました" });
+            if (isOAuthUser) {
+                setErrorMessage(message);
+                setShowErrorToast(true);
+                setTimeout(() => setShowErrorToast(false), 4000);
+            } else {
+                setErrors({ current_password: message });
+            }
         } catch (error) {
             console.error("削除エラー:", error);
             setIsModalOpen(false);
-            setErrors({ current_password: "アカウント削除に失敗しました" });
+            if (isOAuthUser) {
+                setErrorMessage("アカウント削除に失敗しました");
+                setShowErrorToast(true);
+                setTimeout(() => setShowErrorToast(false), 4000);
+            } else {
+                setErrors({ current_password: "アカウント削除に失敗しました" });
+            }
         } finally {
             setIsDeleting(false);
         }
@@ -131,6 +146,12 @@ const DeleteAccountPage = () => {
                 message="アカウントが削除されました"
                 bg="bg-red-600"
             />
+            <Toast
+                showToast={showErrorToast}
+                icon={X}
+                message={errorMessage}
+                bg="bg-red-600"
+            />
             <DeleteAccountModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
@@ -150,10 +171,10 @@ const DeleteAccountPage = () => {
                         <TriangleAlert className="w-10 h-10" />
                         <div>
                             <h2 className="font-bold">
-                                警告：この操作は取り消せません
+                                警告
                             </h2>
                             <p className="text-sm mt-1">
-                                アカウントを削除すると、すべてのデータが完全に削除されます。この操作は元に戻すことができません。
+                                アカウントを削除すると、ログインできなくなり、投稿などのデータにアクセスできなくなります。
                             </p>
                         </div>
                     </div>
