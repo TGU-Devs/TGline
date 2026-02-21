@@ -10,6 +10,29 @@ module Api
         render json: user_response(current_user), status: :ok
       end
 
+      # DELETE /users/me
+      # 現在ログインしているユーザーのアカウントを論理削除
+      def destroy
+        # OAuthユーザー以外はパスワード検証が必要
+        if current_user.provider.blank?
+          current_password = params.dig(:password, :current_password)
+          unless current_user.valid_password?(current_password)
+            render json: { error: "パスワードが正しくありません" }, status: :unauthorized
+            return
+          end
+        end
+
+        current_user.soft_delete
+
+        cookies.delete(:jwt_token, {
+          httponly: true,
+          secure: Rails.env.production?,
+          same_site: :lax
+        })
+
+        head :no_content
+      end
+
       # PATCH /users/me
       # 現在ログインしているユーザーのプロフィールを更新
       def update
@@ -33,6 +56,7 @@ module Api
           display_name: user.display_name,
           description: user.description,
           role: user.role,
+          provider: user.provider,
           created_at: user.created_at.iso8601
         }
       end

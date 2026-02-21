@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 import DeleteAccountModal from "@/components/features/settings/security/DeleteAccountModal";
@@ -9,7 +9,9 @@ import SettingSection from "@/components/features/settings/SettingSection";
 import SecurityFormItem from "@/components/features/settings/security/SecurityFormItem";
 import Button from "@/components/features/settings/security/Button";
 
-import { Trash2, TriangleAlert } from "lucide-react";
+import Toast from "@/components/features/settings/Toast";
+
+import { Check, Trash2, TriangleAlert } from "lucide-react";
 
 import {
     DeleteAccountFormValues,
@@ -34,8 +36,27 @@ const DeleteAccountPage = () => {
     const [errors, setErrors] = useState<FormErrors>({});
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [isOAuthUser, setIsOAuthUser] = useState(false);
+    const [showDeletedToast, setShowDeletedToast] = useState(false);
 
     const router = useRouter();
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const res = await fetch("/api/users/me");
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.provider) {
+                        setIsOAuthUser(true);
+                    }
+                }
+            } catch (error) {
+                console.error("ユーザー情報取得エラー:", error);
+            }
+        };
+        fetchUser();
+    }, []);
 
     const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = e.target;
@@ -47,25 +68,46 @@ const DeleteAccountPage = () => {
 
     const onSubmitHandler = (e: React.FormEvent) => {
         e.preventDefault();
-        const errors = validateForm(formValues);
-        setErrors(errors);
-        if (Object.keys(errors).length === 0) {
-            setIsModalOpen(true);
+        if (!isOAuthUser) {
+            const errors = validateForm(formValues);
+            setErrors(errors);
+            if (Object.keys(errors).length > 0) return;
         }
+        setIsModalOpen(true);
     };
 
     const handleDeleteConfirm = async () => {
         setIsDeleting(true);
         try {
-            //APIを呼び出す
-            // const res = await fetch('/api/account/delete', { ... });
+            const options: RequestInit = {
+                method: "DELETE",
+            };
 
-            // 処理完了後のリダイレクト等はここで行う
-            router.push("/");
+            if (!isOAuthUser) {
+                options.headers = { "Content-Type": "application/json" };
+                options.body = JSON.stringify({
+                    password: {
+                        current_password: formValues.current_password,
+                    },
+                });
+            }
+
+            const res = await fetch("/api/users/me", options);
+
+            if (res.status === 204) {
+                setIsModalOpen(false);
+                setShowDeletedToast(true);
+                setTimeout(() => router.push("/"), 1500);
+                return;
+            }
+
+            const data = await res.json();
+            setIsModalOpen(false);
+            setErrors({ current_password: data.error || "アカウント削除に失敗しました" });
         } catch (error) {
             console.error("削除エラー:", error);
-            // エラー時はモーダルを閉じるか、エラー表示をする
-            setIsDeleting(false);
+            setIsModalOpen(false);
+            setErrors({ current_password: "アカウント削除に失敗しました" });
         } finally {
             setIsDeleting(false);
         }
@@ -83,6 +125,12 @@ const DeleteAccountPage = () => {
 
     return (
         <main className="min-h-screen p-6 max-w-3xl mx-auto">
+            <Toast
+                showToast={showDeletedToast}
+                icon={Check}
+                message="アカウントが削除されました"
+                bg="bg-red-600"
+            />
             <DeleteAccountModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
@@ -114,18 +162,19 @@ const DeleteAccountPage = () => {
                         onSubmit={onSubmitHandler}
                         noValidate
                     >
-                        {formItems.map((item) => {
-                            return (
-                                <SecurityFormItem
-                                    key={item.id}
-                                    item={item}
-                                    formValues={formValues}
-                                    errors={errors}
-                                    ringColor="focus:ring-red-500"
-                                    onChangeHandler={onChangeHandler}
-                                />
-                            );
-                        })}
+                        {!isOAuthUser &&
+                            formItems.map((item) => {
+                                return (
+                                    <SecurityFormItem
+                                        key={item.id}
+                                        item={item}
+                                        formValues={formValues}
+                                        errors={errors}
+                                        ringColor="focus:ring-red-500"
+                                        onChangeHandler={onChangeHandler}
+                                    />
+                                );
+                            })}
                         <Button
                             text="アカウントを削除"
                             bg="bg-red-600"
