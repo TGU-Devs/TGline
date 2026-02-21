@@ -4,8 +4,8 @@ module Api
   module Users
     # セッション管理（ログイン・ログアウト）用コントローラー
     class SessionsController < ApplicationController
-      # ログインは認証不要
-      skip_before_action :authenticate_user!, only: [:create]
+      # ログイン・ログアウトは認証不要（ログアウトは無効なトークンでもcookie削除を実行するため）
+      skip_before_action :authenticate_user!, only: [:create, :destroy]
 
       # POST /users/sign_in
       # ログイン

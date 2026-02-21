@@ -18,10 +18,15 @@ export default function PrivateLayout({
     useEffect(() => {
         // 認証状態をチェック
         fetch("/api/users/me", { credentials: "include" })
-            .then((res) => {
+            .then(async (res) => {
                 if (res.ok) {
                     setIsAuthenticated(true);
                 } else {
+                    // トークンが無効な場合、cookieを削除してからリダイレクト
+                    await fetch("/api/users/sign_out", {
+                        method: "DELETE",
+                        credentials: "include",
+                    });
                     setIsAuthenticated(false);
                     router.push("/login");
                 }
