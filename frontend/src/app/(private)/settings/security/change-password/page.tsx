@@ -47,8 +47,6 @@ const ChangePasswordPage = () => {
     
     const router = useRouter();
 
-    const router = useRouter();
-
     const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = e.target;
         setFormValues((formValues) => ({
