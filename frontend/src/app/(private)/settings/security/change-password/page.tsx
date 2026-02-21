@@ -55,14 +55,40 @@ const ChangePasswordPage = () => {
         }));
     };
 
-    const onSubmitHandler = (e: React.FormEvent) => {
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const onSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (isSubmitting) return;
         const errors = validateForm(formValues);
         setErrors(errors);
         if (Object.keys(errors).length === 0) {
-            // バリデーションが成功した場合、API呼び出しのロジックをここに追加
+            setIsSubmitting(true);
+            try {
+                const res = await fetch("/api/users/password", {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        password: {
+                            current_password: formValues.current_password,
+                            new_password: formValues.new_password,
+                        },
+                    }),
+                });
 
-            router.push("/settings?status=password_changed");
+                if (res.ok) {
+                    router.push("/settings?status=password_changed");
+                } else if (res.status === 401) {
+                    setErrors({ current_password: "現在のパスワードが正しくありません" });
+                } else {
+                    const data = await res.json();
+                    setErrors({ new_password: data.errors?.password?.[0] || "パスワードの変更に失敗しました" });
+                }
+            } catch {
+                setErrors({ current_password: "通信エラーが発生しました" });
+            } finally {
+                setIsSubmitting(false);
+            }
         }
     };
 
@@ -115,9 +141,10 @@ const ChangePasswordPage = () => {
                             );
                         })}
                         <Button
-                            text="パスワードを変更"
+                            text={isSubmitting ? "変更中..." : "パスワードを変更"}
                             bg="bg-sky-600"
                             hoverBg="hover:bg-sky-700"
+                            disabled={isSubmitting}
                         />
                     </form>
                 </SettingSection>
