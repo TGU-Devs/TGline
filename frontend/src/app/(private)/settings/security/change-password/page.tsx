@@ -141,9 +141,10 @@ const ChangePasswordPage = () => {
                             );
                         })}
                         <Button
-                            text="パスワードを変更"
+                            text={isSubmitting ? "変更中..." : "パスワードを変更"}
                             bg="bg-sky-600"
                             hoverBg="hover:bg-sky-700"
+                            disabled={isSubmitting}
                         />
                     </form>
                 </SettingSection>

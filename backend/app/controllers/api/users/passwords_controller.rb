@@ -7,6 +7,10 @@ module Api
       # PATCH /users/password
       # 現在のパスワードを検証して新しいパスワードに変更
       def update
+        if current_user.provider.present?
+          return render json: { error: "ソーシャルログインユーザーはパスワードを変更できません" }, status: :forbidden
+        end
+
         unless current_user.valid_password?(password_params[:current_password])
           return render json: { error: "現在のパスワードが正しくありません" }, status: :unauthorized
         end
