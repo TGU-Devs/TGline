@@ -10,6 +10,32 @@ module Api
         render json: user_response(current_user), status: :ok
       end
 
+      # DELETE /users/me
+      # 現在ログインしているユーザーのアカウントを論理削除
+      def destroy
+        # OAuthユーザー以外はパスワード検証が必要
+        if current_user.provider.blank?
+          current_password = params.dig(:password, :current_password)
+          unless current_user.valid_password?(current_password)
+            render json: { error: "パスワードが正しくありません" }, status: :unauthorized
+            return
+          end
+        end
+        # soft_deleteがfalseの場合(updateが失敗)はアカウント削除に失敗したと判断してエラーを返す
+        unless current_user.soft_delete
+          render json: { error: "アカウント削除に失敗しました" }, status: :internal_server_error
+          return
+        end
+
+        cookies.delete(:jwt_token, {
+          httponly: true,
+          secure: Rails.env.production?,
+          same_site: :lax
+        })
+
+        head :no_content
+      end
+
       # PATCH /users/me
       # 現在ログインしているユーザーのプロフィールを更新
       def update
