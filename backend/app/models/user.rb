@@ -6,6 +6,11 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable
   has_many :posts, dependent: :destroy
 
+  # OAuthユーザーはパスワード不要
+  def password_required?
+    provider.blank? && super
+  end
+
   # バリデーション
   validates :display_name, presence: true
   validates :role, presence: true, inclusion: { in: %w[user admin] }

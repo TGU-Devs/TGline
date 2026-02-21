@@ -1,8 +1,8 @@
 "use client";
 
 import { GraduationCap } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+//Google の認証に必要な設定（Client ID）を子コンポーネントに共有するReact の Context Provider
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 
 export default function AuthLayout({
@@ -10,64 +10,32 @@ export default function AuthLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    fetch('/api/users/me', { credentials: 'include' })
-      .then((res) => {
-        if (res.ok) {
-          router.push('/posts');
-        } else {
-          setIsAuthenticated(false);
-        }
-      })
-      .catch(() => {
-        setIsAuthenticated(false);
-      });
-  }, [router]);
-
-  // ローディング中
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-muted-foreground">読み込み中...</p>
-        </div>
+  return (
+    <div className='relative min-h-screen flex flex-col items-center justify-center p-4 bg-background overflow-hidden'>
+      {/* Background decorative elements */}
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute top-20 left-10 h-72 w-72 rounded-full bg-primary/15 blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 right-10 h-96 w-96 rounded-full bg-accent/10 blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+        <div className="absolute top-1/3 right-1/4 h-48 w-48 rounded-full bg-primary/10 blur-2xl animate-pulse" style={{ animationDelay: "2s" }} />
       </div>
-    );
-  }
 
-  // 未ログインの場合は認証ページを表示
-  if (!isAuthenticated) {
+      <div className='text-center mb-8 animate-fade-in'>
+          <div className='bg-primary text-primary-foreground w-16 h-16 flex items-center justify-center mx-auto mb-4 shadow-lg rounded-2xl'>
+              <GraduationCap size={34} />
+          </div>
+          <h1 className='text-3xl font-bold text-foreground tracking-tight'>TGline</h1>
+          <p className='text-sm text-muted-foreground mt-2'>東北学院大学 学内共通プラットフォーム</p>
+      </div>
 
-    return (
-      <div className='relative min-h-screen flex flex-col items-center justify-center p-4 bg-background overflow-hidden'>
-        {/* Background decorative elements */}
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute top-20 left-10 h-72 w-72 rounded-full bg-primary/15 blur-3xl animate-pulse" />
-          <div className="absolute bottom-20 right-10 h-96 w-96 rounded-full bg-accent/10 blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
-          <div className="absolute top-1/3 right-1/4 h-48 w-48 rounded-full bg-primary/10 blur-2xl animate-pulse" style={{ animationDelay: "2s" }} />
-        </div>
+      <main className='w-full max-w-md animate-slide-up'>
+          <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ''}>
+              {children}
+          </GoogleOAuthProvider>
+      </main>
 
-        <div className='text-center mb-8 animate-fade-in'>
-            <div className='bg-primary text-primary-foreground w-16 h-16 flex items-center justify-center mx-auto mb-4 shadow-lg rounded-2xl'>
-                <GraduationCap size={34} />
-            </div>
-            <h1 className='text-3xl font-bold text-foreground tracking-tight'>TGline</h1>
-            <p className='text-sm text-muted-foreground mt-2'>東北学院大学 学内共通プラットフォーム</p>
-        </div>
-
-        <main className='w-full max-w-md animate-slide-up'>
-            {children}
-        </main>
-
-        <div className='mt-8 text-center text-xs text-muted-foreground'>
-            利用規約とプライバシーポリシーをご確認の上、ご利用ください。
-        </div>
+      <div className='mt-8 text-center text-xs text-muted-foreground'>
+          利用規約とプライバシーポリシーをご確認の上、ご利用ください。
+      </div>
     </div>
   );
-  }
 }
