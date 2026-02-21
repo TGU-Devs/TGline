@@ -47,16 +47,23 @@ module Api
       # 2. 同じメールの既存ユーザーが存在する場合はエラー（乗っ取り防止）
       # 3. 新規ユーザー作成
       def find_or_create_user(google_user)
-        # 1. Google provider + uid で検索
+        # 1. Google provider + uid で検索（アクティブユーザー）
         user = User.active.find_by(provider: 'google', uid: google_user[:uid])
         return user if user
 
-        # 2. 同じメールの既存ユーザーが存在する場合はエラー
+        # 2. 論理削除済みの同一Googleアカウントがあれば復活
+        deleted_user = User.deleted.find_by(provider: 'google', uid: google_user[:uid])
+        if deleted_user
+          deleted_user.update!(deleted_at: nil)
+          return deleted_user
+        end
+
+        # 3. 同じメールの既存ユーザーが存在する場合はエラー（乗っ取り防止）
         if User.active.exists?(email: google_user[:email])
           raise EmailAlreadyTaken
         end
 
-        # 3. 新規ユーザー作成
+        # 4. 新規ユーザー作成
         User.create!(
           email: google_user[:email],
           display_name: google_user[:name] || google_user[:email].split('@').first, # Googleの名前がない場合はメールアドレスの@以前の部分を表示
