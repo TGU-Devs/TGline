@@ -33,6 +33,7 @@ module Api
           display_name: user.display_name,
           description: user.description,
           role: user.role,
+          provider: user.provider,
           created_at: user.created_at.iso8601
         }
       end

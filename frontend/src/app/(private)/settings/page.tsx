@@ -36,6 +36,7 @@ const initUser = {
     display_name: "",
     email: "",
     description: "",
+    provider: null as string | null,
 };
 
 const SettingsPage = () => {
@@ -229,7 +230,11 @@ const SettingsPage = () => {
                 </div>
             </form>
 
-            <SecuritySection icon={Shield} securityOptions={SECURITY_OPTIONS} />
+            <SecuritySection icon={Shield} securityOptions={
+                currentUser.provider
+                    ? SECURITY_OPTIONS.filter((opt) => opt.id !== "change_password")
+                    : SECURITY_OPTIONS
+            } />
 
             <Footer />
         </main>
