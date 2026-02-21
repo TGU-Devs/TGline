@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 
 import Link from "next/link";
 import FormItem from "./FormItem";
@@ -156,6 +157,40 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
         router.push("/posts");
     };
 
+    // Googleログイン処理 credentialResponse: Googleから返されるクレデンシャル情報
+    const handleGoogleLogin = async (credentialResponse: CredentialResponse) => {
+        if (!credentialResponse.credential) {
+            setFormErrors({ main: "Googleログインに失敗しました" });
+            return;
+        }
+
+        setIsLoading(true);
+        setFormErrors({});
+
+        try {
+            const response = await fetch("/api/users/google_sign_in", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ id_token: credentialResponse.credential }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                handleError(data, "Googleログインに失敗しました");
+                return;
+            }
+
+            router.push("/posts");
+        } catch (error) {
+            console.error("Google login error:", error);
+            setFormErrors({ main: "サーバーエラーが発生しました" });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -297,6 +332,24 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
                 <Button className="w-full" type="submit" disabled={isLoading}>
                     {isLoading ? "処理中..." : isRegister ? "登録" : "ログイン"}
                 </Button>
+                <div className="relative my-4">
+                    <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-border"></div>
+                    </div>
+                    <div className="relative flex justify-center text-xs">
+                        <span className="bg-card px-2 text-muted-foreground">または</span>
+                    </div>
+                </div>
+
+                <div className="flex justify-center">
+                    <GoogleLogin
+                        onSuccess={handleGoogleLogin}
+                        onError={() => setFormErrors({ main: "Googleログインに失敗しました" })}
+                        text={isRegister ? "signup_with" : "signin_with"}
+                        width="100%"
+                    />
+                </div>
+
                 <div className="flex justify-center gap-2 text-sm">
                     <p className="text-muted-foreground">
                         {isRegister
