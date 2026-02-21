@@ -3,8 +3,13 @@ import type { LucideIcon } from "lucide-react";
 type FormValues = {
     display_name: string;
     email: string;
-    bio?: string;
+    description?: string;
 };
+
+type Errors = {
+    display_name?: string;
+    email?: string;
+}
 
 type Notification = {
     id: string;
@@ -32,6 +37,7 @@ type SecurityOption = {
 
 export type {
     FormValues,
+    Errors,
     Notification,
     ThemeOption,
     SecurityOption,
