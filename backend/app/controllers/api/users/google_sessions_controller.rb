@@ -4,6 +4,8 @@ module Api
   module Users
     # Google OAuthログイン用コントローラー
     class GoogleSessionsController < ApplicationController
+      class EmailAlreadyTaken < StandardError; end
+
       skip_before_action :authenticate_user!, only: [:create]
 
       # POST /api/users/google_sign_in
@@ -34,30 +36,30 @@ module Api
         end
       rescue GoogleAuthService::InvalidToken => e
         render json: { error: e.message }, status: :unauthorized
+      rescue EmailAlreadyTaken
+        render json: { error: 'このメールアドレスは既にメール/パスワードで登録されています。メール/パスワードでログインしてください。' }, status: :conflict
       end
 
       private
 
       # ユーザー検索/作成ロジック
       # 1. provider + uid で検索（既存のGoogleユーザー）
-      # 2. 同じメールの既存ユーザーを検索（アカウント自動連携）
+      # 2. 同じメールの既存ユーザーが存在する場合はエラー（乗っ取り防止）
       # 3. 新規ユーザー作成
       def find_or_create_user(google_user)
         # 1. Google provider + uid で検索
         user = User.active.find_by(provider: 'google', uid: google_user[:uid])
         return user if user
 
-        # 2. 同じメールの既存ユーザーを検索し、アカウント連携
-        user = User.active.find_by(email: google_user[:email])
-        if user
-          user.update!(provider: 'google', uid: google_user[:uid])
-          return user
+        # 2. 同じメールの既存ユーザーが存在する場合はエラー
+        if User.active.exists?(email: google_user[:email])
+          raise EmailAlreadyTaken
         end
 
         # 3. 新規ユーザー作成
         User.create!(
           email: google_user[:email],
-          display_name: google_user[:name],
+          display_name: google_user[:name] || google_user[:email].split('@').first, # Googleの名前がない場合はメールアドレスの@以前の部分を表示
           provider: 'google',
           uid: google_user[:uid]
         )
