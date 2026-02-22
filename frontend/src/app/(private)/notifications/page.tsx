@@ -5,14 +5,14 @@ import { useRouter } from "next/navigation";
 import { Bell, Sparkles, Home, Clock } from "lucide-react";
 
 const NotificationsPage = () => {
-    // const router = useRouter();
+    const router = useRouter();
 
     const skeletonCount = 6;
     const skeltonItems = [...Array(skeletonCount)];
 
-    // const clickHandler = () => {
-    //     router.push("/posts");
-    // };
+    const clickHandler = () => {
+        router.push("/posts");
+    };
 
     return (
         <div className="min-h-screen bg-[#f8fafc] flex flex-col items-center justify-center p-6 relative overflow-hidden">
@@ -70,7 +70,7 @@ const NotificationsPage = () => {
 
                 <button
                     className="bg-white border-2 border-slate-100 hover:border-sky-300 hover:bg-sky-50 text-slate-600 hover:text-sky-600 px-8 py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 mx-auto shadow-sm group w-full sm:w-auto"
-                    // onClick={clickHandler}
+                    onClick={clickHandler}
                 >
                     <Home
                         size={16}
