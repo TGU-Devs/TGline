@@ -29,6 +29,7 @@ module Api
 
           render json: {
             user: user_response(user),
+            token: token,
             message: 'Googleアカウントでログインしました!'
           }, status: :ok
         else

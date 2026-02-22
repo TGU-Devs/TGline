@@ -1,17 +1,28 @@
 import { NextResponse } from "next/server";
 
 /**
- * バックエンドのSet-Cookieヘッダーをフロントエンドのレスポンスにリレーする
- * ドメイン属性を除去してフロントエンドのドメインでCookieが設定されるようにする
+ * バックエンドから受け取ったJWTトークンをCookieとして設定する
+ * Node.js fetchではSet-Cookieヘッダーが取得できないため、
+ * レスポンスボディのtokenからCookieを直接設定する
  */
-export function relayCookies(backendRes: Response, response: NextResponse) {
-  const cookies = backendRes.headers.getSetCookie();
-  console.log("[relayCookies] getSetCookie() count:", cookies.length);
-  console.log("[relayCookies] getSetCookie() values:", cookies);
-  console.log("[relayCookies] get('set-cookie'):", backendRes.headers.get("set-cookie"));
-  for (const cookie of cookies) {
-    const cleanedCookie = cookie.replace(/;\s*domain=[^;]*/gi, "");
-    console.log("[relayCookies] appending:", cleanedCookie);
-    response.headers.append("Set-Cookie", cleanedCookie);
-  }
+export function setAuthCookie(token: string, response: NextResponse) {
+  const isProduction = process.env.NODE_ENV === "production";
+  const maxAge = 7 * 24 * 60 * 60; // 7日間
+
+  response.headers.append(
+    "Set-Cookie",
+    `jwt_token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}${isProduction ? "; Secure" : ""}`
+  );
+}
+
+/**
+ * JWTトークンを削除するCookieを設定する（ログアウト用）
+ */
+export function clearAuthCookie(response: NextResponse) {
+  const isProduction = process.env.NODE_ENV === "production";
+
+  response.headers.append(
+    "Set-Cookie",
+    `jwt_token=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${isProduction ? "; Secure" : ""}`
+  );
 }

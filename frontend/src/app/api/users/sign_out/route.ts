@@ -1,25 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import { relayCookies } from "@/lib/relay-cookies";
+import { clearAuthCookie } from "@/lib/relay-cookies";
 
 const BACKEND_URL = process.env.BACKEND_URL || "http://backend:3000";
 
 export async function DELETE(request: NextRequest) {
   try {
-    // リクエストからcookieを取得
     const cookie = request.headers.get("cookie") || "";
 
-    // バックエンドにリクエスト
-    const backendRes = await fetch(`${BACKEND_URL}/api/users/sign_out`, {
+    await fetch(`${BACKEND_URL}/api/users/sign_out`, {
       method: "DELETE",
       headers: {
         Cookie: cookie,
       },
     });
 
-    // レスポンスを作成（204 No Contentの場合はbodyなし）
-    const response = new NextResponse(null, { status: backendRes.status });
-
-    relayCookies(backendRes, response);
+    const response = new NextResponse(null, { status: 204 });
+    clearAuthCookie(response);
 
     return response;
   } catch (error) {

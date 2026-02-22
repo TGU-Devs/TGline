@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { relayCookies } from "@/lib/relay-cookies";
+import { clearAuthCookie } from "@/lib/relay-cookies";
 
 const BACKEND_URL = process.env.BACKEND_URL || "http://backend:3000";
 
@@ -58,7 +58,7 @@ export async function DELETE(request: NextRequest) {
     if (backendRes.status === 204) {
       const response = new NextResponse(null, { status: 204 });
 
-      relayCookies(backendRes, response);
+      clearAuthCookie(response);
 
       return response;
     }

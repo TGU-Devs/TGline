@@ -26,6 +26,7 @@ module Api
           
           render json: {
             user: user_response(user),
+            token: token,
             message: 'ユーザー登録が完了しました！'
           }, status: :created
         else
