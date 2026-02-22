@@ -1,7 +1,7 @@
 # ===================================
 # Stage 1: Build
 # ===================================
-FROM node:23-bookworm-slim AS builder
+FROM node:23-bookworm AS builder
 
 WORKDIR /app
 
@@ -17,7 +17,7 @@ RUN npm run build
 # ===================================
 # Stage 2: Run
 # ===================================
-FROM node:23-bookworm-slim AS runner
+FROM node:23-bookworm AS runner
 
 WORKDIR /app
 
