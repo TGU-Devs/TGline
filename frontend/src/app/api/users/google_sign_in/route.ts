@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { relayCookies } from "@/lib/relay-cookies";
 
 const BACKEND_URL = process.env.BACKEND_URL || "http://backend:3000";
 
@@ -20,13 +21,7 @@ export async function POST(request: NextRequest) {
     // レスポンスを作成
     const response = NextResponse.json(data, { status: backendRes.status });
 
-    // バックエンドからのSet-Cookieヘッダーをブラウザにリレー
-    // ドメイン属性を除去してフロントエンドのドメインでCookieが設定されるようにする
-    const setCookieHeader = backendRes.headers.get("set-cookie");
-    if (setCookieHeader) {
-      const cleanedCookie = setCookieHeader.replace(/;\s*domain=[^;]*/gi, "");
-      response.headers.set("Set-Cookie", cleanedCookie);
-    }
+    relayCookies(backendRes, response);
 
     return response;
   } catch (error) {
