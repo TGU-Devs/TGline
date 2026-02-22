@@ -1,6 +1,6 @@
 "use client";
 
-import { GraduationCap } from 'lucide-react';
+import Image from 'next/image';
 //Google の認証に必要な設定（Client ID）を子コンポーネントに共有するReact の Context Provider
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
@@ -20,10 +20,9 @@ export default function AuthLayout({
       </div>
 
       <div className='text-center mb-8 animate-fade-in'>
-          <div className='bg-primary text-primary-foreground w-16 h-16 flex items-center justify-center mx-auto mb-4 shadow-lg rounded-2xl'>
-              <GraduationCap size={34} />
+          <div className='w-18 h-18 flex items-center justify-center mx-auto mb-4 shadow-lg rounded-2xl overflow-hidden bg-white'>
+              <Image src="/TGlinelogo.svg" alt="TGline" width={64} height={64} className="w-full h-full mix-blend-multiply" />
           </div>
-          <h1 className='text-3xl font-bold text-foreground tracking-tight'>TGline</h1>
           <p className='text-sm text-muted-foreground mt-2'>東北学院大学 学内共通プラットフォーム</p>
       </div>
 

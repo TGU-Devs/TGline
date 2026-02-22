@@ -12,7 +12,7 @@ class Post < ApplicationRecord
   private
 
   def at_most_one_faculty_tag
-    faculty_tags = post_tags.map(&:tag).compact.select(&:faculty?)
+    faculty_tags = post_tags.map(&:tag).compact.select(&:faculty?) # Post_tagモデルのtagカラムを取得して、faculty?メソッドを呼び出して、faculty?がtrueのタグを取得して配列にし、それをfaculty_tagsに代入する。
     faculty_count = faculty_tags.size
     if faculty_count > 1
       errors.add(:tags, "学部タグは最大1つまでです")
