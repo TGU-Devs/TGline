@@ -21,9 +21,11 @@ export async function POST(request: NextRequest) {
     const response = NextResponse.json(data, { status: backendRes.status });
 
     // バックエンドからのSet-Cookieヘッダーをブラウザにリレー
+    // ドメイン属性を除去してフロントエンドのドメインでCookieが設定されるようにする
     const setCookieHeader = backendRes.headers.get("set-cookie");
     if (setCookieHeader) {
-      response.headers.set("Set-Cookie", setCookieHeader);
+      const cleanedCookie = setCookieHeader.replace(/;\s*domain=[^;]*/gi, "");
+      response.headers.set("Set-Cookie", cleanedCookie);
     }
 
     return response;

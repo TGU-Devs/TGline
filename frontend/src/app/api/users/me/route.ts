@@ -58,9 +58,11 @@ export async function DELETE(request: NextRequest) {
       const response = new NextResponse(null, { status: 204 });
 
       // バックエンドからのSet-Cookieヘッダーを転送（cookie削除用）
+      // ドメイン属性を除去してフロントエンドのドメインでCookieが設定されるようにする
       const setCookieHeader = backendRes.headers.get("set-cookie");
       if (setCookieHeader) {
-        response.headers.set("Set-Cookie", setCookieHeader);
+        const cleanedCookie = setCookieHeader.replace(/;\s*domain=[^;]*/gi, "");
+        response.headers.set("Set-Cookie", cleanedCookie);
       }
 
       return response;
