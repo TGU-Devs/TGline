@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
+import Loading from "@/components/ui/Loading";
+import ErrorUI from "@/components/ui/ErrorUI";
 import Toast from "@/components/features/settings/Toast";
 import Header from "@/components/features/settings/Header";
 import ProfileSection from "@/components/features/settings/ProfileSection";
@@ -24,7 +26,7 @@ import {
     Shield,
     AlertTriangle,
 } from "lucide-react";
-import { FormValues, Errors } from "@/components/features/settings/types";
+import { SettingsUser, FormValues, Errors } from "@/components/features/settings/types";
 
 const initFormValues = {
     display_name: "",
@@ -32,11 +34,11 @@ const initFormValues = {
     description: "",
 };
 
-const initUser = {
+const initUser: SettingsUser = {
     display_name: "",
     email: "",
     description: "",
-    provider: null as string | null,
+    provider: null,
 };
 
 const SettingsPage = () => {
@@ -44,16 +46,19 @@ const SettingsPage = () => {
     const [showErrorToast, setShowErrorToast] = useState(false);
     const [showPasswordChangedToast, setShowPasswordChangedToast] =
         useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [isDark, setIsDark] = useState(false);
-    const [currentUser, setCurrentUser] = useState(initUser);
+    const [currentUser, setCurrentUser] = useState<SettingsUser>(initUser);
     const [formValues, setFormValues] = useState(initFormValues);
     const [formErrors, setFormErrors] = useState<Errors>({});
 
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    useEffect(() => {
-        const fetchUser = async () => {
+    const fetchUser = useCallback(async () => {
+        try {
+            setIsLoading(true);
             const res = await fetch("/api/users/me", {
                 credentials: "include",
             });
@@ -67,11 +72,21 @@ const SettingsPage = () => {
                     description: data.description,
                 }));
             } else {
-                console.error("ユーザーデータの取得に失敗:", res.status);
+                throw new Error(`データの取得に失敗しました (${res.status})`);
             }
-        };
-        fetchUser();
+        } catch (err) {
+            console.error("ユーザーデータの取得に失敗:", err);
+            setError(
+                err instanceof Error ? err.message : "エラーが発生しました",
+            );
+        } finally {
+            setIsLoading(false);
+        }
     }, []);
+
+    useEffect(() => {
+        fetchUser();
+    }, [fetchUser]);
 
     useEffect(() => {
         if (searchParams.get("status") === "password_changed") {
@@ -155,7 +170,8 @@ const SettingsPage = () => {
 
     const validateForm = (values: FormValues) => {
         const errors: Errors = {};
-        const emailRegex = /^[a-zA-Z0-9_.+-]+@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/;
+        const emailRegex =
+            /^[a-zA-Z0-9_.+-]+@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/;
 
         if (!values.display_name.trim()) {
             errors.display_name = "ユーザー名を入力してください。";
@@ -167,7 +183,7 @@ const SettingsPage = () => {
             errors.email = "正しいメールアドレスを入力してください。";
         }
         return errors;
-    }
+    };
 
     const changeDarkMode = (
         e:
@@ -185,6 +201,14 @@ const SettingsPage = () => {
         const { id, value } = e.target;
         setFormValues((prevFormValues) => ({ ...prevFormValues, [id]: value }));
     };
+
+    if (isLoading) {
+        return <Loading />;
+    }
+
+    if (error) {
+        return <ErrorUI error={error} fetch={fetchUser} />;
+    }
 
     return (
         <main className="min-h-screen bg-background p-6 md:p-10 duration-300">
@@ -230,11 +254,16 @@ const SettingsPage = () => {
                 </div>
             </form>
 
-            <SecuritySection icon={Shield} securityOptions={
-                currentUser.provider
-                    ? SECURITY_OPTIONS.filter((opt) => opt.id !== "change_password")
-                    : SECURITY_OPTIONS
-            } />
+            <SecuritySection
+                icon={Shield}
+                securityOptions={
+                    currentUser.provider
+                        ? SECURITY_OPTIONS.filter(
+                              (opt) => opt.id !== "change_password",
+                          )
+                        : SECURITY_OPTIONS
+                }
+            />
 
             <Footer />
         </main>
@@ -242,4 +271,3 @@ const SettingsPage = () => {
 };
 
 export default SettingsPage;
-
