@@ -2,7 +2,6 @@
 
 import { ArrowRight, Bell, Calendar, Heart, MessageCircle, Home, User, PenSquare, BookOpen, Users, Sparkles, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
 import Link from "next/link";
 
 export function HeroSection() {
@@ -31,7 +30,7 @@ export function HeroSection() {
             {/* Main heading */}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground text-balance">
               東北学院大学生のための
-              <span className="text-primary">情報共有プラットフォーム</span>
+              <span className="text-primary">情報共有アプリ</span>
             </h1>
 
             {/* Subtitle */}
@@ -73,7 +72,7 @@ export function HeroSection() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-primary/30 text-foreground px-8 py-6 text-base font-semibold bg-transparent transition-all hover:scale-105"
+                className="border-primary/30 text-foreground px-8 py-6 text-base font-semibold bg-transparent transition-all hover:bg-primary"
               >
                 投稿を見る
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -81,21 +80,6 @@ export function HeroSection() {
               </Link>
             </div>
 
-            {/* Stats */}
-            <div className="mt-12 flex flex-wrap justify-center lg:justify-start gap-8">
-              <div className="text-center lg:text-left">
-                <div className="text-3xl font-bold text-foreground">1,200+</div>
-                <div className="text-sm text-muted-foreground">アクティブユーザー</div>
-              </div>
-              <div className="text-center lg:text-left">
-                <div className="text-3xl font-bold text-foreground">350+</div>
-                <div className="text-sm text-muted-foreground">投稿数</div>
-              </div>
-              <div className="text-center lg:text-left">
-                <div className="text-3xl font-bold text-foreground">50+</div>
-                <div className="text-sm text-muted-foreground">サークル掲載</div>
-              </div>
-            </div>
           </div>
 
           {/* Right Content - Phone Mockup */}

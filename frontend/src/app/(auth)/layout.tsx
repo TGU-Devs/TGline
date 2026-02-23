@@ -23,7 +23,7 @@ export default function AuthLayout({
           <div className='w-18 h-18 flex items-center justify-center mx-auto mb-4 shadow-lg rounded-2xl overflow-hidden bg-white'>
               <Image src="/TGlinelogo.svg" alt="TGline" width={64} height={64} className="w-full h-full mix-blend-multiply" />
           </div>
-          <p className='text-sm text-muted-foreground mt-2'>東北学院大学 学内共通プラットフォーム</p>
+          <p className='text-sm text-muted-foreground mt-2'>東北学院大学生のための情報共有アプリ</p>
       </div>
 
       <main className='w-full max-w-md animate-slide-up'>
@@ -32,9 +32,6 @@ export default function AuthLayout({
           </GoogleOAuthProvider>
       </main>
 
-      <div className='mt-8 text-center text-xs text-muted-foreground'>
-          利用規約とプライバシーポリシーをご確認の上、ご利用ください。
-      </div>
     </div>
   );
 }

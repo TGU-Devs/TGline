@@ -23,8 +23,11 @@ export async function DELETE(
       return new NextResponse(null, { status: 204 });
     }
 
-    const data = await backendRes.json();
-    return NextResponse.json(data, { status: backendRes.status });
+    const text = await backendRes.text();
+    if (!text) {
+      return new NextResponse(null, { status: backendRes.status });
+    }
+    return NextResponse.json(JSON.parse(text), { status: backendRes.status });
   } catch (error) {
     console.error("Delete comment error:", error);
     return NextResponse.json(

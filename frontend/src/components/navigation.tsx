@@ -1,7 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { LogIn, UserPlus } from "lucide-react";
 
 export function Navigation() {
   return (
@@ -11,20 +9,6 @@ export function Navigation() {
         <Image src="/TGlinelogo.svg" alt="TGline" width={64} height={64} className="w-full h-full mix-blend-multiply" />
       </div>
       </Link>
-      <div className="flex items-center gap-3">
-        <Button asChild variant="ghost" size="sm" className="text-foreground">
-          <Link href="/login">
-            <LogIn className="h-4 w-4 mr-1.5" />
-            ログイン
-          </Link>
-        </Button>
-        <Button asChild size="sm">
-          <Link href="/register">
-            <UserPlus className="h-4 w-4 mr-1.5" />
-            新規登録
-          </Link>
-        </Button>
-      </div>
     </header>
   );
 }

@@ -102,7 +102,7 @@ module Api
         },
         likes_count: post.likes.size,
         current_user_liked: post.likes.any? { |l| l.user_id == current_user&.id },
-        comments_count: post.comments.active.size,
+        comments_count: post.comments.count { |c| c.deleted_at.nil? },
         created_at: post.created_at.iso8601,
         updated_at: post.updated_at.iso8601
       }
