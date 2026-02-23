@@ -9,20 +9,23 @@ const currentUser = {
 
 const UserProfile = () => {
     return (
-        <div className="text-center border-b border-sidebar-border">
+        <div className="border-b border-sidebar-border">
             <div className="p-4">
-                <div className="w-20 h-20 bg-primary rounded-full mx-auto mb-4 flex items-center justify-center text-3xl text-primary-foreground font-bold shadow-lg">
-                    {currentUser.name.charAt(0)}
+                <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 shrink-0 bg-primary rounded-full flex items-center justify-center text-lg text-primary-foreground font-bold shadow-sm">
+                        {currentUser.name.charAt(0)}
+                    </div>
+                    <div className="min-w-0">
+                        <h2 className="text-sm font-bold text-sidebar-foreground truncate">
+                            {currentUser.name}
+                        </h2>
+                        {currentUser.description && (
+                            <p className="text-xs text-sidebar-foreground/60 truncate">
+                                {currentUser.description}
+                            </p>
+                        )}
+                    </div>
                 </div>
-                <h2 className="text-xl font-bold text-sidebar-foreground mb-1">
-                    {currentUser.name}
-                </h2>
-                {currentUser.description && (
-                    <p className="text-sm text-sidebar-foreground/60 mb-4 line-clamp-2">
-                        {currentUser.description}
-                    </p>
-                )}
-                {!currentUser.description && <div className="mb-4" />}
                 <Link
                     href="/posts/new"
                     className="flex items-center justify-center w-full p-3 bg-primary text-primary-foreground font-medium rounded-xl cursor-pointer hover:bg-primary/90 transition-colors"
