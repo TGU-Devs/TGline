@@ -1,9 +1,9 @@
 import SettingSection from "./SettingSection";
 import { FormValues, Errors } from "./types";
 import type { LucideIcon } from "lucide-react";
+import Avatar from "boring-avatars";
 
 type ProfileSectionProps = {
-    currentUserName: string;
     formValues: FormValues;
     formErrors: Errors;
     icon: LucideIcon;
@@ -11,7 +11,6 @@ type ProfileSectionProps = {
 };
 
 const ProfileSection = ({
-    currentUserName,
     formValues,
     formErrors,
     icon: Icon,
@@ -21,7 +20,7 @@ const ProfileSection = ({
         <SettingSection title="プロフィール設定" icon={Icon}>
             <div className="flex flex-col md:flex-row gap-8 items-start">
                 <div className="w-20 h-20 bg-sky-600 rounded-full mb-4 flex items-center justify-center text-3xl text-white font-bold shadow-lg">
-                    {currentUserName.charAt(0)}
+                 <Avatar name="Belva Lockwood" colors={["#0a0310","#49007e","#ff005b","#ff7b10","#ffb238"]} variant="beam" size={80}/>
                 </div>
 
                 <fieldset className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 w-full">

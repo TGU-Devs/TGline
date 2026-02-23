@@ -1,5 +1,6 @@
 import { SquarePen } from "lucide-react";
 import Link from "next/link";
+import Avatar from "boring-avatars";
 
 const currentUser = {
     id: "taro_1225",
@@ -13,7 +14,7 @@ const UserProfile = () => {
             <div className="p-4">
                 <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 shrink-0 bg-primary rounded-full flex items-center justify-center text-lg text-primary-foreground font-bold shadow-sm">
-                        {currentUser.name.charAt(0)}
+                        <Avatar name="Belva Lockwood" colors={["#0a0310","#49007e","#ff005b","#ff7b10","#ffb238"]} variant="beam" size={60}/>
                     </div>
                     <div className="min-w-0">
                         <h2 className="text-sm font-bold text-sidebar-foreground truncate">
