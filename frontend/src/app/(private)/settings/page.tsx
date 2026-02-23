@@ -26,7 +26,7 @@ import {
     Shield,
     AlertTriangle,
 } from "lucide-react";
-import { FormValues, Errors } from "@/components/features/settings/types";
+import { SettingsUser, FormValues, Errors } from "@/components/features/settings/types";
 
 const initFormValues = {
     display_name: "",
@@ -34,11 +34,11 @@ const initFormValues = {
     description: "",
 };
 
-const initUser = {
+const initUser: SettingsUser = {
     display_name: "",
     email: "",
     description: "",
-    provider: null as string | null,
+    provider: null,
 };
 
 const SettingsPage = () => {
@@ -49,7 +49,7 @@ const SettingsPage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isDark, setIsDark] = useState(false);
-    const [currentUser, setCurrentUser] = useState(initUser);
+    const [currentUser, setCurrentUser] = useState<SettingsUser>(initUser);
     const [formValues, setFormValues] = useState(initFormValues);
     const [formErrors, setFormErrors] = useState<Errors>({});
 
