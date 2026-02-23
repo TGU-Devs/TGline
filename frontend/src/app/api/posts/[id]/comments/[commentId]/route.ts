@@ -4,13 +4,14 @@ const BACKEND_URL = process.env.BACKEND_URL || "http://backend:3000";
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string; commentId: string } }
+  { params }: { params: Promise<{ id: string; commentId: string }> }
 ) {
   try {
+    const { id, commentId } = await params;
     const cookie = request.headers.get("cookie") || "";
 
     const backendRes = await fetch(
-      `${BACKEND_URL}/api/posts/${params.id}/comments/${params.commentId}`,
+      `${BACKEND_URL}/api/posts/${id}/comments/${commentId}`,
       {
         method: "DELETE",
         headers: {

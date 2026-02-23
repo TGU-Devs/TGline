@@ -4,13 +4,14 @@ const BACKEND_URL = process.env.BACKEND_URL || "http://backend:3000";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const cookie = request.headers.get("cookie") || "";
 
     const backendRes = await fetch(
-      `${BACKEND_URL}/api/posts/${params.id}/comments`,
+      `${BACKEND_URL}/api/posts/${id}/comments`,
       {
         method: "GET",
         headers: {
@@ -32,14 +33,15 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const cookie = request.headers.get("cookie") || "";
     const body = await request.json();
 
     const backendRes = await fetch(
-      `${BACKEND_URL}/api/posts/${params.id}/comments`,
+      `${BACKEND_URL}/api/posts/${id}/comments`,
       {
         method: "POST",
         headers: {
