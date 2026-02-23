@@ -17,7 +17,9 @@
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
     # ブラウザからの直接アクセスとNext.jsプロキシからのアクセスを許可
-    origins 'http://localhost:3000', 'http://frontend:3000'
+    origins 'http://localhost:3000', 'http://frontend:3000',
+            'https://tgline-production.up.railway.app',
+            'http://tgline.railway.internal'
     resource '*',
       headers: :any,
       methods: [:get, :post, :put, :patch, :delete, :options, :head],

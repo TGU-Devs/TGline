@@ -26,6 +26,7 @@ module Api
           
           render json: {
             user: user_response(user),
+            token: token,
             message: 'サインインに成功しました!'
           }, status: :ok
         else

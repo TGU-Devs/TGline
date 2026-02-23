@@ -2,6 +2,8 @@ class Post < ApplicationRecord
   belongs_to :user
   has_many :post_tags, dependent: :destroy # 中間テーブルへの直接アクセス
   has_many :tags, through: :post_tags # タグへの間接アクセス
+  has_many :likes, dependent: :destroy
+  has_many :comments, dependent: :destroy
 
   validates :title, presence: true
   validates :body, presence: true
@@ -10,7 +12,7 @@ class Post < ApplicationRecord
   private
 
   def at_most_one_faculty_tag
-    faculty_tags = post_tags.map(&:tag).compact.select(&:faculty?)
+    faculty_tags = post_tags.map(&:tag).compact.select(&:faculty?) # Post_tagモデルのtagカラムを取得して、faculty?メソッドを呼び出して、faculty?がtrueのタグを取得して配列にし、それをfaculty_tagsに代入する。
     faculty_count = faculty_tags.size
     if faculty_count > 1
       errors.add(:tags, "学部タグは最大1つまでです")

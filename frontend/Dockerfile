@@ -1,23 +1,28 @@
 # ===================================
 # Stage 1: Build
 # ===================================
-FROM node:23-bookworm-slim AS builder
+FROM node:23-bookworm AS builder
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
+COPY package.json ./
 RUN npm install
 
 COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_GOOGLE_CLIENT_ID=$NEXT_PUBLIC_GOOGLE_CLIENT_ID
+
 RUN npm run build
 
 # ===================================
 # Stage 2: Run
 # ===================================
-FROM node:23-bookworm-slim AS runner
+FROM node:23-bookworm AS runner
 
 WORKDIR /app
 
