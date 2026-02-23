@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import Loading from "@/components/ui/Loading";
+import ErrorUI from "@/components/ui/ErrorUI";
 import Toast from "@/components/features/settings/Toast";
 import Header from "@/components/features/settings/Header";
 import ProfileSection from "@/components/features/settings/ProfileSection";
@@ -46,6 +47,7 @@ const SettingsPage = () => {
     const [showPasswordChangedToast, setShowPasswordChangedToast] =
         useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [isDark, setIsDark] = useState(false);
     const [currentUser, setCurrentUser] = useState(initUser);
     const [formValues, setFormValues] = useState(initFormValues);
@@ -54,31 +56,37 @@ const SettingsPage = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                setIsLoading(true);
-                const res = await fetch("/api/users/me", {
-                    credentials: "include",
-                });
-                if (res.ok) {
-                    const data = await res.json();
-                    setCurrentUser(data);
-                    setFormValues((prevFormValues) => ({
-                        ...prevFormValues,
-                        display_name: data.display_name,
-                        email: data.email,
-                        description: data.description,
-                    }));
-                }
-            } catch (error) {
-                console.error("ユーザーデータの取得に失敗:", error);
-            } finally {
-                setIsLoading(false);
+    const fetchUser = useCallback(async () => {
+        try {
+            setIsLoading(true);
+            const res = await fetch("/api/users/me", {
+                credentials: "include",
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setCurrentUser(data);
+                setFormValues((prevFormValues) => ({
+                    ...prevFormValues,
+                    display_name: data.display_name,
+                    email: data.email,
+                    description: data.description,
+                }));
+            } else {
+                throw new Error(`データの取得に失敗しました (${res.status})`);
             }
-        };
-        fetchUser();
+        } catch (err) {
+            console.error("ユーザーデータの取得に失敗:", err);
+            setError(
+                err instanceof Error ? err.message : "エラーが発生しました",
+            );
+        } finally {
+            setIsLoading(false);
+        }
     }, []);
+
+    useEffect(() => {
+        fetchUser();
+    }, [fetchUser]);
 
     useEffect(() => {
         if (searchParams.get("status") === "password_changed") {
@@ -196,6 +204,10 @@ const SettingsPage = () => {
 
     if (isLoading) {
         return <Loading />;
+    }
+
+    if (error) {
+        return <ErrorUI error={error} fetch={fetchUser} />;
     }
 
     return (
