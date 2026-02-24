@@ -5,3 +5,9 @@ export type MenuItem = {
     path: string;
     icon: LucideIcon;
 };
+
+export type ProfileUser = {
+    id: string;
+    display_name: string;
+    description: string;
+};
