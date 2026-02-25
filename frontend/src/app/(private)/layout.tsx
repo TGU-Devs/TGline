@@ -56,9 +56,9 @@ export default function PrivateLayout({
 
     // 認証済みの場合は子コンポーネントを表示
     return (
-        <div className="flex">
+        <div className="lg:flex">
             <Sidebar />
-            <main className="flex-1 pb-16 lg:pb-0">{children}</main>
+            <main className="pt-16 min-h-screen lg:min-h-0 lg:flex-1 lg:pb-0 ">{children}</main>
         </div>
     );
 }

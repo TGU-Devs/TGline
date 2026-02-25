@@ -10,4 +10,5 @@ export type ProfileUser = {
     id: string;
     display_name: string;
     description: string;
+    role: string;
 };

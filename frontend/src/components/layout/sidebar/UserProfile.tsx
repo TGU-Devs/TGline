@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import Link from "next/link";
 
 import { SquarePen } from "lucide-react";
@@ -6,36 +5,12 @@ import Avatar from "boring-avatars";
 
 import type { ProfileUser } from "./types";
 
-const initUser: ProfileUser = {
-    id: "",
-    display_name: "",
-    description: "",
+type UserProfileProps = {
+    currentUser: ProfileUser | null;
+    isLoading: boolean;
 };
 
-const UserProfile = () => {
-    const [currentUser, setCurrentUser] = useState<ProfileUser>(initUser);
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                setIsLoading(true);
-                const res = await fetch("/api/users/me", {
-                    credentials: "include",
-                });
-                if (res.ok) {
-                    const data = await res.json();
-                    setCurrentUser(data);
-                }
-            } catch (err) {
-                console.error("ユーザーデータの取得に失敗:", err);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchUser();
-    }, []);
-
+const UserProfile = ({ currentUser, isLoading }: UserProfileProps) => {
     return (
         <div className="border-b border-sidebar-border">
             <div className="p-4">
@@ -45,7 +20,7 @@ const UserProfile = () => {
                     </div>
                     <div className="min-w-0">
                         <h2 className="text-sm font-bold text-sidebar-foreground truncate">
-                            {isLoading ? "読み込み中..." : currentUser.display_name}
+                            {isLoading ? "読み込み中..." : currentUser?.display_name || ""}
                         </h2>
                         {currentUser?.description && (
                             <p className="text-xs text-sidebar-foreground/60 truncate">
