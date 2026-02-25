@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 
 import Link from "next/link";
@@ -65,8 +64,6 @@ const initFormValues = {
 };
 
 const AuthForm = ({ isRegister }: AuthFormProps) => {
-    const router = useRouter();
-
     const [formValues, setFormValues] = useState(initFormValues);
     const [formErrors, setFormErrors] = useState<Errors>({});
     const [isLoading, setIsLoading] = useState(false);
@@ -130,7 +127,7 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
             return;
         }
 
-        router.push("/posts");
+        window.location.href = "/posts";
     };
 
     // サインイン処理
@@ -154,7 +151,7 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
             return;
         }
 
-        router.push("/posts");
+        window.location.href = "/posts";
     };
 
     // Googleログイン処理 credentialResponse: Googleから返されるクレデンシャル情報
@@ -182,7 +179,7 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
                 return;
             }
 
-            router.push("/posts");
+            window.location.href = "/posts";
         } catch (error) {
             console.error("Google login error:", error);
             setFormErrors({ main: "サーバーエラーが発生しました" });
