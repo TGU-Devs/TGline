@@ -6,6 +6,7 @@ class CreateTags < ActiveRecord::Migration[7.2]
 
       t.timestamps
     end
+    # マスターデータなのでマイグレーションに入れる
     # タグを増やしたい時は Tag::DEFINITIONS を編集 + 新しいマイグレーションで追加INSERT、という流れ
     reversible do |dir|
       dir.up do
