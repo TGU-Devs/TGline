@@ -235,7 +235,6 @@ const SettingsPage = () => {
                 <Header icon={Save} saveHandler={saveHandler} />
 
                 <ProfileSection
-                    currentUserName={currentUser.display_name}
                     formValues={formValues}
                     formErrors={formErrors}
                     icon={UserIcon}
