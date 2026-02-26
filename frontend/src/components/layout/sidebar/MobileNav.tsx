@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 
+import Logo from "./Logo";
 import LogoutButton from "./LogoutButton";
 
 import { Menu, X } from "lucide-react";
@@ -40,15 +40,7 @@ const MobileNav = ({
     return (
         <div className="lg:hidden">
             <header className="fixed inset-x-0 top-0 z-40 flex h-16 items-center justify-between border-b border-sidebar-border bg-sidebar px-3 shadow-sm">
-                <div className="flex items-center">
-                    <Image
-                        src="/TGline-nobg1.png"
-                        alt="TGline"
-                        width={150}
-                        height={150}
-                        className="w-36 h-auto object-contain -ml-3"
-                    />
-                </div>
+                <Logo isDesktop={false} />
 
                 <button
                     onClick={toggleMenu}
