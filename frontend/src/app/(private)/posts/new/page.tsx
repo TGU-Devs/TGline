@@ -12,16 +12,15 @@ import {
 } from "@/components/ui/popover";
 import { ArrowLeft, Plus, ChevronDown, X, Check } from "lucide-react";
 
+import { useFormValidate } from "@/components/features/posts/hooks/useFormValidate";
+
 interface Tag {
   id: number;
   name: string;
   category: "faculty" | "topic";
 }
 
-type Errors = {
-  title?: string;
-  body?: string;
-}
+
 
 const CATEGORY_CONFIG = {
   faculty: {
@@ -42,11 +41,12 @@ export default function PostNewPage() {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const [FormErrors, setFormErrors] = useState<Errors>({});
   const [isCreating, setIsCreating] = useState(false);
   const [tags, setTags] = useState<Tag[]>([]);
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [openCategory, setOpenCategory] = useState<string | null>(null);
+
+  const { FormErrors, validateForm, clearErrors } = useFormValidate();
 
   useEffect(() => {
     fetchTags();
@@ -102,13 +102,10 @@ export default function PostNewPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const errors = validateForm(title, body);
-    if (Object.keys(errors).length > 0) {
-      setFormErrors(errors);
-      return;
-    }
+    const isValid = validateForm(title, body);
+    if (!isValid) return;
 
-    setFormErrors({});
+    clearErrors();
 
     try {
       setIsCreating(true);
@@ -145,16 +142,7 @@ export default function PostNewPage() {
     }
   };
 
-  const validateForm = (title: string, body: string) => {
-    const errors: Errors = {};
-    if (!title.trim()) {
-      errors.title = "タイトルを入力してください";
-    }
-    if (!body.trim()) {
-      errors.body = "本文を入力してください";
-    }
-    return errors;
-  };
+  
 
   return (
     <div className="min-h-screen bg-background py-4 sm:py-8">

@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/popover";
 import { ArrowLeft, Save, ChevronDown, X, Check } from "lucide-react";
 
+import { useFormValidate } from "@/components/features/posts/hooks/useFormValidate";
+
 interface Tag {
   id: number;
   name: string;
@@ -58,6 +60,8 @@ export default function PostEditPage() {
   const [tags, setTags] = useState<Tag[]>([]);
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [openCategory, setOpenCategory] = useState<string | null>(null);
+
+  const { FormErrors, validateForm, clearErrors } = useFormValidate();
 
   useEffect(() => {
     fetchTags();
@@ -152,10 +156,10 @@ export default function PostEditPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!title.trim() || !body.trim()) {
-      alert("タイトルと本文を入力してください");
-      return;
-    }
+      const isValid = validateForm(title, body);
+      if (!isValid) return;
+
+      clearErrors();
 
     try {
       setIsSaving(true);
@@ -237,7 +241,7 @@ export default function PostEditPage() {
         <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-4 sm:p-6 lg:p-8">
           <h1 className="text-xl sm:text-2xl font-bold text-card-foreground mb-4 sm:mb-6">投稿を編集</h1>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6" noValidate>
             {/* タイトル */}
             <div>
               <label
@@ -255,6 +259,9 @@ export default function PostEditPage() {
                 placeholder="投稿のタイトルを入力"
                 required
               />
+              {FormErrors.title && (
+                <p className="mt-1 text-sm text-destructive">{FormErrors.title}</p>
+              )}
             </div>
 
             {/* 本文 */}
@@ -274,6 +281,9 @@ export default function PostEditPage() {
                 placeholder="投稿の本文を入力"
                 required
               />
+              {FormErrors.body && (
+                <p className="mt-1 text-sm text-destructive">{FormErrors.body}</p>
+              )}
             </div>
 
             {/* タグ選択 */}
