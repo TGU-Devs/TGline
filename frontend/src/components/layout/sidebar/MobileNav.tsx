@@ -5,6 +5,7 @@ import Logo from "./Logo";
 import LogoutButton from "./LogoutButton";
 
 import { Menu, X } from "lucide-react";
+import Avatar from "boring-avatars";
 
 import type { MenuItem, ProfileUser } from "./types";
 
@@ -98,7 +99,7 @@ const MobileNav = ({
                 <div className="p-6 border-t border-sidebar-border">
                     <div className="flex items-center space-x-3 mb-4">
                         <div className="w-10 h-10 shrink-0 bg-primary rounded-full flex items-center justify-center text-lg text-primary-foreground font-bold shadow-sm">
-                            {currentUser?.display_name.charAt(0) || ""}
+                            <Avatar name="Belva Lockwood" colors={["#0a0310","#49007e","#ff005b","#ff7b10","#ffb238"]} variant="beam" size={60}/>
                         </div>
                         <div>
                             <p className="text-sm font-bold text-sidebar-foreground truncate">
