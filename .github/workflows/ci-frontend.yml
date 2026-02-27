@@ -1,29 +1,40 @@
+# GitHub Actionsの表示名（PRのチェック欄に出る名前）
 name: CI - Frontend Build Check
 
+# PRが作成 or 更新された時に発火
 on:
   pull_request:
+    # frontend/ 配下のファイルに変更がある場合のみ実行（バックエンドだけの変更ではスキップ）
     paths:
       - "frontend/**"
 
 jobs:
   build:
+    # GitHub提供のLinuxマシン上で実行
     runs-on: ubuntu-latest
     defaults:
       run:
+        # 全ての run コマンドを frontend/ ディレクトリ内で実行
         working-directory: frontend
 
     steps:
+      # リポジトリのコードをマシンにクローン
       - uses: actions/checkout@v4
 
+      # Node.js環境をセットアップ
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+          # node_modulesをキャッシュ（2回目以降のインストールが速くなる）
           cache: "npm"
+          # キャッシュキーの基準ファイル（lockfileが変わったらキャッシュ再生成）
           cache-dependency-path: frontend/package-lock.json
 
+      # package-lock.json から正確に依存をインストール（npm installと違いlockfileを変更しない、CI向き）
       - run: npm ci
 
+      # next build を実行。型エラーがあればここで失敗 → PRに赤バツが付く
       - run: npm run build
-        env: # 一旦CIではビルドが通るかどうかだけ確認したいので環境変数はダミーで設定
+        env: # CIではビルドが通るかだけ確認したいので環境変数はダミーで設定
           NEXT_PUBLIC_GOOGLE_CLIENT_ID: dummy
           NEXT_PUBLIC_API_URL: http://localhost:3000
