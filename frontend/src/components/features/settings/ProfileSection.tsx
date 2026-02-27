@@ -7,7 +7,9 @@ type ProfileSectionProps = {
     formValues: FormValues;
     formErrors: Errors;
     icon: LucideIcon;
-    onchangeHandler: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+    onchangeHandler: (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    ) => void;
 };
 
 const ProfileSection = ({
@@ -20,7 +22,11 @@ const ProfileSection = ({
         <SettingSection title="プロフィール設定" icon={Icon}>
             <div className="flex flex-col md:flex-row gap-8 items-start">
                 <div className="w-20 h-20 bg-sky-600 rounded-full mb-4 flex items-center justify-center text-3xl text-white font-bold shadow-lg">
-                 <Avatar name="Belva Lockwood" colors={["#0a0310","#49007e","#ff005b","#ff7b10","#ffb238"]} variant="beam" size={80}/>
+                    <Avatar
+                        name={formValues.display_name || ""}
+                        variant="beam"
+                        size={80}
+                    />
                 </div>
 
                 <fieldset className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 w-full">

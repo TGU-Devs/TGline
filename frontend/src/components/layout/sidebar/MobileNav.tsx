@@ -7,12 +7,13 @@ import LogoutButton from "./LogoutButton";
 import { Menu, X } from "lucide-react";
 import Avatar from "boring-avatars";
 
-import type { MenuItem, ProfileUser } from "./types";
+import { User } from "@/types/user";
+import type { MenuItem } from "./types";
 
 import { APP_COPYRIGHT, APP_VERSION } from "@/constants/app";
 
 type MobileNavProps = {
-    currentUser: ProfileUser | null;
+    currentUser: User | null;
     isLoading: boolean;
     menuList: MenuItem[];
     pathname: string;
@@ -99,7 +100,15 @@ const MobileNav = ({
                 <div className="p-6 border-t border-sidebar-border">
                     <div className="flex items-center space-x-3 mb-4">
                         <div className="w-10 h-10 shrink-0 bg-primary rounded-full flex items-center justify-center text-lg text-primary-foreground font-bold shadow-sm">
-                            <Avatar name="Belva Lockwood" colors={["#0a0310","#49007e","#ff005b","#ff7b10","#ffb238"]} variant="beam" size={60}/>
+                            {currentUser ? (
+                                <Avatar
+                                    name={currentUser?.display_name || ""}
+                                    variant="beam"
+                                    size={60}
+                                />
+                            ) : (
+                                <div className="animate-pulse w-10 h-10 bg-primary/50 rounded-full" />
+                            )}
                         </div>
                         <div>
                             <p className="text-sm font-bold text-sidebar-foreground truncate">
