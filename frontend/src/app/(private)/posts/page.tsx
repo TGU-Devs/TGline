@@ -328,9 +328,6 @@ export default function PostsPage() {
                       })}
                     </div>
                   )}
-                  <p className="text-sm sm:text-base text-slate-600 mb-3 sm:mb-4 line-clamp-3">
-                    {post.body}
-                  </p>
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
                     <div className="flex items-center gap-1.5">
                       <div className="w-5 h-5 bg-primary/15 rounded-full flex items-center justify-center">
