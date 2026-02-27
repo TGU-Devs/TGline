@@ -4,7 +4,11 @@ import { DoorOpen } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-const LogoutButton = () => {
+type LogoutButtonProps = {
+    isDesktop?: boolean;
+};
+
+const LogoutButton = ({ isDesktop }: LogoutButtonProps) => {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
 
@@ -33,12 +37,12 @@ const LogoutButton = () => {
     return (
         <div className="p-3">
             <button
-                className="flex items-center justify-center w-full p-3 text-muted-foreground font-medium rounded-xl cursor-pointer hover:bg-muted transition-colors"
+                className={`flex items-center transition-colors ${isDesktop ? "justify-center w-full p-3 font-medium text-muted-foreground rounded-xl cursor-pointer hover:bg-muted " : "px-3 py-4 text-destructive hover:bg-destructive/10 rounded-lg"}`}
                 onClick={handleLogout}
                 disabled={isLoading}
             >
-                <DoorOpen className="w-5 h-5 mr-2" />
-                {isLoading ? "ログアウト中..." : "ログアウト"}
+                <DoorOpen className={`${isDesktop ? "w-5 h-5 mr-2" : "mr-4"}`} />
+                <span className={isDesktop ? "" : "text-xs font-medium"}>{isLoading ? "ログアウト中..." : "ログアウト"} </span>
             </button>
         </div>
     );

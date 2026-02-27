@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+
+import { useUser } from "@/contexts/UserContext";
 
 import Loading from "@/components/ui/Loading";
 import ErrorUI from "@/components/ui/ErrorUI";
@@ -26,7 +28,7 @@ import {
     Shield,
     AlertTriangle,
 } from "lucide-react";
-import { SettingsUser, FormValues, Errors } from "@/components/features/settings/types";
+import { FormValues, Errors } from "@/components/features/settings/types"; // SettingsUserは不要になったため削除
 
 const initFormValues = {
     display_name: "",
@@ -34,59 +36,29 @@ const initFormValues = {
     description: "",
 };
 
-const initUser: SettingsUser = {
-    display_name: "",
-    email: "",
-    description: "",
-    provider: null,
-};
-
 const SettingsPage = () => {
+    const { user, isLoading, error, refreshUser, setUser } = useUser();
+
     const [showSaveToast, setShowSaveToast] = useState(false);
     const [showErrorToast, setShowErrorToast] = useState(false);
-    const [showPasswordChangedToast, setShowPasswordChangedToast] =
-        useState(false);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const[showPasswordChangedToast, setShowPasswordChangedToast] = useState(false);
     const [isDark, setIsDark] = useState(false);
-    const [currentUser, setCurrentUser] = useState<SettingsUser>(initUser);
-    const [formValues, setFormValues] = useState(initFormValues);
+    const [formValues, setFormValues] = useState<FormValues>(initFormValues);
     const [formErrors, setFormErrors] = useState<Errors>({});
 
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    const fetchUser = useCallback(async () => {
-        try {
-            setIsLoading(true);
-            const res = await fetch("/api/users/me", {
-                credentials: "include",
-            });
-            if (res.ok) {
-                const data = await res.json();
-                setCurrentUser(data);
-                setFormValues((prevFormValues) => ({
-                    ...prevFormValues,
-                    display_name: data.display_name,
-                    email: data.email,
-                    description: data.description,
-                }));
-            } else {
-                throw new Error(`データの取得に失敗しました (${res.status})`);
-            }
-        } catch (err) {
-            console.error("ユーザーデータの取得に失敗:", err);
-            setError(
-                err instanceof Error ? err.message : "エラーが発生しました",
-            );
-        } finally {
-            setIsLoading(false);
-        }
-    }, []);
 
     useEffect(() => {
-        fetchUser();
-    }, [fetchUser]);
+        if (user) {
+            setFormValues({
+                display_name: user.display_name || "",
+                email: user.email || "",
+                description: user.description || "",
+            });
+        }
+    }, [user]);
 
     useEffect(() => {
         if (searchParams.get("status") === "password_changed") {
@@ -104,7 +76,7 @@ const SettingsPage = () => {
         }
     }, [showPasswordChangedToast]);
 
-    const themeOptions = [
+    const themeOptions =[
         {
             id: "light",
             label: "ライトモード",
@@ -154,7 +126,9 @@ const SettingsPage = () => {
             if (res.ok) {
                 setShowSaveToast(true);
                 const updated = await res.json();
-                setCurrentUser(updated);
+                
+                setUser(updated);
+                
                 setTimeout(() => setShowSaveToast(false), 3000);
             } else {
                 console.error("ユーザーデータの更新に失敗:", res.status);
@@ -207,7 +181,7 @@ const SettingsPage = () => {
     }
 
     if (error) {
-        return <ErrorUI error={error} fetch={fetchUser} />;
+        return <ErrorUI error={error} fetch={refreshUser} />; 
     }
 
     return (
@@ -256,7 +230,7 @@ const SettingsPage = () => {
             <SecuritySection
                 icon={Shield}
                 securityOptions={
-                    currentUser.provider
+                    user?.provider
                         ? SECURITY_OPTIONS.filter(
                               (opt) => opt.id !== "change_password",
                           )

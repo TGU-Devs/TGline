@@ -1,12 +1,5 @@
 import type { LucideIcon } from "lucide-react";
 
-type SettingsUser = {
-    display_name: string;
-    email: string;
-    description: string;
-    provider: string | null;
-};
-
 type FormValues = {
     display_name: string;
     email: string;
@@ -43,7 +36,6 @@ type SecurityOption = {
 };
 
 export type {
-    SettingsUser,
     FormValues,
     Errors,
     Notification,

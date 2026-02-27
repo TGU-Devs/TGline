@@ -1,6 +1,8 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { useUser } from "@/contexts/UserContext";
+
 import { Home, Settings, Bell } from "lucide-react";
 
 import DesktopSidebar from "./DesktopSidebar";
@@ -17,10 +19,12 @@ const menuList: MenuItem[] = [
 const Sidebar = () => {
     const pathname = usePathname();
 
+    const { user: currentUser, isLoading } = useUser();
+
     return (
         <>
-            <DesktopSidebar menuList={menuList} pathname={pathname} />
-            <MobileNav menuList={menuList} pathname={pathname} />
+            <DesktopSidebar menuList={menuList} pathname={pathname} currentUser={currentUser} isLoading={isLoading} />
+            <MobileNav menuList={menuList} pathname={pathname} currentUser={currentUser} isLoading={isLoading} />
         </>
     );
 };
