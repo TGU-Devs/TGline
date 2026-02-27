@@ -234,7 +234,7 @@ export default function PostEditPage() {
         </Button>
 
         {/* 編集フォーム */}
-        <div className="bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6 lg:p-8">
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-4 sm:p-6 lg:p-8">
           <h1 className="text-xl sm:text-2xl font-bold text-card-foreground mb-4 sm:mb-6">投稿を編集</h1>
 
           <form onSubmit={handleSubmit} className="space-y-6">

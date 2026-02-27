@@ -304,7 +304,7 @@ export default function PostsPage() {
                 href={`/posts/${post.id}`}
                 className="block"
               >
-                <div className="bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6 hover:shadow-md hover:border-primary/30 transition-all">
+                <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-4 sm:p-6 hover:shadow-md hover:border-primary/30 transition-all">
                   <h2 className="text-lg sm:text-xl font-semibold text-card-foreground mb-2 sm:mb-3 line-clamp-2">
                     {post.title}
                   </h2>

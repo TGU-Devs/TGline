@@ -295,7 +295,7 @@ export default function PostDetailPage() {
         </Button>
 
         {/* 投稿カード */}
-        <div className="bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6 lg:p-8">
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-4 sm:p-6 lg:p-8">
           {/* ヘッダー */}
           <div className="flex flex-col sm:flex-row items-start sm:items-start justify-between mb-4 sm:mb-6 gap-4">
             <div className="flex-1 w-full sm:w-auto">
@@ -375,7 +375,7 @@ export default function PostDetailPage() {
         </div>
 
         {/* コメントセクション */}
-        <div className="mt-6 bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6 lg:p-8">
+        <div className="mt-6 bg-white rounded-3xl shadow-sm border border-slate-100 p-4 sm:p-6 lg:p-8">
           {/* コメントヘッダー */}
           <div className="flex items-center gap-2 mb-4 sm:mb-6">
             <MessageCircle className="h-5 w-5 text-muted-foreground" />

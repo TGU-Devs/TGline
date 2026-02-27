@@ -98,7 +98,7 @@ const MobileNav = ({
                 </nav>
 
                 <div className="p-6 border-t border-sidebar-border">
-                    <div className="flex items-center space-x-3 mb-4">
+                    <Link href="/settings" onClick={toggleMenu} className="flex items-center space-x-3 mb-4 rounded-xl p-2 -m-2 hover:bg-sidebar-accent/10 transition-colors">
                         <div className="w-10 h-10 shrink-0 bg-primary rounded-full flex items-center justify-center text-lg text-primary-foreground font-bold shadow-sm">
                             {currentUser ? (
                                 <Avatar
@@ -120,7 +120,7 @@ const MobileNav = ({
                                 {currentUser?.role || ""}
                             </p>
                         </div>
-                    </div>
+                    </Link>
                     <p className="mt-2 text-[10px] text-muted-foreground">
                         {APP_COPYRIGHT} v{APP_VERSION}
                     </p>
