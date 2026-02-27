@@ -1,0 +1,29 @@
+name: CI - Frontend Build Check
+
+on:
+  pull_request:
+    paths:
+      - "frontend/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - run: npm ci
+
+      - run: npm run build
+        env: # 一旦CIではビルドが通るかどうかだけ確認したいので環境変数はダミーで設定
+          NEXT_PUBLIC_GOOGLE_CLIENT_ID: dummy
+          NEXT_PUBLIC_API_URL: http://localhost:3000
