@@ -304,7 +304,7 @@ export default function PostsPage() {
                 href={`/posts/${post.id}`}
                 className="block"
               >
-                <div className="bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6 hover:shadow-md hover:border-primary/30 transition-all">
+                <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-4 sm:p-6 hover:shadow-md hover:border-primary/30 transition-all">
                   <h2 className="text-lg sm:text-xl font-semibold text-card-foreground mb-2 sm:mb-3 line-clamp-2">
                     {post.title}
                   </h2>
@@ -328,9 +328,6 @@ export default function PostsPage() {
                       })}
                     </div>
                   )}
-                  <p className="text-sm sm:text-base text-slate-600 mb-3 sm:mb-4 line-clamp-3">
-                    {post.body}
-                  </p>
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
                     <div className="flex items-center gap-1.5">
                       <div className="w-5 h-5 bg-primary/15 rounded-full flex items-center justify-center">

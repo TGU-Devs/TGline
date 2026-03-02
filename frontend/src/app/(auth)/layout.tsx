@@ -1,6 +1,8 @@
 "use client";
 
 import Image from 'next/image';
+import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 //Google の認証に必要な設定（Client ID）を子コンポーネントに共有するReact の Context Provider
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
@@ -12,6 +14,15 @@ export default function AuthLayout({
 }>) {
   return (
     <div className='relative min-h-screen flex flex-col items-center justify-center p-4 bg-background overflow-hidden'>
+      {/* トップページに戻るボタン */}
+      <Link
+        href="/"
+        className="absolute top-4 left-4 z-10 flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        トップページに戻る
+      </Link>
+
       {/* Background decorative elements */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-20 left-10 h-72 w-72 rounded-full bg-primary/15 blur-3xl animate-pulse" />

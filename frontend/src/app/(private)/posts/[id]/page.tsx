@@ -164,9 +164,13 @@ export default function PostDetailPage() {
     }
   };
 
+  const isOwnerOrAdmin = (userId: number | undefined) => {
+    if (!currentUser || !userId) return false;
+    return userId === currentUser.id || currentUser.role === "admin";
+  };
+
   const canDeleteComment = (comment: Comment) => {
-    if (!currentUser) return false;
-    return comment.user?.id === currentUser.id || currentUser.role === "admin";
+    return isOwnerOrAdmin(comment.user?.id);
   };
 
   const handleDelete = async () => {
@@ -264,7 +268,7 @@ export default function PostDetailPage() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <p className="text-destructive mb-4">{error || "投稿が見つかりません"}</p>
-          <Button asChild variant="outline">
+          <Button asChild >
             <Link href="/posts">
               <ArrowLeft className="h-4 w-4 mr-2" />
               一覧に戻る
@@ -291,7 +295,7 @@ export default function PostDetailPage() {
         </Button>
 
         {/* 投稿カード */}
-        <div className="bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6 lg:p-8">
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-4 sm:p-6 lg:p-8">
           {/* ヘッダー */}
           <div className="flex flex-col sm:flex-row items-start sm:items-start justify-between mb-4 sm:mb-6 gap-4">
             <div className="flex-1 w-full sm:w-auto">
@@ -337,27 +341,29 @@ export default function PostDetailPage() {
                 </button>
               </div>
             </div>
-            <div className="flex gap-2 w-full sm:w-auto">
-              <Button
-                asChild
-                variant="outline"
-                className="flex-1 sm:flex-initial"
-              >
-                <Link href={`/posts/${post.id}/edit`}>
-                  <Edit className="h-4 w-4 mr-2" />
-                  <span className="hidden sm:inline">編集</span>
-                </Link>
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={handleDelete}
-                disabled={isDeleting}
-                className="flex-1 sm:flex-initial"
-              >
-                <Trash2 className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">{isDeleting ? "削除中..." : "削除"}</span>
-              </Button>
-            </div>
+            {isOwnerOrAdmin(post.user?.id) && (
+              <div className="flex gap-2 w-full sm:w-auto">
+                <Button
+                  asChild
+                  variant="outline"
+                  className="flex-1 sm:flex-initial"
+                >
+                  <Link href={`/posts/${post.id}/edit`}>
+                    <Edit className="h-4 w-4 mr-2" />
+                    <span className="hidden sm:inline">編集</span>
+                  </Link>
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="flex-1 sm:flex-initial"
+                >
+                  <Trash2 className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">{isDeleting ? "削除中..." : "削除"}</span>
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* 本文 */}
@@ -369,7 +375,7 @@ export default function PostDetailPage() {
         </div>
 
         {/* コメントセクション */}
-        <div className="mt-6 bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6 lg:p-8">
+        <div className="mt-6 bg-white rounded-3xl shadow-sm border border-slate-100 p-4 sm:p-6 lg:p-8">
           {/* コメントヘッダー */}
           <div className="flex items-center gap-2 mb-4 sm:mb-6">
             <MessageCircle className="h-5 w-5 text-muted-foreground" />

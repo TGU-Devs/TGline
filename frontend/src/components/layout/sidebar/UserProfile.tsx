@@ -14,7 +14,7 @@ const UserProfile = ({ currentUser, isLoading }: UserProfileProps) => {
     return (
         <div className="border-b border-sidebar-border">
             <div className="p-4">
-                <div className="flex items-center gap-3 mb-4">
+                <Link href="/settings" className="flex items-center gap-3 mb-4 rounded-xl p-2 -m-2 hover:bg-sidebar-accent/10 transition-colors">
                     <div className="w-10 h-10 shrink-0 bg-primary rounded-full flex items-center justify-center text-lg text-primary-foreground font-bold shadow-sm">
                         {currentUser ? (
                             <Avatar
@@ -38,7 +38,7 @@ const UserProfile = ({ currentUser, isLoading }: UserProfileProps) => {
                             </p>
                         )}
                     </div>
-                </div>
+                </Link>
                 <Link
                     href="/posts/new"
                     className="flex items-center justify-center w-full p-3 bg-primary text-primary-foreground font-medium rounded-xl cursor-pointer hover:bg-primary/90 transition-colors"

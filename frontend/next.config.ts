@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-    optimizeFonts: false,
     // Route Handlersでバックエンドへのプロキシを実装（cookieを正しく転送するため）
     // rewritesは使わない（Set-Cookieヘッダーが正しく転送されないため）
     devIndicators: false,

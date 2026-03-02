@@ -30,8 +30,10 @@ jobs:
           # キャッシュキーの基準ファイル（lockfileが変わったらキャッシュ再生成）
           cache-dependency-path: frontend/package-lock.json
 
-      # package-lock.json から正確に依存をインストール（npm installと違いlockfileを変更しない、CI向き）
-      - run: npm ci
+      # 依存をインストール（Dockerfileと同様にnpm installを使用。
+      # npm ciはpackage-lock.jsonに厳密に従うが、macOSで生成されたlockfileには
+      # Linux用ネイティブバイナリ(lightningcss等)の解決情報が含まれないため）
+      - run: npm install
 
       # next build を実行。型エラーがあればここで失敗 → PRに赤バツが付く
       - run: npm run build
