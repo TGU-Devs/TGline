@@ -134,7 +134,7 @@ export default function PostNewPage() {
       }
 
       const data = await res.json();
-      router.push(`/posts/${data.id}`);
+      router.push(`/posts/${data.id}?status=created`);
     } catch (err) {
       alert(err instanceof Error ? err.message : "投稿の作成に失敗しました");
     } finally {

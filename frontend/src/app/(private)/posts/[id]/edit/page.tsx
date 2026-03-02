@@ -187,7 +187,7 @@ export default function PostEditPage() {
         );
       }
 
-      router.push(`/posts/${params.id}`);
+      router.push(`/posts/${params.id}?status=updated`);
     } catch (err) {
       alert(err instanceof Error ? err.message : "更新に失敗しました");
     } finally {

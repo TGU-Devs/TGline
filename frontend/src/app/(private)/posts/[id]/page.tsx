@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Toast from "@/components/ui/Toast";
 import { Button } from "@/components/ui/button";
-import { Calendar, User, Edit, Trash2, ArrowLeft, Heart, MessageCircle, Send } from "lucide-react";
+import { Calendar, User, Edit, Trash2, ArrowLeft, Heart, MessageCircle, Send, CheckCircle2 } from "lucide-react";
+
+import { useStatusToast } from "@/hooks/useStatusToast";
 
 interface Tag {
   id: number;
@@ -59,6 +62,7 @@ export default function PostDetailPage() {
   const [commentBody, setCommentBody] = useState("");
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
+  
 
   useEffect(() => {
     if (params.id) {
@@ -67,6 +71,14 @@ export default function PostDetailPage() {
       fetchCurrentUser();
     }
   }, [params.id]);
+
+  const { showToast, message } = useStatusToast(
+    `/posts/${params.id}`,
+    {
+      created: { message: "新しい投稿が作成されました。" },
+      updated: { message: "投稿が編集されました。" },
+    }
+  );
 
   const fetchCurrentUser = async () => {
     try {
@@ -189,7 +201,7 @@ export default function PostDetailPage() {
         throw new Error("削除に失敗しました");
       }
 
-      router.push("/posts");
+      router.push("/posts?status=deleted");
     } catch (err) {
       alert(err instanceof Error ? err.message : "削除に失敗しました");
     } finally {
@@ -281,6 +293,14 @@ export default function PostDetailPage() {
 
   return (
     <div className="min-h-screen bg-background py-4 sm:py-8">
+        {showToast && (
+          <Toast
+            showToast={showToast}
+            icon={CheckCircle2}
+            message={message}
+            bg="bg-emerald-500"
+          />
+        )}
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         {/* 戻るボタン */}
         <Button
