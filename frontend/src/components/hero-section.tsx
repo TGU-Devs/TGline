@@ -1,8 +1,9 @@
 "use client";
 
-import { ArrowRight, Bell, Calendar, Heart, MessageCircle, Home, User, PenSquare, BookOpen, Users, Sparkles, Settings } from "lucide-react";
+import { ArrowRight, Bell, Calendar, Heart, MessageCircle, Home, User, PenSquare, BookOpen, Users, Settings, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { notoSansJP } from "@/lib/fonts";
 
 export function HeroSection() {
   return (
@@ -14,29 +15,31 @@ export function HeroSection() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-64 w-64 rounded-full bg-primary/10 blur-2xl animate-pulse" style={{ animationDelay: "2s" }} />
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-24 sm:pt-32 pb-16">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-24 sm:pt-15 pb-16">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left Content */}
           <div className="text-center lg:text-left animate-fade-in">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 rounded-full bg-accent/15 px-4 py-1.5 text-sm font-medium text-accent mb-6">
+            <div className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-1.5 text-sm font-medium text-accent-foreground mb-6">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-foreground opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-accent-foreground"></span>
               </span>
               誰でも自由に投稿できる
             </div>
 
             {/* Main heading */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground text-balance">
-              東北学院大学生のための
+            <h1 className={`${notoSansJP.className} text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground`}>
+              <span className="inline-block whitespace-nowrap">東北学院大生のための</span>
+              <br />
               <span className="text-primary">情報共有アプリ</span>
             </h1>
 
             {/* Subtitle */}
-            <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-xl mx-auto lg:mx-0 leading-relaxed text-pretty">
-              授業情報、サークル活動、学内イベント、なんでも投稿OK。
-              TGUの学生同士でつながろう。
+            <p className="mt-3 text-lg sm:text-xl text-muted-foreground max-w-xl mx-auto lg:ml-2 leading-relaxed">
+              授業情報・サークル活動・学内イベント
+              <br />
+              なんでも投稿OK。
             </p>
 
             {/* Feature Tags */}
@@ -45,7 +48,7 @@ export function HeroSection() {
                 <BookOpen className="h-4 w-4" />
                 授業情報
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-3 py-1.5 text-sm font-medium text-accent">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1.5 text-sm font-medium text-accent-foreground">
                 <Users className="h-4 w-4" />
                 サークル
               </span>
@@ -53,26 +56,24 @@ export function HeroSection() {
                 <Calendar className="h-4 w-4" />
                 学内イベント
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-3 py-1.5 text-sm font-medium text-accent">
-                <Sparkles className="h-4 w-4" />
-                その他色々
-              </span>
             </div>
 
             {/* CTA Buttons */}
-            <div className="mt-10 flex flex-col sm:flex-row items-center lg:items-start justify-center lg:justify-start gap-4">
+            <div className="mt-10 flex flex-col sm:flex-row items-stretch sm:items-start justify-center lg:justify-start gap-4 max-w-xs sm:max-w-none mx-auto lg:mx-0">
+              <Link href="/posts/new" className="w-full sm:w-auto">
               <Button
                 size="lg"
-                className="bg-accent hover:bg-accent/90 text-accent-foreground px-8 py-6 text-base font-semibold shadow-lg shadow-accent/25 transition-all hover:shadow-xl hover:shadow-accent/30 hover:scale-105"
+                className="w-full sm:w-auto bg-accent hover:bg-accent/90 text-accent-foreground px-8 py-6 text-base font-semibold shadow-lg shadow-accent/25 transition-all hover:shadow-xl hover:shadow-accent/30 hover:scale-105"
               >
                 <PenSquare className="mr-2 h-5 w-5" />
                 投稿してみる
               </Button>
-              <Link href="/posts">
+              </Link>
+              <Link href="/posts" className="w-full sm:w-auto">
               <Button
                 size="lg"
                 variant="outline"
-                className="border-primary/30 text-foreground px-8 py-6 text-base font-semibold bg-transparent transition-all hover:bg-primary"
+                className="w-full sm:w-auto border-primary/30 text-foreground px-8 py-6 text-base font-semibold bg-transparent transition-all hover:bg-primary"
               >
                 投稿を見る
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -142,12 +143,12 @@ function PhoneMockup() {
           </div>
 
           {/* App Content */}
-          <div className="px-4 pb-20">
+          <div className="px-3 pb-20">
             {/* Header - matches actual app */}
             <div className="flex items-center justify-between py-3">
-              <h2 className="text-base font-bold text-foreground">投稿一覧</h2>
-              <div className="bg-primary text-primary-foreground text-[10px] font-medium px-2.5 py-1 rounded-lg flex items-center gap-1">
-                <PenSquare className="h-3 w-3" />
+              <h2 className="text-sm font-bold text-foreground">投稿一覧</h2>
+              <div className="bg-primary text-primary-foreground text-[10px] font-medium px-2.5 py-1.5 rounded-xl flex items-center gap-1">
+                <Plus className="h-3 w-3" />
                 新規投稿
               </div>
             </div>
@@ -156,30 +157,24 @@ function PhoneMockup() {
             <div className="space-y-2.5 mt-1">
               <MockPostCard
                 title="プログラミング勉強会メンバー募集"
-                body="毎週水曜日に活動しています。初心者歓迎！"
                 user="たろう"
-                tag="サークル"
-                tagType="topic"
+                tags={[{ name: "サークル", type: "topic" }]}
                 time="30分前"
                 likes={42}
                 comments={8}
               />
               <MockPostCard
                 title="月曜2限の経済学、教室変更"
-                body="来週から教室がH301に変わります。"
                 user="はなこ"
-                tag="工学部"
-                tagType="faculty"
+                tags={[{ name: "工学部", type: "faculty" }]}
                 time="2時間前"
                 likes={28}
                 comments={3}
               />
               <MockPostCard
                 title="学園祭実行委員募集中"
-                body="一緒に学園祭を盛り上げませんか？"
                 user="じろう"
-                tag="イベント"
-                tagType="topic"
+                tags={[{ name: "イベント", type: "topic" }, { name: "文学部", type: "faculty" }]}
                 time="昨日"
                 likes={156}
                 comments={24}
@@ -212,34 +207,33 @@ function PhoneMockup() {
 
 function MockPostCard({
   title,
-  body,
   user,
-  tag,
-  tagType,
+  tags,
   time,
   likes,
   comments,
 }: {
   title: string;
-  body: string;
   user: string;
-  tag: string;
-  tagType: "faculty" | "topic";
+  tags: { name: string; type: "faculty" | "topic" }[];
   time: string;
   likes: number;
   comments: number;
 }) {
   return (
-    <div className="bg-card border border-border rounded-xl p-3 transition-all">
-      <h3 className="text-xs font-semibold text-foreground truncate mb-1.5">{title}</h3>
-      <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded-full border ${
-        tagType === "faculty"
-          ? "bg-blue-50 text-blue-700 border-blue-200"
-          : "bg-orange-50 text-orange-700 border-orange-200"
-      }`}>
-        {tag}
-      </span>
-      <p className="text-[10px] text-muted-foreground mt-1.5 line-clamp-1">{body}</p>
+    <div className="bg-white border border-slate-100 rounded-2xl p-3 shadow-sm">
+      <h3 className="text-xs font-semibold text-foreground line-clamp-2 mb-1.5">{title}</h3>
+      <div className="flex flex-wrap gap-1 mb-1.5">
+        {tags.map((tag) => (
+          <span key={tag.name} className={`text-[8px] font-medium px-1.5 py-0.5 rounded-full border ${
+            tag.type === "faculty"
+              ? "bg-blue-50 text-blue-700 border-blue-200"
+              : "bg-orange-50 text-orange-700 border-orange-200"
+          }`}>
+            {tag.name}
+          </span>
+        ))}
+      </div>
       <div className="flex items-center gap-2 mt-2 text-[10px] text-muted-foreground">
         <div className="flex items-center gap-1">
           <div className="w-3.5 h-3.5 bg-primary/15 rounded-full flex items-center justify-center">

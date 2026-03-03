@@ -31,9 +31,9 @@
   /* Muted: Soft gray-blue */
   --muted: oklch(0.90 0.015 230);
   --muted-foreground: oklch(0.45 0.02 240);
-  /* Accent: Coral pink (トップページで使用) */
-  --accent: oklch(0.70 0.15 25);
-  --accent-foreground: oklch(0.98 0.005 25);
+  /* Accent: Baby pink #fadbda (トップページで使用) */
+  --accent: oklch(0.90 0.04 15);
+  --accent-foreground: oklch(0.40 0.08 15);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.98 0.005 25);
   --border: oklch(0.85 0.02 230);
