@@ -24,7 +24,7 @@ const MenuList = ({ menuList, pathname }: MenuListProps) => {
                                         href={menu.path}
                                         className={`flex items-center p-3 h-10 font-medium rounded-xl transition-colors ${
                                             pathname === menu.path
-                                                ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
+                                                ? "bg-primary text-sidebar-primary-foreground shadow-sm"
                                                 : "text-sidebar-foreground hover:bg-sidebar-accent/10"
                                         }`}
                                     >
