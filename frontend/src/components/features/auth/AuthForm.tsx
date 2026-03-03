@@ -7,7 +7,7 @@ import Link from "next/link";
 import FormItem from "./FormItem";
 import { Button } from "@/components/ui/button";
 
-import { User, Mail, KeyRound, RotateCcwKey } from "lucide-react";
+import { User, Mail, KeyRound, RotateCcwKey, Eye, EyeOff } from "lucide-react";
 
 type RailsErrorResponse = {
     errors?: Record<string, string | string[]>;
@@ -67,6 +67,7 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
     const [formValues, setFormValues] = useState(initFormValues);
     const [formErrors, setFormErrors] = useState<Errors>({});
     const [isLoading, setIsLoading] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const onchangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -308,13 +309,20 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
                                 <RotateCcwKey size={18} />
                             </div>
                         <input
-                            type="password"
+                            type={showConfirmPassword ? "text" : "password"}
                             name="confirmPassword"
                             placeholder="パスワード確認用"
                             value={formValues.confirmPassword}
                             onChange={(e) => onchangeHandler(e)}
-                            className="border border-input rounded-lg p-2 pl-10 w-full bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow"
+                            className="border border-input rounded-lg p-2 pl-10 pr-10 w-full bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow"
                         />
+                        <button
+                            type="button"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                            {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
                         </div>
                         {formErrors.confirmPassword && (
                             <p className="text-destructive text-sm mt-1">{formErrors.confirmPassword}</p>

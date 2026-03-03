@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { FormItemType } from "./AuthForm";
 
 type FormItemProps = {
@@ -15,6 +17,9 @@ const FormItem = ({
     onchangeHandler,
     error,
 }: FormItemProps) => {
+    const [showPassword, setShowPassword] = useState(false);
+    const isPassword = item.type === "password";
+
     return (
         <div className="flex flex-col">
             <label
@@ -28,13 +33,22 @@ const FormItem = ({
                     <Icon size={18}/>
                 </div>
                 <input
-                    type={item.type}
+                    type={isPassword && showPassword ? "text" : item.type}
                     placeholder={item.label}
                     name={item.id}
                     value={value}
                     onChange={(e) => onchangeHandler(e)}
-                    className="border border-input rounded-lg p-2 pl-10 w-full bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow"
+                    className="border border-input rounded-lg p-2 pl-10 pr-10 w-full bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow"
                 />
+                {isPassword && (
+                    <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                )}
             </div>
             {error && <p className="text-destructive text-sm mt-1">{error}</p>}
         </div>
