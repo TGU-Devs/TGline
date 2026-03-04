@@ -8,7 +8,7 @@ type StatusConfig = {
 export const useStatusToast = <T extends string>(
   redirectPath: string,
   statusConfig: Record<T, StatusConfig>,
-  duration: number = 3000
+  duration: number = 5000
 ) => {
   const router = useRouter();
   const searchParams = useSearchParams();
