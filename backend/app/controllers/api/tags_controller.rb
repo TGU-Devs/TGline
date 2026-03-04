@@ -8,7 +8,13 @@ module Api
       # もしクエリパラメーターがあれば、そのカテゴリのタグを取得して上書き
       tags = tags.where(category: Tag.categories[params[:category]]) if params[:category].present?
 
-      render json: tags.map { |tag| tag_response(tag) }, status: :ok
+      # DEFINITIONS の定義順でソート
+      ordered = tags.sort_by do |tag|
+        names = Tag::DEFINITIONS[tag.category.to_sym] || []
+        names.index(tag.name) || names.size
+      end
+
+      render json: ordered.map { |tag| tag_response(tag) }, status: :ok
     end
 
     private

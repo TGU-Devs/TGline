@@ -6,19 +6,7 @@ class CreateTags < ActiveRecord::Migration[7.2]
 
       t.timestamps
     end
-    # マスターデータなのでマイグレーションに入れる
-    # タグを増やしたい時は Tag::DEFINITIONS を編集 + 新しいマイグレーションで追加INSERT、という流れ
-    reversible do |dir|
-      dir.up do
-        Tag::DEFINITIONS.each do |category, names|
-          names.each do |name|
-            execute <<~SQL
-              INSERT INTO tags (name, category, created_at, updated_at)
-              VALUES ('#{name}', #{Tag.categories[category]}, NOW(), NOW())
-            SQL
-          end
-        end
-      end
-    end
+    # タグのマスターデータは db:seed (find_or_create_by!) で投入する
+    # タグを増やしたい時は Tag::DEFINITIONS を編集するだけでOK
   end
 end
