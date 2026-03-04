@@ -4,10 +4,11 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { useUser } from "@/contexts/UserContext";
+import { useStatusToast } from "@/hooks/useStatusToast";
 
 import Loading from "@/components/ui/Loading";
 import ErrorUI from "@/components/ui/ErrorUI";
-import Toast from "@/components/features/settings/Toast";
+import Toast from "@/components/ui/Toast";
 import Header from "@/components/features/settings/Header";
 import ProfileSection from "@/components/features/settings/ProfileSection";
 import NotificationSection from "@/components/features/settings/NotificationSection";
@@ -28,7 +29,7 @@ import {
     Shield,
     AlertTriangle,
 } from "lucide-react";
-import { FormValues, Errors } from "@/components/features/settings/types"; // SettingsUserは不要になったため削除
+import { FormValues, Errors } from "@/components/features/settings/types"; 
 
 const initFormValues = {
     display_name: "",
@@ -41,14 +42,9 @@ const SettingsPage = () => {
 
     const [showSaveToast, setShowSaveToast] = useState(false);
     const [showErrorToast, setShowErrorToast] = useState(false);
-    const[showPasswordChangedToast, setShowPasswordChangedToast] = useState(false);
     const [isDark, setIsDark] = useState(false);
     const [formValues, setFormValues] = useState<FormValues>(initFormValues);
     const [formErrors, setFormErrors] = useState<Errors>({});
-
-    const router = useRouter();
-    const searchParams = useSearchParams();
-
 
     useEffect(() => {
         if (user) {
@@ -60,23 +56,14 @@ const SettingsPage = () => {
         }
     }, [user]);
 
-    useEffect(() => {
-        if (searchParams.get("status") === "password_changed") {
-            setShowPasswordChangedToast(true);
-            router.replace("/settings", { scroll: false });
+    const { showToast: showPasswordChangedToast } = useStatusToast(
+        "/settings",
+        {
+            password_changed: { message: "パスワードを変更しました。" },
         }
-    }, [searchParams, router]);
+    );
 
-    useEffect(() => {
-        if (showPasswordChangedToast) {
-            const timer = setTimeout(() => {
-                setShowPasswordChangedToast(false);
-            }, 3000);
-            return () => clearTimeout(timer);
-        }
-    }, [showPasswordChangedToast]);
-
-    const themeOptions =[
+    const themeOptions = [
         {
             id: "light",
             label: "ライトモード",
@@ -126,9 +113,9 @@ const SettingsPage = () => {
             if (res.ok) {
                 setShowSaveToast(true);
                 const updated = await res.json();
-                
+
                 setUser(updated);
-                
+
                 setTimeout(() => setShowSaveToast(false), 3000);
             } else {
                 console.error("ユーザーデータの更新に失敗:", res.status);
@@ -181,7 +168,7 @@ const SettingsPage = () => {
     }
 
     if (error) {
-        return <ErrorUI error={error} fetch={refreshUser} />; 
+        return <ErrorUI error={error} fetch={refreshUser} />;
     }
 
     return (

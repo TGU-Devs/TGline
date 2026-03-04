@@ -12,11 +12,15 @@ import {
 } from "@/components/ui/popover";
 import { ArrowLeft, Plus, ChevronDown, X, Check } from "lucide-react";
 
+import { useFormValidate } from "@/components/features/posts/hooks/useFormValidate";
+
 interface Tag {
   id: number;
   name: string;
   category: "faculty" | "topic";
 }
+
+
 
 const CATEGORY_CONFIG = {
   faculty: {
@@ -41,6 +45,8 @@ export default function PostNewPage() {
   const [tags, setTags] = useState<Tag[]>([]);
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [openCategory, setOpenCategory] = useState<string | null>(null);
+
+  const { FormErrors, validateForm, clearErrors } = useFormValidate();
 
   useEffect(() => {
     fetchTags();
@@ -96,10 +102,10 @@ export default function PostNewPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!title.trim() || !body.trim()) {
-      alert("タイトルと本文を入力してください");
-      return;
-    }
+    const isValid = validateForm(title, body);
+    if (!isValid) return;
+
+    clearErrors();
 
     try {
       setIsCreating(true);
@@ -128,13 +134,15 @@ export default function PostNewPage() {
       }
 
       const data = await res.json();
-      router.push(`/posts/${data.id}`);
+      router.push(`/posts/${data.id}?status=created`);
     } catch (err) {
       alert(err instanceof Error ? err.message : "投稿の作成に失敗しました");
     } finally {
       setIsCreating(false);
     }
   };
+
+  
 
   return (
     <div className="min-h-screen bg-background py-4 sm:py-8">
@@ -155,7 +163,7 @@ export default function PostNewPage() {
         <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-4 sm:p-6 lg:p-8">
           <h1 className="text-xl sm:text-2xl font-bold text-card-foreground mb-4 sm:mb-6">新規投稿</h1>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6" noValidate>
             {/* タイトル */}
             <div>
               <label
@@ -173,6 +181,9 @@ export default function PostNewPage() {
                 placeholder="投稿のタイトルを入力"
                 required
               />
+              {FormErrors.title && (
+                <p className="mt-1 text-sm text-destructive">{FormErrors.title}</p>
+              )}
             </div>
 
             {/* 本文 */}
@@ -192,6 +203,9 @@ export default function PostNewPage() {
                 placeholder="投稿の本文を入力"
                 required
               />
+              {FormErrors.body && (
+                <p className="mt-1 text-sm text-destructive">{FormErrors.body}</p>
+              )}
             </div>
 
             {/* タグ選択 */}
