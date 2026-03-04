@@ -9,7 +9,7 @@ import SettingSection from "@/components/features/settings/SettingSection";
 import SecurityFormItem from "@/components/features/settings/security/SecurityFormItem";
 import Button from "@/components/features/settings/security/Button";
 
-import Toast from "@/components/features/settings/Toast";
+import Toast from "@/components/ui/Toast";
 
 import { Check, Trash2, TriangleAlert, X } from "lucide-react";
 
@@ -170,9 +170,7 @@ const DeleteAccountPage = () => {
                     <div className="flex items-center gap-3 mb-7 text-red-600 bg-red-50 p-4 rounded-md">
                         <TriangleAlert className="w-10 h-10" />
                         <div>
-                            <h2 className="font-bold">
-                                警告
-                            </h2>
+                            <h2 className="font-bold">警告</h2>
                             <p className="text-sm mt-1">
                                 アカウントを削除すると、ログインできなくなり、投稿などのデータにアクセスできなくなります。
                             </p>

@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import { useStatusToast } from "@/hooks/useStatusToast";
+import Toast from "@/components/ui/Toast";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -9,7 +11,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Plus, Calendar, User, ChevronDown, X, MessageCircle, Heart } from "lucide-react";
+import { Plus, Calendar, User, ChevronDown, X, MessageCircle, Heart, Trash } from "lucide-react";
 
 interface Tag {
   id: number;
@@ -53,6 +55,13 @@ export default function PostsPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedTagId, setSelectedTagId] = useState<number | null>(null);
   const [openCategory, setOpenCategory] = useState<string | null>(null);
+
+  const { showToast, message } = useStatusToast(
+     "/posts",
+     {
+       deleted: { message: "投稿が削除されました。" },
+     }
+   );
 
   const fetchTags = async () => {
     try {
@@ -197,6 +206,7 @@ export default function PostsPage() {
 
   return (
     <div className="min-h-screen bg-background py-4 sm:py-8">
+      <Toast showToast={showToast} icon={Trash} message={message} bg="bg-red-500" />
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         {/* ヘッダー */}
         <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
