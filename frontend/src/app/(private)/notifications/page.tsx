@@ -15,7 +15,7 @@ const NotificationsPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#f8fafc] flex flex-col items-center justify-center p-6 relative overflow-hidden">
+        <div className="min-h-screen bg-[#f8fafc] flex flex-col items-center justify-center p-6 relative overflow-hidden -mt-16">
             <BackSkeleton skeletonCount={skeletonCount} />
             <MainContent clickHandler={clickHandler} />
         </div>
