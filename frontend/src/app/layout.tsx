@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   title: 'TGline',
   description: ' 東北学院大学生のための情報共有アプリ・掲示板',
   icons: {
-    icon: '/favicon.png',
+    icon: '/favicon2.png',
   },
 }
 

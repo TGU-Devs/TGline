@@ -8,6 +8,8 @@ import {
     FolderOpen,
     Monitor,
     Trophy,
+    HouseHeart,
+    Book,
 } from "lucide-react";
 
 const externalSites: ExternalSite[] = [
@@ -16,17 +18,17 @@ const externalSites: ExternalSite[] = [
         description:
             "履修登録、成績確認、授業の欠席届など、学生生活に必須のポータルサイトです。",
         url: "https://www.tohoku-gakuin.ac.jp/faculty/mytg/",
-        icon: GraduationCap,
+        icon: BookOpen,
         category: "教務・学習",
-        iconClass: "text-primary bg-primary/10",
+        iconClass: "text-chart-4 bg-chart-4/10",
     },
     {
         title: "東北学院大学公式サイト",
         description: "大学のニュース、入試情報、各学部の詳細が確認できます。",
         url: "https://www.tohoku-gakuin.ac.jp/",
-        icon: BookOpen,
+        icon: GraduationCap,
         category: "大学公式サイト",
-        iconClass: "text-chart-4 bg-chart-4/10",
+        iconClass: "text-primary bg-primary/10",
     },
     {
         title: "TG-folio（東北学院大学学生ポートフォリオ）",
@@ -50,7 +52,7 @@ const externalSites: ExternalSite[] = [
         title: "在学生向けサポートサイト",
         description: "在学生だけでなく、保護者や入学予定の方へ向けた生活や履修、施設など様々な情報をまとめたサポートサイトです。",
         url: "https://www.tohoku-gakuin.ac.jp/student/",
-        icon: BookOpen,
+        icon: HouseHeart,
         category: "学生生活",
         iconClass: "text-chart-5 bg-chart-5/10",
     },
