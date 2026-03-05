@@ -2,7 +2,7 @@
 
 import { MessageSquare, ExternalLink } from "lucide-react";
 
-const GOOGLE_FORM_URL = "https://forms.gle/QZb3ZqtpxbLaYRTW6";
+const GOOGLE_FORM_URL = "https://forms.gle/xHNi1hotjP1iBtae8";
 
 const ContactPage = () => {
     return (

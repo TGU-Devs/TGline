@@ -171,6 +171,7 @@ export default function PostNewPage() {
                 className="block text-sm font-medium text-foreground mb-2"
               >
                 タイトル
+                <span className="text-destructive ml-1">※必須</span>
               </label>
               <input
                 id="title"
@@ -193,6 +194,7 @@ export default function PostNewPage() {
                 className="block text-sm font-medium text-foreground mb-2"
               >
                 本文
+                <span className="text-destructive ml-1">※必須</span>
               </label>
               <textarea
                 id="body"
