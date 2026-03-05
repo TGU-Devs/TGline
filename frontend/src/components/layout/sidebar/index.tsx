@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import { useUser } from "@/contexts/UserContext";
 
-import { Home, Settings, Bell, MessageSquare } from "lucide-react";
+import { Home, Settings, Bell, MessageSquare, ExternalLink } from "lucide-react";
 
 import DesktopSidebar from "./DesktopSidebar";
 import MobileNav from "./MobileNav";
@@ -13,6 +13,7 @@ import type { MenuItem } from "./types";
 const menuList: MenuItem[] = [
     { name: "投稿一覧", path: "/posts", icon: Home },
     { name: "通知", path: "/notifications", icon: Bell },
+    { name: "外部サイト", path: "/external", icon: ExternalLink },
     { name: "お問い合わせ", path: "/contact", icon: MessageSquare },
     { name: "設定", path: "/settings", icon: Settings },
 ];
