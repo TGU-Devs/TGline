@@ -45,7 +45,10 @@ export default function PostNewPage() {
   const [body, setBody] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [tags, setTags] = useState<Tag[]>([]);
-  const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
+  const [selectedTagIds, setSelectedTagIds] = useState<number[]>(() => {
+    const tagId = searchParams.get("tag_id");
+    return tagId ? [Number(tagId)] : [];
+  });
   const [openCategory, setOpenCategory] = useState<string | null>(null);
 
   const { FormErrors, validateForm, clearErrors } = useFormValidate();
