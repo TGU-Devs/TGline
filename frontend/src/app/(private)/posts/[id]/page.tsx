@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { linkify } from "@/utils/linkify";
 import Toast from "@/components/ui/Toast";
 import Modal from "@/components/ui/Modal";
 import { Button } from "@/components/ui/button";
@@ -446,7 +447,7 @@ export default function PostDetailPage() {
                     {/* 本文 */}
                     <div className="prose max-w-none">
                         <p className="text-sm sm:text-base text-foreground leading-relaxed whitespace-pre-wrap wrap-break-words">
-                            {post.body}
+                            {linkify(post.body)}
                         </p>
                     </div>
                 </div>
@@ -526,7 +527,7 @@ export default function PostDetailPage() {
                                         )}
                                     </div>
                                     <p className="text-sm text-foreground whitespace-pre-wrap wrap-break-words">
-                                        {comment.body}
+                                        {linkify(comment.body)}
                                     </p>
                                 </div>
                             ))}
