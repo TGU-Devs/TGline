@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useStatusToast } from "@/hooks/useStatusToast";
 import Toast from "@/components/ui/Toast";
 import { Button } from "@/components/ui/button";
@@ -49,11 +50,17 @@ const CATEGORY_CONFIG = {
 } as const;
 
 export default function PostsPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [posts, setPosts] = useState<Post[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedTagId, setSelectedTagId] = useState<number | null>(null);
+  const [selectedTagId, setSelectedTagId] = useState<number | null>(() => {
+    const tagId = searchParams.get("tag_id");
+    return tagId ? Number(tagId) : null;
+  });
   const [openCategory, setOpenCategory] = useState<string | null>(null);
 
   const { showToast, message } = useStatusToast(
@@ -117,6 +124,17 @@ export default function PostsPage() {
     acc[tag.category].push(tag);
     return acc;
   }, {});
+
+   const handleTagSelect = useCallback((tagId: number | null) => {
+    setSelectedTagId(tagId);
+    const params = new URLSearchParams(searchParams.toString());
+    if (tagId !== null) {
+      params.set("tag_id", String(tagId));
+    } else {
+      params.delete("tag_id");
+    }
+    router.replace(`/posts?${params.toString()}`, { scroll: false });
+  }, [router, searchParams]);
 
   const handleLikeToggle = async (e: React.MouseEvent, postId: number, currentLiked: boolean) => {
     e.preventDefault();
@@ -212,7 +230,7 @@ export default function PostsPage() {
         <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <h1 className="text-2xl sm:text-3xl font-bold text-foreground">投稿一覧</h1>
           <Button asChild className="w-full sm:w-auto">
-            <Link href="/posts/new">
+            <Link href={`/posts/new?${searchParams.toString()}`}>
               <Plus className="h-4 w-4 mr-2" />
               新規投稿
             </Link>
@@ -251,7 +269,7 @@ export default function PostsPage() {
                         <button
                           key={tag.id}
                           onClick={() => {
-                            setSelectedTagId(
+                            handleTagSelect(
                               selectedTagId === tag.id ? null : tag.id
                             );
                             setOpenCategory(null);
@@ -282,7 +300,7 @@ export default function PostsPage() {
           {/* 選択中のタグ表示 */}
           {selectedTag && (
             <button
-              onClick={() => setSelectedTagId(null)}
+              onClick={() => handleTagSelect(null)}
               className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium bg-sky-100 text-sky-700 border border-sky-200 hover:bg-sky-200 transition-colors"
             >
               {selectedTag.name}
@@ -300,7 +318,7 @@ export default function PostsPage() {
             <p className="text-foreground text-lg font-medium mb-2">まだ投稿がありません</p>
             <p className="text-muted-foreground text-sm mb-6">最初の投稿を作成して、みんなと情報を共有しましょう</p>
             <Button asChild>
-              <Link href="/posts/new">
+              <Link href={`/posts/new?${searchParams.toString()}`}>
                 <Plus className="h-4 w-4 mr-2" />
                 最初の投稿を作成
               </Link>
@@ -311,7 +329,7 @@ export default function PostsPage() {
             {posts.map((post) => (
               <Link
                 key={post.id}
-                href={`/posts/${post.id}`}
+                href={`/posts/${post.id}?${searchParams.toString()}`}
                 className="block"
               >
                 <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-4 sm:p-6 hover:shadow-md hover:border-primary/30 transition-all">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -39,6 +39,8 @@ const CATEGORY_CONFIG = {
 
 export default function PostNewPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [isCreating, setIsCreating] = useState(false);
@@ -134,7 +136,9 @@ export default function PostNewPage() {
       }
 
       const data = await res.json();
-      router.push(`/posts/${data.id}?status=created`);
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("status", "created");
+      router.push(`/posts/${data.id}?${params.toString()}`);
     } catch (err) {
       alert(err instanceof Error ? err.message : "投稿の作成に失敗しました");
     } finally {
@@ -153,7 +157,7 @@ export default function PostNewPage() {
           variant="ghost"
           className="mb-4 sm:mb-6 text-muted-foreground hover:text-foreground"
         >
-          <Link href="/posts">
+          <Link href={`/posts?${searchParams.toString()}`}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             一覧に戻る
           </Link>
@@ -316,7 +320,7 @@ export default function PostNewPage() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => router.back()}
+                onClick={() => router.push(`/posts?${searchParams.toString()}`)}
                 disabled={isCreating}
                 className="w-full sm:w-auto"
               >

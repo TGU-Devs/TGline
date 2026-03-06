@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -51,6 +51,8 @@ const CATEGORY_CONFIG = {
 export default function PostEditPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [post, setPost] = useState<Post | null>(null);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -187,7 +189,9 @@ export default function PostEditPage() {
         );
       }
 
-      router.push(`/posts/${params.id}?status=updated`);
+      const redirectParams = new URLSearchParams(searchParams.toString());
+      redirectParams.set("status", "updated");
+      router.push(`/posts/${params.id}?${redirectParams.toString()}`);
     } catch (err) {
       alert(err instanceof Error ? err.message : "更新に失敗しました");
     } finally {
@@ -212,7 +216,7 @@ export default function PostEditPage() {
         <div className="text-center">
           <p className="text-destructive mb-4">{error || "投稿が見つかりません"}</p>
           <Button asChild variant="outline">
-            <Link href="/posts">
+            <Link href={`/posts?${searchParams.toString()}`}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               一覧に戻る
             </Link>
@@ -231,7 +235,7 @@ export default function PostEditPage() {
           variant="ghost"
           className="mb-4 sm:mb-6 text-muted-foreground hover:text-foreground"
         >
-          <Link href={`/posts/${params.id}`}>
+          <Link href={`/posts/${params.id}?${searchParams.toString()}`}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             詳細に戻る
           </Link>
@@ -394,7 +398,7 @@ export default function PostEditPage() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => router.back()}
+                onClick={() => router.push(`/posts/${params.id}?${searchParams.toString()}`)}
                 disabled={isSaving}
                 className="w-full sm:w-auto"
               >
