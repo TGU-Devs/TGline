@@ -18,7 +18,10 @@ export const useStatusToast = <T extends string>(
     const status = searchParams.get("status") as T | null;
     if (status && statusConfig[status]) {
       setActiveStatus(status);
-      router.replace(redirectPath, { scroll: false });
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("status");
+      const query = params.toString();
+      router.replace(query ? `${redirectPath}?${query}` : redirectPath, { scroll: false });
     }
   }, [searchParams, redirectPath, router]);
 

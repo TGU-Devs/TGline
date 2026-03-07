@@ -66,6 +66,8 @@ const TAG_COLORS: Record<string, string> = {
 export default function PostDetailPage() {
     const params = useParams();
     const router = useRouter();
+    const searchParams = useSearchParams();
+
     const [post, setPost] = useState<Post | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -226,7 +228,7 @@ export default function PostDetailPage() {
                 throw new Error("削除に失敗しました");
             }
 
-            router.push("/posts?status=deleted");
+            router.push(`/posts?status=deleted&${searchParams.toString()}`);
         } catch (err) {
             alert(err instanceof Error ? err.message : "削除に失敗しました");
         } finally {
@@ -314,7 +316,7 @@ export default function PostDetailPage() {
                         {error || "投稿が見つかりません"}
                     </p>
                     <Button asChild>
-                        <Link href="/posts">
+                        <Link href={`/posts?${searchParams.toString()}`}>
                             <ArrowLeft className="h-4 w-4 mr-2" />
                             一覧に戻る
                         </Link>
@@ -357,7 +359,7 @@ export default function PostDetailPage() {
                     variant="ghost"
                     className="mb-4 sm:mb-6 text-muted-foreground hover:text-foreground"
                 >
-                    <Link href="/posts">
+                    <Link href={`/posts?${searchParams.toString()}`}>
                         <ArrowLeft className="h-4 w-4 mr-2" />
                         一覧に戻る
                     </Link>
@@ -422,7 +424,7 @@ export default function PostDetailPage() {
                                     variant="outline"
                                     className="flex-1 sm:flex-initial"
                                 >
-                                    <Link href={`/posts/${post.id}/edit`}>
+                                    <Link href={`/posts/${post.id}/edit?${searchParams.toString()}`}>
                                         <Edit className="h-4 w-4 mr-2" />
                                         <span className="hidden sm:inline">
                                             編集
