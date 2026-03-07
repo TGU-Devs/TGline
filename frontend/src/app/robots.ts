@@ -5,7 +5,14 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/settings", "/posts/new", "/posts/*/edit"],
+      disallow: [
+        "/settings",
+        "/posts/new",
+        "/posts/*/edit",
+        "/login",
+        "/register",
+        "/posts",
+      ],
     },
     sitemap: "https://tgline.dev/sitemap.xml",
   };

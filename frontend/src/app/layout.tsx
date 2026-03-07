@@ -8,8 +8,8 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 
 export const metadata: Metadata = {
-  title: 'TGline',
-  description: ' 東北学院大学生のための情報共有アプリ・掲示板',
+  title: '東北学院大学生のための情報共有アプリ・掲示板 | TGline',
+  description: '東北学院大学生のための情報共有アプリ・掲示板',
   icons: {
     icon: '/favicon3.png',
   },
