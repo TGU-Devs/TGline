@@ -101,8 +101,14 @@ const ChangePasswordPage = () => {
 
         if (!values.new_password) {
             error.new_password = "新しいパスワードを入力してください";
-        } else if (values.new_password.length < 6) {
-            error.new_password = "6文字以上のパスワードを入力してください";
+        } else if (values.new_password.length < 8) {
+            error.new_password = "8文字以上のパスワードを入力してください";
+        } else if (!/[A-Z]/.test(values.new_password)) {
+            error.new_password = "パスワードには大文字を含めてください";
+        } else if (!/[a-z]/.test(values.new_password)) {
+            error.new_password = "パスワードには小文字を含めてください";
+        } else if (!/[0-9]/.test(values.new_password)) {
+            error.new_password = "パスワードには数字を含めてください";
         }
 
         if (!values.confirm_new_password) {
