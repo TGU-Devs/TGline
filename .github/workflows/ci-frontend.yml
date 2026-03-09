@@ -26,9 +26,10 @@ jobs:
         with:
           node-version: 20
 
-      # macOSで生成されたlockfileにはLinux用ネイティブバイナリの情報が
-      # 含まれないため、npm install後に明示的にLinux用バイナリをインストール
-      - run: npm install && npm install lightningcss-linux-x64-gnu
+      # npmのoptional dependenciesバグ(npm/cli#4828)により、macOS生成の
+      # lockfileではLinux用ネイティブバイナリが欠落する。
+      # lockfileとnode_modulesを削除し--forceで強制再解決する
+      - run: rm -rf node_modules package-lock.json && npm install --force
 
       # next build を実行。型エラーがあればここで失敗 → PRに赤バツが付く
       - run: npm run build
