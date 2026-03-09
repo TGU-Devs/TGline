@@ -3,14 +3,15 @@
 import { usePathname } from "next/navigation";
 import { useUser } from "@/contexts/UserContext";
 
-import { Home, Settings, Bell, MessageSquare, ExternalLink } from "lucide-react";
+import { useMemo } from "react";
+import { Home, Settings, Bell, MessageSquare, ExternalLink, Shield } from "lucide-react";
 
 import DesktopSidebar from "./DesktopSidebar";
 import MobileNav from "./MobileNav";
 
 import type { MenuItem } from "./types";
 
-const menuList: MenuItem[] = [
+const baseMenuList: MenuItem[] = [
     { name: "投稿一覧", path: "/posts", icon: Home },
     { name: "通知", path: "/notifications", icon: Bell },
     { name: "外部サイト", path: "/external", icon: ExternalLink },
@@ -22,6 +23,13 @@ const Sidebar = () => {
     const pathname = usePathname();
 
     const { user: currentUser, isLoading } = useUser();
+
+    const menuList = useMemo(() => {
+        if (currentUser?.role === "admin") {
+            return [...baseMenuList, { name: "管理", path: "/admin", icon: Shield }];
+        }
+        return baseMenuList;
+    }, [currentUser?.role]);
 
     return (
         <>
