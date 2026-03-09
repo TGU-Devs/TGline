@@ -25,15 +25,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          # node_modulesをキャッシュ（2回目以降のインストールが速くなる）
-          cache: "npm"
-          # キャッシュキーの基準ファイル（lockfileが変わったらキャッシュ再生成）
-          cache-dependency-path: frontend/package-lock.json
 
-      # 依存をインストール（Dockerfileと同様にnpm installを使用。
-      # npm ciはpackage-lock.jsonに厳密に従うが、macOSで生成されたlockfileには
-      # Linux用ネイティブバイナリ(lightningcss等)の解決情報が含まれないため）
-      - run: npm install
+      # macOSで生成されたlockfileにはLinux用ネイティブバイナリの情報が
+      # 含まれないため、npm install後に明示的にLinux用バイナリをインストール
+      - run: npm install && npm install lightningcss-linux-x64-gnu
 
       # next build を実行。型エラーがあればここで失敗 → PRに赤バツが付く
       - run: npm run build
