@@ -27,7 +27,8 @@ jobs:
           # Node 22はnpm 10.8+同梱でoptional dependenciesバグ(npm/cli#4828)が修正済み
           node-version: 22
 
-      - run: rm -rf package-lock.json && npm install
+      # Dockerと同じ条件でインストール（lockfileと.npmrcなし）
+      - run: rm -rf package-lock.json .npmrc && npm install
 
       # next build を実行。型エラーがあればここで失敗 → PRに赤バツが付く
       - run: npm run build
