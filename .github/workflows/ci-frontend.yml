@@ -25,9 +25,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          # lockfileを削除するためキャッシュはpackage.jsonベースに変更
-          cache: "npm"
-          cache-dependency-path: frontend/package.json
 
       # macOSで生成されたpackage-lock.jsonにはLinux用ネイティブバイナリ
       # (lightningcss, @next/swc等)の解決情報が含まれないため、
