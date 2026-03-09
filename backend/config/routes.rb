@@ -12,6 +12,9 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "posts#index"
   namespace :api do
+    # テスト用（確認後に削除）
+    get "test_error", to: "time#test_error"
+
     get "time", to: "time#index"
 
     # 認証・ユーザー関連
