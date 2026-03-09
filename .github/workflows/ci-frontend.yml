@@ -26,10 +26,9 @@ jobs:
         with:
           node-version: 20
 
-      # macOSで生成されたpackage-lock.jsonにはLinux用ネイティブバイナリ
-      # (lightningcss, @next/swc等)の解決情報が含まれないため、
-      # lockfileを削除してからnpm installで依存を解決する
-      - run: rm -f package-lock.json && npm install
+      # macOSで生成されたlockfileにはLinux用ネイティブバイナリの情報が
+      # 含まれないため、npm install後に明示的にLinux用バイナリをインストール
+      - run: npm install && npm install lightningcss-linux-x64-gnu
 
       # next build を実行。型エラーがあればここで失敗 → PRに赤バツが付く
       - run: npm run build
