@@ -32,9 +32,9 @@ const UserProfile = ({ currentUser, isLoading }: UserProfileProps) => {
                                 ? "読み込み中..."
                                 : currentUser?.display_name || ""}
                         </h2>
-                        {currentUser?.description && (
+                        {currentUser?.role && (
                             <p className="text-xs text-sidebar-foreground/60 truncate">
-                                {currentUser.description}
+                                {currentUser.role}
                             </p>
                         )}
                     </div>
