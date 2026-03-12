@@ -24,16 +24,11 @@ jobs:
       # Node.js環境をセットアップ
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          # node_modulesをキャッシュ（2回目以降のインストールが速くなる）
-          cache: "npm"
-          # キャッシュキーの基準ファイル（lockfileが変わったらキャッシュ再生成）
-          cache-dependency-path: frontend/package-lock.json
+          # Node 22はnpm 10.8+同梱でoptional dependenciesバグ(npm/cli#4828)が修正済み
+          node-version: 22
 
-      # 依存をインストール（Dockerfileと同様にnpm installを使用。
-      # npm ciはpackage-lock.jsonに厳密に従うが、macOSで生成されたlockfileには
-      # Linux用ネイティブバイナリ(lightningcss等)の解決情報が含まれないため）
-      - run: npm install
+      # macOS生成のlockfileにはLinux用バイナリ情報が含まれないため削除
+      - run: rm -f package-lock.json && npm install
 
       # next build を実行。型エラーがあればここで失敗 → PRに赤バツが付く
       - run: npm run build

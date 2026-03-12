@@ -27,6 +27,11 @@ Rails.application.routes.draw do
     end
     resources :users, only: [:index, :show]
 
+    # 管理者用
+    namespace :admin do
+      get "stats", to: "stats#index"
+    end
+
     # タグ関連
     resources :tags, only: [:index]
 
