@@ -155,6 +155,20 @@ export default function PostsPage() {
       return;
     }
 
+    const rollbackLike = () => {
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === postId
+            ? {
+                ...p,
+                current_user_liked: currentLiked,
+                likes_count: currentLiked ? p.likes_count + 1 : p.likes_count - 1,
+              }
+            : p
+        )
+      );
+    };
+
     // 楽観的 UI 更新
     setPosts((prev) =>
       prev.map((p) =>
@@ -178,48 +192,15 @@ export default function PostsPage() {
       if (res.status === 401) {
         setIsAuthenticated(false);
         setShowLoginModal(true);
-        // ロールバック
-        setPosts((prev) =>
-          prev.map((p) =>
-            p.id === postId
-              ? {
-                  ...p,
-                  current_user_liked: currentLiked,
-                  likes_count: currentLiked ? p.likes_count + 1 : p.likes_count - 1,
-                }
-              : p
-          )
-        );
+        rollbackLike();
         return;
       }
 
       if (!res.ok && res.status !== 201 && res.status !== 204) {
-        // 失敗時にロールバック
-        setPosts((prev) =>
-          prev.map((p) =>
-            p.id === postId
-              ? {
-                  ...p,
-                  current_user_liked: currentLiked,
-                  likes_count: currentLiked ? p.likes_count + 1 : p.likes_count - 1,
-                }
-              : p
-          )
-        );
+        rollbackLike();
       }
     } catch {
-      // 失敗時にロールバック
-      setPosts((prev) =>
-        prev.map((p) =>
-          p.id === postId
-            ? {
-                ...p,
-                current_user_liked: currentLiked,
-                likes_count: currentLiked ? p.likes_count + 1 : p.likes_count - 1,
-              }
-            : p
-        )
-      );
+      rollbackLike();
     }
   };
 
