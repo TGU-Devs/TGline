@@ -9,8 +9,9 @@ import {
     Monitor,
     Trophy,
     HouseHeart,
-    Book,
+    Instagram,
 } from "lucide-react";
+import { FaXTwitter } from "react-icons/fa6";
 
 const externalSites: ExternalSite[] = [
     {
@@ -50,7 +51,8 @@ const externalSites: ExternalSite[] = [
     },
     {
         title: "在学生向けサポートサイト",
-        description: "在学生だけでなく、保護者や入学予定の方へ向けた生活や履修、施設など様々な情報をまとめたサポートサイトです。",
+        description:
+            "在学生だけでなく、保護者や入学予定の方へ向けた生活や履修、施設など様々な情報をまとめたサポートサイトです。",
         url: "https://www.tohoku-gakuin.ac.jp/student/",
         icon: HouseHeart,
         category: "学生生活",
@@ -64,6 +66,33 @@ const externalSites: ExternalSite[] = [
         icon: Trophy,
         category: "課外活動",
         iconClass: "text-chart-2 bg-chart-2/10",
+    },
+    {
+        title: "東北学院大学情報局（部活・サークル紹介）",
+        description:
+            "東北学院大学のサークル・部活動・就活情報を紹介するInstagramアカウントで、大学生活を充実させるための情報が発信されています。",
+        url: "https://www.instagram.com/tohoku_gakuin_recommend?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==",
+        icon: Instagram,
+        category: "SNS・情報発信",
+        iconClass: "text-chart-5 bg-chart-5/10",
+    },
+    {
+        title: "TGline公式Instagram",
+        description:
+            "TGlineの公式Instagramアカウントで、アプリ内のアップデート情報やイベント情報を発信しています。",
+        url: "https://www.instagram.com/our_tgline?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==",
+        icon: Instagram,
+        category: "SNS・情報発信",
+        iconClass: "text-chart-5 bg-chart-5/10",
+    },
+    {
+        title: "TGline公式X（旧Twitter）",
+        description:
+            "TGlineの公式X（旧Twitter）アカウントで、アプリ内のアップデート情報やイベント情報を発信しています。",
+        url: "https://l.instagram.com/?u=https%3A%2F%2Fx.com%2Four_tgline%3Fs%3D21%26fbclid%3DPAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQMMjU2MjgxMDQwNTU4AAGnzgF3VgTp9AdEC9lJEqmIY2VVp3F1LEUBEx5Zj-VlcIpWymxtPf1THSmCfh0_aem_GgCWGLZ0870I2fOsMHwamA&e=AT7COzcsClCuAdfluRMlkv9y34lQTEmu0kkgOmr-wsz4aoNwjCw7peB9jH1cSH9akEzwoAdh6aBJpj2gFadMLTGVkUlK6OHi20OWaXAzMQ",
+        icon: FaXTwitter,
+        category: "SNS・情報発信",
+        iconClass: "text-foreground bg-foreground/10",
     },
 ];
 
