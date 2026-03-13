@@ -3,6 +3,7 @@
 module Api
   # 投稿管理用コントローラー
   class PostsController < ApplicationController
+    skip_before_action :authenticate_user!, only: [:index]
     # postが存在するかどうかを確認するメソッド
     before_action :set_post, only: [:show, :update, :destroy]
 
