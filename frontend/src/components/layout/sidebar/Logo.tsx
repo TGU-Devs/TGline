@@ -3,11 +3,12 @@ import Link from "next/link";
 
 type LogoProps = {
     isDesktop?: boolean;
+    href?: string;
 };
 
-const Logo = ({ isDesktop }: LogoProps) => {
+const Logo = ({ isDesktop, href = "/posts" }: LogoProps) => {
     return (
-        <Link href="/posts" className={`flex items-center ${isDesktop ? "justify-center px-4 py-2 " : ""}`}>
+        <Link href={href} className={`flex items-center ${isDesktop ? "justify-center px-4 py-2 " : ""}`}>
             <Image
                 src="/TGline-nobg2.png"
                 alt="TGline"

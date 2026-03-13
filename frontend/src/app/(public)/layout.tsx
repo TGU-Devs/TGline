@@ -70,7 +70,7 @@ export default function PublicLayout({
     <>
       {/* PC: ロゴのみの固定ヘッダー */}
       <header className="hidden lg:flex fixed inset-x-0 top-0 z-40 h-16 items-center border-b border-sidebar-border bg-sidebar px-6 shadow-sm">
-        <Logo isDesktop={false} />
+        <Logo isDesktop={false} href="/" />
       </header>
       {/* スマホ: MobileNav ヘッダー（currentUser=null でハンバーガー非表示） */}
       <MobileNav

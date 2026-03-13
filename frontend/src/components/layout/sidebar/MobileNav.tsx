@@ -42,7 +42,7 @@ const MobileNav = ({
     return (
         <div className="lg:hidden">
             <header className="fixed inset-x-0 top-0 z-40 flex h-16 items-center justify-between border-b border-sidebar-border bg-sidebar px-3 shadow-sm">
-                <Logo isDesktop={false} />
+                <Logo isDesktop={false} href={currentUser ? "/posts" : "/"} />
 
                 {currentUser && (
                     <button
