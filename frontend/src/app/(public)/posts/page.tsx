@@ -13,6 +13,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Plus, Calendar, User, ChevronDown, X, MessageCircle, Heart, Trash } from "lucide-react";
+import LoginPromptModal from "@/components/features/auth/LoginPromptModal";
 
 interface Tag {
   id: number;
@@ -50,6 +51,8 @@ const CATEGORY_CONFIG = {
 } as const;
 
 export default function PostsPage() {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -109,6 +112,12 @@ export default function PostsPage() {
   }, [selectedTagId]);
 
   useEffect(() => {
+    fetch("/api/users/me", { credentials: "include" })
+      .then((res) => setIsAuthenticated(res.ok))
+      .catch(() => setIsAuthenticated(false));
+  }, []);
+
+  useEffect(() => {
     fetchTags();
   }, []);
 
@@ -140,6 +149,12 @@ export default function PostsPage() {
     e.preventDefault();
     e.stopPropagation();
 
+    // 未ログインならモーダル表示
+    if (!isAuthenticated) {
+      setShowLoginModal(true);
+      return;
+    }
+
     // 楽観的 UI 更新
     setPosts((prev) =>
       prev.map((p) =>
@@ -158,6 +173,25 @@ export default function PostsPage() {
         method: currentLiked ? "DELETE" : "POST",
         credentials: "include",
       });
+
+      // 401: トークン期限切れ → モーダル表示
+      if (res.status === 401) {
+        setIsAuthenticated(false);
+        setShowLoginModal(true);
+        // ロールバック
+        setPosts((prev) =>
+          prev.map((p) =>
+            p.id === postId
+              ? {
+                  ...p,
+                  current_user_liked: currentLiked,
+                  likes_count: currentLiked ? p.likes_count + 1 : p.likes_count - 1,
+                }
+              : p
+          )
+        );
+        return;
+      }
 
       if (!res.ok && res.status !== 201 && res.status !== 204) {
         // 失敗時にロールバック
@@ -229,12 +263,22 @@ export default function PostsPage() {
         {/* ヘッダー */}
         <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <h1 className="text-2xl sm:text-3xl font-bold text-foreground">投稿一覧</h1>
-          <Button asChild className="w-full sm:w-auto">
-            <Link href={`/posts/new?${searchParams.toString()}`}>
+          {isAuthenticated ? (
+            <Button asChild className="w-full sm:w-auto">
+              <Link href={`/posts/new?${searchParams.toString()}`}>
+                <Plus className="h-4 w-4 mr-2" />
+                新規投稿
+              </Link>
+            </Button>
+          ) : (
+            <Button
+              className="w-full sm:w-auto"
+              onClick={() => setShowLoginModal(true)}
+            >
               <Plus className="h-4 w-4 mr-2" />
               新規投稿
-            </Link>
-          </Button>
+            </Button>
+          )}
         </div>
 
         {/* タグフィルター: カテゴリ別ドロップダウン */}
@@ -317,21 +361,24 @@ export default function PostsPage() {
             </div>
             <p className="text-foreground text-lg font-medium mb-2">まだ投稿がありません</p>
             <p className="text-muted-foreground text-sm mb-6">最初の投稿を作成して、みんなと情報を共有しましょう</p>
-            <Button asChild>
-              <Link href={`/posts/new?${searchParams.toString()}`}>
+            {isAuthenticated ? (
+              <Button asChild>
+                <Link href={`/posts/new?${searchParams.toString()}`}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  最初の投稿を作成
+                </Link>
+              </Button>
+            ) : (
+              <Button onClick={() => setShowLoginModal(true)}>
                 <Plus className="h-4 w-4 mr-2" />
                 最初の投稿を作成
-              </Link>
-            </Button>
+              </Button>
+            )}
           </div>
         ) : (
           <div className="space-y-4">
-            {posts.map((post) => (
-              <Link
-                key={post.id}
-                href={`/posts/${post.id}?${searchParams.toString()}`}
-                className="block"
-              >
+            {posts.map((post) => {
+              const cardContent = (
                 <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-4 sm:p-6 hover:shadow-md hover:border-primary/30 transition-all">
                   <h2 className="text-lg sm:text-xl font-semibold text-card-foreground mb-2 sm:mb-3 line-clamp-2">
                     {post.title}
@@ -388,11 +435,33 @@ export default function PostsPage() {
                     </div>
                   </div>
                 </div>
-              </Link>
-            ))}
+              );
+
+              return isAuthenticated ? (
+                <Link
+                  key={post.id}
+                  href={`/posts/${post.id}?${searchParams.toString()}`}
+                  className="block"
+                >
+                  {cardContent}
+                </Link>
+              ) : (
+                <div
+                  key={post.id}
+                  className="block cursor-pointer"
+                  onClick={() => setShowLoginModal(true)}
+                >
+                  {cardContent}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
+      <LoginPromptModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+      />
     </div>
   );
 }
