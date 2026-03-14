@@ -469,11 +469,13 @@ export default function PostDetailPage() {
                         <textarea
                             value={commentBody}
                             onChange={(e) => setCommentBody(e.target.value)}
+                            maxLength={1000}
                             placeholder="コメントを入力..."
                             rows={3}
                             className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
                         />
-                        <div className="flex justify-end mt-2">
+                        <div className="flex justify-between items-center mt-2">
+                            <span className={`text-xs ${commentBody.length >= 1000 ? "text-destructive" : "text-muted-foreground"}`}>{commentBody.length}/1000</span>
                             <Button
                                 onClick={handleSubmitComment}
                                 disabled={

@@ -14,7 +14,7 @@ class User < ApplicationRecord
   end
 
   # バリデーション
-  validates :display_name, presence: true
+  validates :display_name, presence: true, length: { maximum: 20 }
   validates :role, presence: true, inclusion: { in: %w[user admin] }
   validates :description, length: { maximum: 200 }, allow_nil: true # roleの値はuserかadminのみ
 

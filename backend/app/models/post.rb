@@ -5,8 +5,8 @@ class Post < ApplicationRecord
   has_many :likes, dependent: :destroy
   has_many :comments, dependent: :destroy
 
-  validates :title, presence: true
-  validates :body, presence: true
+  validates :title, presence: true, length: { maximum: 100 }
+  validates :body, presence: true, length: { maximum: 10000 }
   validate :at_most_one_faculty_tag  # カスタムバリデーション：学部タグは最大1つ
 
   private
