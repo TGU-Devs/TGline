@@ -42,14 +42,16 @@ const ProfileSection = ({
                             id="display_name"
                             value={formValues.display_name}
                             onChange={onchangeHandler}
+                            maxLength={20}
                             className="w-full px-4 py-3 rounded-xl border bg-slate-50 border-slate-200 focus:ring-2 focus:ring-sky-500 outline-none transition-all"
                             required
                         />
-                        {formErrors.display_name && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {formErrors.display_name}
-                            </p>
-                        )}
+                        <div className="flex justify-between">
+                            {formErrors.display_name ? (
+                                <p className="text-red-500 text-sm">{formErrors.display_name}</p>
+                            ) : <span />}
+                            <span className={`text-xs ${formValues.display_name.length >= 20 ? "text-red-500" : "text-slate-400"}`}>{formValues.display_name.length}/20</span>
+                        </div>
                     </div>
                     <div className="space-y-1">
                         <label

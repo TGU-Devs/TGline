@@ -185,13 +185,17 @@ export default function PostNewPage() {
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                maxLength={100}
                 className="w-full px-4 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground placeholder:text-muted-foreground transition-shadow"
                 placeholder="投稿のタイトルを入力"
                 required
               />
-              {FormErrors.title && (
-                <p className="mt-1 text-sm text-destructive">{FormErrors.title}</p>
-              )}
+              <div className="flex justify-between mt-1">
+                {FormErrors.title ? (
+                  <p className="text-sm text-destructive">{FormErrors.title}</p>
+                ) : <span />}
+                <span className={`text-xs ${title.length >= 100 ? "text-destructive" : "text-muted-foreground"}`}>{title.length}/100</span>
+              </div>
             </div>
 
             {/* 本文 */}
@@ -207,14 +211,18 @@ export default function PostNewPage() {
                 id="body"
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
+                maxLength={10000}
                 rows={12}
                 className="w-full px-4 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground placeholder:text-muted-foreground resize-y transition-shadow"
                 placeholder="投稿の本文を入力"
                 required
               />
-              {FormErrors.body && (
-                <p className="mt-1 text-sm text-destructive">{FormErrors.body}</p>
-              )}
+              <div className="flex justify-between mt-1">
+                {FormErrors.body ? (
+                  <p className="text-sm text-destructive">{FormErrors.body}</p>
+                ) : <span />}
+                <span className={`text-xs ${body.length >= 10000 ? "text-destructive" : "text-muted-foreground"}`}>{body.length}/10000</span>
+              </div>
             </div>
 
             {/* タグ選択 */}
