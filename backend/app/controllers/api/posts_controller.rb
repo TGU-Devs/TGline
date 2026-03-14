@@ -3,11 +3,12 @@
 module Api
   # 投稿管理用コントローラー
   class PostsController < ApplicationController
+    skip_before_action :authenticate_user!, only: [:index]
     # postが存在するかどうかを確認するメソッド
     before_action :set_post, only: [:show, :update, :destroy]
 
     # GET /posts
-    # 投稿一覧を取得（認証必須）
+    # 投稿一覧を取得（認証不要）
     def index
       posts = Post.active.includes(:user, :tags, :likes, :comments).order(created_at: :desc)
 
