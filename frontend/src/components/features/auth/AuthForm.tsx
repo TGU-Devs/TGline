@@ -230,8 +230,16 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
         // パスワードのバリデーション
         if (!values.password) {
             errors.password = "パスワードを入力してください";
-        } else if (values.password.length < 6) {
-            errors.password = "6文字以上のパスワードを入力してください";
+        } else if (isRegister) {
+            if (values.password.length < 8) {
+                errors.password = "8文字以上のパスワードを入力してください";
+            } else if (!/[A-Z]/.test(values.password)) {
+                errors.password = "パスワードには大文字を含めてください";
+            } else if (!/[a-z]/.test(values.password)) {
+                errors.password = "パスワードには小文字を含めてください";
+            } else if (!/[0-9]/.test(values.password)) {
+                errors.password = "パスワードには数字を含めてください";
+            }
         }
 
         // 登録時の追加バリデーション
@@ -244,8 +252,8 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
             // パスワード確認のバリデーション
             if (!values.confirmPassword) {
                 errors.confirmPassword = "パスワード確認を入力してください";
-            } else if (values.confirmPassword.length < 6) {
-                errors.confirmPassword = "6文字以上のパスワードを入力してください";
+            } else if (values.confirmPassword.length < 8) {
+                errors.confirmPassword = "8文字以上のパスワードを入力してください";
             } else if (values.password !== values.confirmPassword) {
                 errors.confirmPassword = "パスワードが一致しません";
             }
