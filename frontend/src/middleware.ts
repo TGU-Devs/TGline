@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 // 認証不要（未ログインユーザー向け）のパス
-const publicPaths = ["/", "/login", "/register"];
+const publicPaths = ["/", "/login", "/register", "/posts"];
 
 // middleware が適用されないパス
 // API routes, _next, static files は除外
@@ -16,7 +16,7 @@ export function middleware(request: NextRequest) {
   const isPublicPath = publicPaths.includes(pathname);
 
   // 認証済み + public/auth ページ → /posts にリダイレクト
-  if (token && isPublicPath) {
+  if (token && isPublicPath && pathname !== "/posts") {
     return NextResponse.redirect(new URL("/posts", request.url));
   }
 
