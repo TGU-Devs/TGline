@@ -1,13 +1,14 @@
 "use client";
 
+import Main from "@/components/ui/PageMain";
 import { MessageSquare, ExternalLink } from "lucide-react";
 
 const GOOGLE_FORM_URL = "https://forms.gle/xHNi1hotjP1iBtae8";
 
 const ContactPage = () => {
     return (
-        <main className="min-h-screen bg-background p-6 md:p-10 duration-300">
-            <div className="max-w-2xl mx-auto">
+        <Main>
+            <div className="max-w-3xl mx-auto">
                 <div className="flex items-center gap-3 mb-8">
                     <MessageSquare className="w-7 h-7 text-primary" />
                     <h1 className="text-2xl font-bold text-foreground">
@@ -50,7 +51,7 @@ const ContactPage = () => {
                     </p>
                 </div>
             </div>
-        </main>
+        </Main>
     );
 };
 

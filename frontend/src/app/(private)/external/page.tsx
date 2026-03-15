@@ -1,4 +1,5 @@
-import Header from "@/components/features/external/Header";
+import Header from "@/components/ui/PageHeader";
+import Main from "@/components/ui/PageMain";
 import ExternalContent from "@/components/features/external/ExternalContent";
 import Help from "@/components/features/external/Help";
 import type { ExternalSite } from "@/components/features/external/types";
@@ -98,19 +99,18 @@ const externalSites: ExternalSite[] = [
 
 const ExternalPage = () => {
     return (
-        <main className="min-h-screen bg-background p-8 md:p-12 duration-300">
-            <div className="max-w-7xl mx-auto">
-                <Header title="外部サイト" />
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-y-12 gap-x-6">
-                    {externalSites.map((site) => (
-                        <ExternalContent key={site.url} site={site} />
-                    ))}
-                </div>
-
-                <Help />
+        <Main>
+            <Header
+                title="外部サイト"
+                description="東北学院大学関連サイト一覧"
+            />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-y-12 gap-x-6 mt-8">
+                {externalSites.map((site) => (
+                    <ExternalContent key={site.url} site={site} />
+                ))}
             </div>
-        </main>
+            <Help />
+        </Main>
     );
 };
 
