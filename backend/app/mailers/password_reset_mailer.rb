@@ -2,7 +2,7 @@
 
 class PasswordResetMailer < ApplicationMailer
   layout false
-  default from: ENV.fetch("MAILER_FROM_ADDRESS", "noreply@tgu-board.example.com")
+  default from: ENV.fetch("MAILER_FROM_ADDRESS", "noreply@tgline.example.com")
 
   def reset_email(user, raw_token)
     @user = user
