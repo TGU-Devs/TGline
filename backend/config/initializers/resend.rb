@@ -1,3 +1,3 @@
 # frozen_string_literal: true
 
-Resend.api_key = ENV["RESEND_API_KEY"]
+Resend.api_key = ENV.fetch("RESEND_API_KEY") { Rails.env.production? ? raise("RESEND_API_KEY is required in production") : nil }
