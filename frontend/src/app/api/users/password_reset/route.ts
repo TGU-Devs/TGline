@@ -40,15 +40,19 @@ export async function PATCH(request: NextRequest) {
     });
 
     const data = await backendRes.json();
-    const response = NextResponse.json(data, { status: backendRes.status });
 
     // リセット成功時、レスポンスボディのtokenからCookieを設定
     // （Node.js fetchではSet-Cookieヘッダーを取得できないため）
     if (backendRes.ok && data.token) {
-      setAuthCookie(data.token, response);
+      const token = data.token;
+      // JWTトークンをブラウザに露出させない（httpOnly Cookieでのみ管理）
+      delete data.token;
+      const response = NextResponse.json(data, { status: backendRes.status });
+      setAuthCookie(token, response);
+      return response;
     }
 
-    return response;
+    return NextResponse.json(data, { status: backendRes.status });
   } catch (error) {
     console.error("Password reset error:", error);
     return NextResponse.json(

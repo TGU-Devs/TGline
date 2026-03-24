@@ -32,5 +32,8 @@ module Backend
     # Cookieミドルウェアを有効化（JWTトークンをcookieに保存するため）
     config.middleware.use ActionDispatch::Cookies
     config.middleware.use ActionDispatch::Session::CookieStore, key: '_tgu_session' # _tgu_sessionはcookieのキー
+
+    # レートリミット（rack-attack）
+    config.middleware.use Rack::Attack
   end
 end
