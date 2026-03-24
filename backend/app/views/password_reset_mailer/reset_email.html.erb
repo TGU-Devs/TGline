@@ -4,63 +4,67 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: 'Helvetica Neue', Arial, sans-serif;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f1f5f9; padding: 40px 20px;">
+<body style="margin: 0; padding: 0; background-color: #eef2f7; font-family: 'Helvetica Neue', Arial, 'Hiragino Sans', sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #eef2f7; padding: 40px 20px;">
     <tr>
       <td align="center">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width: 520px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
-          <!-- Header -->
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width: 480px;">
+          <!-- Logo -->
           <tr>
-            <td style="background: linear-gradient(135deg, #1B2A6B 0%, #2D3F8F 100%); padding: 32px 40px; text-align: center;">
-              <span style="font-size: 28px; font-weight: 700; color: #ffffff; letter-spacing: 1px;">TG line</span>
+            <td align="center" style="padding-bottom: 24px;">
+              <img src="<%= ENV.fetch('FRONTEND_URL', 'http://localhost:3000') %>/TGline-nobg2.png"
+                   alt="TG line"
+                   width="160"
+                   style="display: block; width: 160px; height: auto;" />
             </td>
           </tr>
-          <!-- Body -->
+          <!-- Card -->
           <tr>
-            <td style="padding: 40px;">
-              <h2 style="margin: 0 0 8px; font-size: 20px; font-weight: 700; color: #1B2A6B;">パスワードリセットのご案内</h2>
-              <p style="margin: 0 0 24px; font-size: 14px; color: #64748b;">パスワード再設定のリクエストを受け付けました</p>
-
-              <p style="margin: 0 0 16px; font-size: 15px; color: #334155; line-height: 1.6;">
-                <strong><%= @user.display_name %></strong> さん
-              </p>
-
-              <p style="margin: 0 0 32px; font-size: 15px; color: #334155; line-height: 1.6;">
-                以下のボタンをクリックして、新しいパスワードを設定してください。
-              </p>
-
-              <table role="presentation" cellpadding="0" cellspacing="0" style="margin: 0 auto 32px;">
+            <td>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #dce3ed;">
+                <!-- Card Body -->
                 <tr>
-                  <td style="border-radius: 8px; background-color: #1B2A6B;">
-                    <a href="<%= @reset_url %>"
-                       style="display: inline-block; padding: 14px 32px; font-size: 15px; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 8px;">
-                      パスワードをリセットする
-                    </a>
-                  </td>
-                </tr>
-              </table>
+                  <td style="padding: 36px 32px;">
+                    <h2 style="margin: 0 0 8px; font-size: 18px; font-weight: 700; color: #2d3748;">パスワードリセットのご案内</h2>
+                    <p style="margin: 0 0 24px; font-size: 13px; color: #8896a8;">パスワード再設定のリクエストを受け付けました</p>
 
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 24px;">
-                <tr>
-                  <td style="background-color: #f8fafc; border-radius: 8px; padding: 16px; text-align: center;">
-                    <p style="margin: 0; font-size: 13px; color: #64748b;">
-                      ⏱ このリンクは <strong style="color: #1B2A6B;"><%= @expires_in %></strong> 以内に有効です
+                    <p style="margin: 0 0 20px; font-size: 14px; color: #4a5568; line-height: 1.7;">
+                      <strong><%= @user.display_name %></strong> さん、以下のボタンから新しいパスワードを設定してください。
+                    </p>
+
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 24px;">
+                      <tr>
+                        <td align="center">
+                          <a href="<%= @reset_url %>"
+                             style="display: inline-block; padding: 12px 36px; font-size: 14px; font-weight: 600; color: #ffffff; background-color: #3b82f6; text-decoration: none; border-radius: 8px;">
+                            パスワードをリセットする
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 20px;">
+                      <tr>
+                        <td style="background-color: #f5f7fa; border-radius: 8px; padding: 12px 16px; text-align: center;">
+                          <p style="margin: 0; font-size: 12px; color: #8896a8;">
+                            このリンクは <strong style="color: #3b82f6;"><%= @expires_in %></strong> 以内に有効です
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <p style="margin: 0; font-size: 12px; color: #a0aec0; line-height: 1.6;">
+                      このメールに心当たりがない場合は、無視してください。パスワードは変更されません。
                     </p>
                   </td>
                 </tr>
               </table>
-
-              <p style="margin: 0; font-size: 13px; color: #94a3b8; line-height: 1.5;">
-                このメールに心当たりがない場合は、無視してください。パスワードは変更されません。
-              </p>
             </td>
           </tr>
           <!-- Footer -->
           <tr>
-            <td style="padding: 24px 40px; background-color: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center;">
-              <p style="margin: 0; font-size: 12px; color: #94a3b8;">
-                &copy; TG line — 東北学院大学 学内情報共有掲示板
-              </p>
+            <td align="center" style="padding-top: 24px;">
+              <p style="margin: 0; font-size: 11px; color: #a0aec0;">TG line</p>
             </td>
           </tr>
         </table>
