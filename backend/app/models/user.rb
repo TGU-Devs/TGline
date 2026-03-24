@@ -13,28 +13,38 @@ class User < ApplicationRecord
     provider.blank? && super
   end
 
+  # パスワード強度バリデーション
+  validate :password_complexity, if: :password_required?
+
   # バリデーション
   validates :display_name, presence: true, length: { maximum: 20 }
   validates :role, presence: true, inclusion: { in: %w[user admin] }
-  validates :description, length: { maximum: 200 }, allow_nil: true # roleの値はuserかadminのみ
+  validates :description, length: { maximum: 200 }, allow_nil: true
 
-  # スコープ(クエリのショートカット)。集合検索でSQLを発行する
-  # ユーザーがactiveかdeletedかを判断するメソッド的なもの。
+  # スコープ
   scope :active, -> { where(deleted_at: nil) }
   scope :deleted, -> { where.not(deleted_at: nil) }
 
-  # 論理削除(deleted_atカラムに現在時刻を保存することで論理削除を行う)
   def soft_delete
     update(deleted_at: Time.current)
   end
 
-  # ユーザーがdeletedかどうかを判断するメソッド1人の User インスタンスに対する質問
   def deleted?
     deleted_at.present?
   end
 
-  # 管理者チェック
   def admin?
     role == 'admin'
+  end
+
+  private
+
+  def password_complexity
+    return if password.blank?
+
+    errors.add(:password, "は8文字以上で入力してください") if password.length < 8
+    errors.add(:password, "には大文字を含めてください") unless password.match?(/[A-Z]/)
+    errors.add(:password, "には小文字を含めてください") unless password.match?(/[a-z]/)
+    errors.add(:password, "には数字を含めてください") unless password.match?(/[0-9]/)
   end
 end

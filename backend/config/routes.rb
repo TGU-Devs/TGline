@@ -23,6 +23,8 @@ Rails.application.routes.draw do
       get "me", to: "me#show"
       patch "me", to: "me#update"
       patch "password", to: "passwords#update"
+      post "password_reset", to: "password_resets#create"
+      patch "password_reset", to: "password_resets#update"
       delete "me", to: "me#destroy"
     end
     resources :users, only: [:index, :show]

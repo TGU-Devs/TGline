@@ -10,6 +10,8 @@ import Button from "@/components/features/settings/security/Button";
 
 import { Lock } from "lucide-react";
 
+import { validatePassword } from "@/lib/validators";
+
 import {
     ChangePasswordFormValues,
     ChangePasswordFormItem,
@@ -99,16 +101,9 @@ const ChangePasswordPage = () => {
             error.current_password = "現在のパスワードを入力してください";
         }
 
-        if (!values.new_password) {
-            error.new_password = "新しいパスワードを入力してください";
-        } else if (values.new_password.length < 8) {
-            error.new_password = "8文字以上のパスワードを入力してください";
-        } else if (!/[A-Z]/.test(values.new_password)) {
-            error.new_password = "パスワードには大文字を含めてください";
-        } else if (!/[a-z]/.test(values.new_password)) {
-            error.new_password = "パスワードには小文字を含めてください";
-        } else if (!/[0-9]/.test(values.new_password)) {
-            error.new_password = "パスワードには数字を含めてください";
+        const passwordError = validatePassword(values.new_password);
+        if (passwordError) {
+            error.new_password = passwordError;
         }
 
         if (!values.confirm_new_password) {
