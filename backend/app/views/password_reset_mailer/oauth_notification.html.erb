@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+</head>
+<body style="font-family: sans-serif; padding: 20px; color: #333;">
+  <h2>ログイン方法のご案内</h2>
+
+  <p><%= @user.display_name %> さん</p>
+
+  <p>パスワードリセットのリクエストを受け付けましたが、このアカウントはGoogleアカウントで登録されています。</p>
+  <p>ログインページからGoogleログインをご利用ください。</p>
+
+  <p style="margin: 24px 0;">
+    <a href="<%= @login_url %>"
+       style="background-color: #0284c7; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">
+      ログインページへ
+    </a>
+  </p>
+
+  <p style="color: #666; font-size: 14px;">
+    このメールに心当たりがない場合は、無視してください。
+  </p>
+</body>
+</html>
