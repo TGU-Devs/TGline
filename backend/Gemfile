@@ -16,6 +16,12 @@ gem 'devise'
 gem 'jwt'
 gem 'google-id-token'
 
+# Email delivery
+gem 'resend'
+
+# Rate limiting
+gem 'rack-attack'
+
 # Password hashing (required by Devise)
 gem "bcrypt", "~> 3.1.7"
 
