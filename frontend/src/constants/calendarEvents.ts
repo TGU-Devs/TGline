@@ -1,4 +1,4 @@
-import CalendarEvent from "@/types/calendarEventType";
+import { CalendarEvent } from "@/types/calendarEventTypes";
 
 const baseEvents: CalendarEvent[] = [
     {
