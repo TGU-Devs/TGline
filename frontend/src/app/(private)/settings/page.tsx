@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 
 import { useUser } from "@/contexts/UserContext";
 import { useStatusToast } from "@/hooks/useStatusToast";
@@ -9,6 +8,7 @@ import { useStatusToast } from "@/hooks/useStatusToast";
 import Loading from "@/components/ui/Loading";
 import ErrorUI from "@/components/ui/ErrorUI";
 import Toast from "@/components/ui/Toast";
+import Main from "@/components/ui/PageMain";
 import Header from "@/components/features/settings/Header";
 import ProfileSection from "@/components/features/settings/ProfileSection";
 import NotificationSection from "@/components/features/settings/NotificationSection";
@@ -29,7 +29,7 @@ import {
     Shield,
     AlertTriangle,
 } from "lucide-react";
-import { FormValues, Errors } from "@/components/features/settings/types"; 
+import { FormValues, Errors } from "@/components/features/settings/types";
 
 const initFormValues = {
     display_name: "",
@@ -60,7 +60,7 @@ const SettingsPage = () => {
         "/settings",
         {
             password_changed: { message: "パスワードを変更しました。" },
-        }
+        },
     );
 
     const themeOptions = [
@@ -172,7 +172,7 @@ const SettingsPage = () => {
     }
 
     return (
-        <main className="min-h-screen bg-background p-6 md:p-10 duration-300">
+        <Main padding="p-3 md:p-12">
             <Toast
                 showToast={showSaveToast}
                 icon={CheckCircle2}
@@ -226,7 +226,7 @@ const SettingsPage = () => {
             />
 
             <Footer />
-        </main>
+        </Main>
     );
 };
 

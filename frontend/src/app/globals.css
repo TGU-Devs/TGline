@@ -53,6 +53,12 @@
   --sidebar-accent-foreground: oklch(0.98 0.005 25);
   --sidebar-border: oklch(0.85 0.02 230);
   --sidebar-ring: oklch(0.65 0.12 230);
+  --event-class: oklch(0.90 0.035 230);    /* 落ち着いた水色 */
+  --event-guidance: oklch(0.91 0.06 140);  /* 【変更】少し緑をはっきりとさせたミントグリーン */
+  --event-ceremony: oklch(0.92 0.04 310);  /* 【変更】ラベンダー（パープル系）に大きく色相を変更 */
+  --event-warning: oklch(0.85 0.09 20);    /* 赤みを少し強く（彩度アップ・少し暗く） */
+  --event-holiday: oklch(0.86 0.03 230);   /* 薄すぎないように少し濃いグレーブルーに */
+  --event-text: oklch(0.35 0.04 240);
 }
 
 .dark {
@@ -88,6 +94,12 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
+  --event-class: oklch(0.32 0.05 230);
+  --event-guidance: oklch(0.32 0.07 140);  /* ダークモードでも緑を少しはっきりと */
+  --event-ceremony: oklch(0.35 0.06 310);  /* ダークモード用パープル */
+  --event-warning: oklch(0.38 0.12 20);    /* ダークモードでも少し赤みを強めに */
+  --event-holiday: oklch(0.28 0.03 230);   /* ダークモードの休日も少し濃いめに */
+  --event-text: oklch(0.90 0.01 230);
 }
 
 @theme inline {
