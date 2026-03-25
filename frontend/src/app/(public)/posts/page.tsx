@@ -247,7 +247,7 @@ export default function PostsPage() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <p className="text-destructive mb-4">{error}</p>
-          <Button onClick={fetchPosts}>再試行</Button>
+          <Button onClick={() => fetchPosts()}>再試行</Button>
         </div>
       </div>
     );
