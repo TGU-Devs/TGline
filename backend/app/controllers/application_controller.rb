@@ -6,12 +6,14 @@ class ApplicationController < ActionController::API
   # cookie許可
   include ActionController::Cookies
 
+  # エラーをDiscordに通知するためのコード
   rescue_from StandardError do |e|
     notify_discord(e)
     raise e
   end
 
   private
+
 
   def notify_discord(error)
     return unless Rails.env.production?

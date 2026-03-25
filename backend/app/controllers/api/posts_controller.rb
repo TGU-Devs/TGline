@@ -10,6 +10,9 @@ module Api
     # GET /posts
     # 投稿一覧を取得（認証不要）
     def index
+      per_page = 20
+      page = (params[:page] || 1).to_i
+
       posts = Post.active.includes(:user, :tags, :likes, :comments).order(created_at: :desc)
 
       # カテゴリで絞り込み
@@ -24,7 +27,14 @@ module Api
         posts = posts.joins(:tags).where(tags: { id: params[:tag_id] }).distinct
       end
 
-      render json: posts.map { |post| post_response(post) }, status: :ok
+      # ページネーション: 1件多く取得して次ページの有無を判定
+      posts = posts.limit(per_page + 1).offset((page - 1) * per_page)
+      has_next = posts.size > per_page
+
+      render json: {
+        posts: posts.first(per_page).map { |post| post_response(post) },
+        has_next: has_next
+      }, status: :ok
     end
 
     # GET /posts/:id

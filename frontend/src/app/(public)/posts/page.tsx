@@ -59,7 +59,10 @@ export default function PostsPage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const [selectedTagId, setSelectedTagId] = useState<number | null>(() => {
     const tagId = searchParams.get("tag_id");
     return tagId ? Number(tagId) : null;
@@ -85,16 +88,20 @@ export default function PostsPage() {
     }
   };
 
-  const fetchPosts = useCallback(async () => {
+  const fetchPosts = useCallback(async (targetPage: number = 1) => {
     try {
-      setIsLoading(true);
+      if (targetPage === 1) {
+        setIsLoading(true);
+      } else {
+        setIsLoadingMore(true);
+      }
       // フロント側でクエリパラメーターを作成してapiに渡す
       const params = new URLSearchParams();
       if (selectedTagId !== null) {
         params.set("tag_id", String(selectedTagId));
       }
-      const query = params.toString();
-      const url = query ? `/api/posts?${query}` : "/api/posts";
+      params.set("page", String(targetPage));
+      const url = `/api/posts?${params.toString()}`;
       // バックエンドにリクエスト(今の場合route handlerを仲介させている)
       const res = await fetch(url, { credentials: "include" });
 
@@ -103,11 +110,18 @@ export default function PostsPage() {
       }
 
       const data = await res.json();
-      setPosts(data);
+      if (targetPage === 1) {
+        setPosts(data.posts);
+      } else {
+        setPosts((prev: Post[]) => [...prev, ...data.posts]);
+      }
+      setHasMore(data.has_next);
+      setPage(targetPage);
     } catch (err) {
       setError(err instanceof Error ? err.message : "エラーが発生しました");
     } finally {
       setIsLoading(false);
+      setIsLoadingMore(false);
     }
   }, [selectedTagId]);
 
@@ -136,6 +150,8 @@ export default function PostsPage() {
 
    const handleTagSelect = useCallback((tagId: number | null) => {
     setSelectedTagId(tagId);
+    setPage(1);
+    setHasMore(true);
     const params = new URLSearchParams(searchParams.toString());
     if (tagId !== null) {
       params.set("tag_id", String(tagId));
@@ -436,6 +452,17 @@ export default function PostsPage() {
                 </div>
               );
             })}
+            {hasMore && (
+              <div className="flex justify-center pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => fetchPosts(page + 1)}
+                  disabled={isLoadingMore}
+                >
+                  {isLoadingMore ? "読み込み中..." : "もっと読む"}
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </div>
