@@ -75,13 +75,13 @@ const CalendarWidget = ({ eventClick, events }: CalendarWidgetProps) => {
                     <div className="flex bg-muted/50 p-1 rounded-xl">
                         <button
                             onClick={handlePrev}
-                            className="p-2 hover:bg-destructive-foreground/80 hover:shadow-sm rounded-lg transition-colors text--muted-foreground"
+                            className="p-2 hover:bg-destructive-foreground/80 hover:shadow-sm rounded-lg transition-colors text-muted-foreground"
                         >
                             <ChevronLeft size={20} />
                         </button>
                         <button
                             onClick={handleNext}
-                            className="p-2 hover:bg-destructive-foreground/80 hover:shadow-sm rounded-lg transition-colors text--muted-foreground"
+                            className="p-2 hover:bg-destructive-foreground/80 hover:shadow-sm rounded-lg transition-colors text-muted-foreground"
                         >
                             <ChevronRight size={20} />
                         </button>

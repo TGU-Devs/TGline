@@ -1,9 +1,9 @@
-type HederProps = {
+type HeaderProps = {
     title: string;
     description?: string;
 };
 
-const Header = ({ title, description }: HederProps) => {
+const Header = ({ title, description }: HeaderProps) => {
     return (
         <header className="max-w-4xl max-auto">
             <h1 className="text-3xl font-bold text-foreground">{title}</h1>

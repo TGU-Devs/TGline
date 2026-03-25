@@ -536,9 +536,9 @@ const generateSemesterEvents = (
     return generatedEvents;
 };
 
-const calenderEvents: CalendarEvent[] = [
+const calendarEvents: CalendarEvent[] = [
     ...baseEvents,
     ...generateSemesterEvents(springFirstDays, "spring"),
     ...generateSemesterEvents(fallFirstDays, "fall"),
 ];
-export default calenderEvents;
+export default calendarEvents;
