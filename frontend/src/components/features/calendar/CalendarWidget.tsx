@@ -1,7 +1,4 @@
-type CalendarWidgetProps = {
-    events: EventInput[];
-    eventClick: (arg: EventClickArg) => void;
-};
+"use client";
 
 import React, { useState, useRef } from "react";
 import FullCalendar from "@fullcalendar/react";
@@ -11,6 +8,11 @@ import interactionPlugin from "@fullcalendar/interaction";
 import { EventInput, EventClickArg, DatesSetArg } from "@fullcalendar/core";
 import { DateClickArg } from "@fullcalendar/interaction";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+
+type CalendarWidgetProps = {
+    events: EventInput[];
+    eventClick: (arg: EventClickArg) => void;
+};
 
 const views = [
     { key: "dayGridMonth", label: "月" },
@@ -69,7 +71,7 @@ const CalendarWidget = ({ eventClick, events }: CalendarWidgetProps) => {
     };
 
     return (
-        <div className="flex flex-col h-200 bg-card p-3 rounded-xl border shadow-sm mt-8 md:p-8 md:h-180">
+        <div className="flex flex-col h-[50rem] bg-card p-3 rounded-xl border shadow-sm mt-8 md:p-8 md:h-[45rem]">
             <div className="p-5 mb-4 border-b border-sidebar-border flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-2">
                     <div className="flex bg-muted/50 p-1 rounded-xl">
@@ -88,6 +90,7 @@ const CalendarWidget = ({ eventClick, events }: CalendarWidgetProps) => {
                     </div>
                     <button
                         onClick={handleToday}
+                        disabled={isTodayDisabled}
                         className={`px-5 py-2 rounded-xl border border-sidebar-border text-sm font-bold transition-colors shadow-sm ${
                             isTodayDisabled
                                 ? "bg-muted/50 text-muted-foreground opacity-50 cursor-not-allowed"
@@ -122,7 +125,7 @@ const CalendarWidget = ({ eventClick, events }: CalendarWidgetProps) => {
             </div>
             <div className="grow overflow-x-auto overflow-y-hidden">
                 <div
-                    className={`${currentView === "timeGridWeek" ? "min-w-175 md:min-w-0" : "w-full"} h-full`}
+                    className={`${currentView === "timeGridWeek" ? "min-w-[43.75rem] md:min-w-0" : "w-full"} h-full`}
                 >
                     <FullCalendar
                         ref={calendarRef}

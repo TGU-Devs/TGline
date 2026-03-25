@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { EventClickArg } from "@fullcalendar/core";
 
-import calenderEvents from "@/constants/calendarEvents";
+import calendarEvents from "@/constants/calendarEvents";
 import Main from "@/components/ui/PageMain";
 import Header from "@/components/ui/PageHeader";
 import OfficeHours from "@/components/features/calendar/OfficeHours";
@@ -13,7 +13,7 @@ import { SelectedEventType } from "@/types/calendarEventTypes";
 
 
 const CalendarPage = () => {
-    const [events, setEvents] = useState(calenderEvents);
+    const events = calendarEvents;
     const [selectedEvent, setSelectedEvent] = useState<SelectedEventType | null>(null);
     const [modalOpen, setModalOpen] = useState(false);
 
