@@ -80,4 +80,10 @@ Rails.application.configure do
 
   # 開発環境では credentials.yml.enc に依存せず、固定の secret_key_base を使用
   config.secret_key_base = "dev_secret_key_base_not_for_production"
+
+  # Bullet: N+1クエリ検知
+  config.after_initialize do
+    Bullet.enable = true
+    Bullet.rails_logger = true
+  end
 end

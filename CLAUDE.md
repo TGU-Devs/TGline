@@ -71,6 +71,14 @@ docker compose down -v        # DBボリュームも削除
 
 主要変数: `DATABASE_HOST`, `DATABASE_PASSWORD`, `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_GOOGLE_CLIENT_ID`
 
+## Prompts
+
+開発時は `prompts/` 配下の定義を参照すること。
+- `prompts/skills/` — 実装パターン・手順の定義
+- `prompts/agents/` — 自動化タスクの定義
+
+該当する作業の際は、対応するファイルを読んでから実行すること。
+
 ## 本番環境
 
 - Railwayでフロント、バックエンド、DBをそれぞれデプロイしている。
