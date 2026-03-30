@@ -335,6 +335,7 @@ export type ResourceName = {
 - [ ] TypeScript 型が Rails のレスポンス形式と一致している
 - [ ] 論理削除対象なら `deleted_at`, `scope :active`, `soft_delete` がある
 - [ ] ネストリソースの場合、親リソースの存在チェック（`set_parent`）がある
+- [ ] **OpenAPI 仕様を更新した**（`prompts/skills/updating-openapi/instruction.md` に従う）
 
 ## 参照ファイル
 

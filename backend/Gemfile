@@ -22,6 +22,10 @@ gem 'resend'
 # Rate limiting
 gem 'rack-attack'
 
+# API documentation
+gem 'rswag-api'
+gem 'rswag-ui'
+
 # Password hashing (required by Devise)
 gem "bcrypt", "~> 3.1.7"
 

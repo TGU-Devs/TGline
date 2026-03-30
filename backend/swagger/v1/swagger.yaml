@@ -1,0 +1,1166 @@
+openapi: 3.0.3
+info:
+  title: TGU API
+  description: 東北学院大学 学内情報共有掲示板 API
+  version: 1.0.0
+  contact:
+    name: TGU Devs
+
+servers:
+  - url: http://localhost:3001
+    description: Development
+  - url: https://your-production-url.railway.app
+    description: Production
+
+tags:
+  - name: Authentication
+    description: ユーザー認証（サインイン・サインアップ・サインアウト）
+  - name: Google OAuth
+    description: Googleアカウントによる認証
+  - name: User
+    description: ユーザー情報の取得・更新
+  - name: Password
+    description: パスワード変更・リセット
+  - name: Post
+    description: 投稿のCRUD
+  - name: Like
+    description: いいね機能
+  - name: Comment
+    description: コメント機能
+  - name: Tag
+    description: タグ一覧
+  - name: Admin
+    description: 管理者専用エンドポイント
+  - name: Misc
+    description: その他
+
+paths:
+  # ============================================================
+  # Authentication
+  # ============================================================
+  /api/users/sign_up:
+    post:
+      tags: [Authentication]
+      summary: ユーザー登録
+      operationId: signUp
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [user]
+              properties:
+                user:
+                  type: object
+                  required: [email, password, password_confirmation, display_name]
+                  properties:
+                    email:
+                      type: string
+                      format: email
+                      example: user@tgu.ac.jp
+                    password:
+                      type: string
+                      minLength: 8
+                      description: 大文字・小文字・数字を含む8文字以上
+                      example: Password1
+                    password_confirmation:
+                      type: string
+                      example: Password1
+                    display_name:
+                      type: string
+                      maxLength: 20
+                      example: テストユーザー
+                    description:
+                      type: string
+                      maxLength: 200
+                      example: よろしくお願いします
+      responses:
+        '201':
+          description: 登録成功
+          headers:
+            Set-Cookie:
+              description: JWT httpOnly cookie
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '422':
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrors'
+
+  /api/users/sign_in:
+    post:
+      tags: [Authentication]
+      summary: サインイン
+      operationId: signIn
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [session]
+              properties:
+                session:
+                  type: object
+                  required: [email, password]
+                  properties:
+                    email:
+                      type: string
+                      format: email
+                      example: admin@tgu.ac.jp
+                    password:
+                      type: string
+                      example: admin123
+      responses:
+        '200':
+          description: サインイン成功
+          headers:
+            Set-Cookie:
+              description: JWT httpOnly cookie
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: 認証失敗
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/users/sign_out:
+    delete:
+      tags: [Authentication]
+      summary: サインアウト
+      operationId: signOut
+      responses:
+        '204':
+          description: サインアウト成功（cookieを削除）
+
+  /api/users/google_sign_in:
+    post:
+      tags: [Google OAuth]
+      summary: Googleアカウントでサインイン
+      operationId: googleSignIn
+      description: |
+        Google Identity ServicesのIDトークンを使用してサインイン/サインアップする。
+        ユーザーが存在しない場合は自動的に作成される。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id_token]
+              properties:
+                id_token:
+                  type: string
+                  description: Google ID Token
+      responses:
+        '200':
+          description: サインイン成功
+          headers:
+            Set-Cookie:
+              description: JWT httpOnly cookie
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: 無効なトークン
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: メールアドレスが既にメール/パスワードで登録済み
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ============================================================
+  # Current User (me)
+  # ============================================================
+  /api/users/me:
+    get:
+      tags: [User]
+      summary: 現在のユーザー情報を取得
+      operationId: getMe
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentUser'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    patch:
+      tags: [User]
+      summary: プロフィールを更新
+      operationId: updateMe
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    display_name:
+                      type: string
+                      maxLength: 20
+                    description:
+                      type: string
+                      maxLength: 200
+                    email:
+                      type: string
+                      format: email
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentUser'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrors'
+
+    delete:
+      tags: [User]
+      summary: アカウントを削除（論理削除）
+      operationId: deleteMe
+      security:
+        - cookieAuth: []
+      description: OAuthユーザーはパスワード不要。メール/パスワードユーザーは現在のパスワードが必要。
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: object
+                  properties:
+                    current_password:
+                      type: string
+                      description: メール/パスワードユーザーのみ必須
+      responses:
+        '204':
+          description: 削除成功
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ============================================================
+  # Password
+  # ============================================================
+  /api/users/password:
+    patch:
+      tags: [Password]
+      summary: パスワードを変更
+      operationId: changePassword
+      security:
+        - cookieAuth: []
+      description: OAuthユーザーは使用不可（403）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [password]
+              properties:
+                password:
+                  type: object
+                  required: [current_password, new_password]
+                  properties:
+                    current_password:
+                      type: string
+                    new_password:
+                      type: string
+                      minLength: 8
+                      description: 大文字・小文字・数字を含む8文字以上
+      responses:
+        '200':
+          description: 変更成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: パスワードを変更しました
+        '401':
+          description: 現在のパスワードが間違っている
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: OAuthユーザーのためパスワード変更不可
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/users/password_reset:
+    post:
+      tags: [Password]
+      summary: パスワードリセットメールを送信
+      operationId: requestPasswordReset
+      description: アカウント列挙防止のため、メールアドレスの存在有無に関わらず常に200を返す
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [password_reset]
+              properties:
+                password_reset:
+                  type: object
+                  required: [email]
+                  properties:
+                    email:
+                      type: string
+                      format: email
+      responses:
+        '200':
+          description: リクエスト受付（メールが存在しない場合も同じレスポンス）
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+    patch:
+      tags: [Password]
+      summary: パスワードをリセット（トークン使用）
+      operationId: resetPassword
+      description: リセット完了後、自動的にサインインする
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [password_reset]
+              properties:
+                password_reset:
+                  type: object
+                  required: [reset_password_token, password, password_confirmation]
+                  properties:
+                    reset_password_token:
+                      type: string
+                    password:
+                      type: string
+                      minLength: 8
+                    password_confirmation:
+                      type: string
+      responses:
+        '200':
+          description: リセット成功（自動サインイン）
+          headers:
+            Set-Cookie:
+              description: JWT httpOnly cookie
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '422':
+          description: 無効なトークンまたはバリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrors'
+
+  # ============================================================
+  # Users (public)
+  # ============================================================
+  /api/users:
+    get:
+      tags: [User]
+      summary: ユーザー一覧を取得
+      operationId: listUsers
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserSummary'
+
+  /api/users/{id}:
+    get:
+      tags: [User]
+      summary: ユーザー詳細を取得
+      operationId: getUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '404':
+          description: ユーザーが見つからない
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ============================================================
+  # Posts
+  # ============================================================
+  /api/posts:
+    get:
+      tags: [Post]
+      summary: 投稿一覧を取得
+      operationId: listPosts
+      description: 20件ずつページネーション。認証なしでもアクセス可能。
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+          description: ページ番号
+        - name: category
+          in: query
+          schema:
+            type: string
+            enum: [faculty, topic]
+          description: タグカテゴリでフィルタ
+        - name: tag_id
+          in: query
+          schema:
+            type: integer
+          description: 特定のタグIDでフィルタ
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Post'
+                  has_next:
+                    type: boolean
+                    description: 次のページが存在するか
+
+    post:
+      tags: [Post]
+      summary: 投稿を作成
+      operationId: createPost
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [post]
+              properties:
+                post:
+                  type: object
+                  required: [title, body]
+                  properties:
+                    title:
+                      type: string
+                      maxLength: 100
+                      example: テスト投稿
+                    body:
+                      type: string
+                      maxLength: 10000
+                      example: これはテスト投稿です。
+                    tag_ids:
+                      type: array
+                      items:
+                        type: integer
+                      description: タグIDの配列（学部タグは最大1つ）
+                      example: [1, 10]
+      responses:
+        '201':
+          description: 作成成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrors'
+
+  /api/posts/{id}:
+    get:
+      tags: [Post]
+      summary: 投稿詳細を取得
+      operationId: getPost
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PostId'
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: 投稿が見つからない
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Errors'
+
+    patch:
+      tags: [Post]
+      summary: 投稿を更新
+      operationId: updatePost
+      security:
+        - cookieAuth: []
+      description: 投稿者本人のみ更新可能
+      parameters:
+        - $ref: '#/components/parameters/PostId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [post]
+              properties:
+                post:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                      maxLength: 100
+                    body:
+                      type: string
+                      maxLength: 10000
+                    tag_ids:
+                      type: array
+                      items:
+                        type: integer
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: 権限なし（投稿者本人ではない）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: 投稿が見つからない
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Errors'
+        '422':
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrors'
+
+    delete:
+      tags: [Post]
+      summary: 投稿を削除（論理削除）
+      operationId: deletePost
+      security:
+        - cookieAuth: []
+      description: 投稿者本人または管理者が削除可能
+      parameters:
+        - $ref: '#/components/parameters/PostId'
+      responses:
+        '204':
+          description: 削除成功
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: 権限なし
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: 投稿が見つからない
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Errors'
+
+  # ============================================================
+  # Likes
+  # ============================================================
+  /api/posts/{post_id}/likes:
+    post:
+      tags: [Like]
+      summary: いいねする
+      operationId: createLike
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PostIdPath'
+      responses:
+        '201':
+          description: いいね成功
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: 投稿が見つからない
+        '422':
+          description: 既にいいね済み
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrors'
+
+    delete:
+      tags: [Like]
+      summary: いいねを取り消す
+      operationId: deleteLike
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PostIdPath'
+      responses:
+        '204':
+          description: いいね取り消し成功
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: いいねが見つからない
+
+  # ============================================================
+  # Comments
+  # ============================================================
+  /api/posts/{post_id}/comments:
+    get:
+      tags: [Comment]
+      summary: コメント一覧を取得
+      operationId: listComments
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PostIdPath'
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: 投稿が見つからない
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Errors'
+
+    post:
+      tags: [Comment]
+      summary: コメントを作成
+      operationId: createComment
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PostIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [comment]
+              properties:
+                comment:
+                  type: object
+                  required: [body]
+                  properties:
+                    body:
+                      type: string
+                      maxLength: 1000
+                      example: 参考になります！
+      responses:
+        '201':
+          description: 作成成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: 投稿が見つからない
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Errors'
+        '422':
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrors'
+
+  /api/posts/{post_id}/comments/{id}:
+    delete:
+      tags: [Comment]
+      summary: コメントを削除（論理削除）
+      operationId: deleteComment
+      security:
+        - cookieAuth: []
+      description: コメント投稿者本人または管理者が削除可能
+      parameters:
+        - $ref: '#/components/parameters/PostIdPath'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: コメントID
+      responses:
+        '204':
+          description: 削除成功
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: 権限なし
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: 投稿またはコメントが見つからない
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Errors'
+
+  # ============================================================
+  # Tags
+  # ============================================================
+  /api/tags:
+    get:
+      tags: [Tag]
+      summary: タグ一覧を取得
+      operationId: listTags
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+            enum: [faculty, topic]
+          description: カテゴリでフィルタ
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tag'
+
+  # ============================================================
+  # Admin
+  # ============================================================
+  /api/admin/stats:
+    get:
+      tags: [Admin]
+      summary: 管理者統計情報を取得
+      operationId: getAdminStats
+      security:
+        - cookieAuth: []
+      description: 管理者ロールのユーザーのみアクセス可能
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminStats'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: 管理者権限なし
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ============================================================
+  # Misc
+  # ============================================================
+  /api/time:
+    get:
+      tags: [Misc]
+      summary: サーバー時刻を取得
+      operationId: getTime
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  current_time:
+                    type: string
+                    example: '2026-03-30 12:00:00'
+
+# ============================================================
+# Components
+# ============================================================
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: jwt_token
+      description: httpOnly JWT cookie（サインイン時に自動設定）
+
+  parameters:
+    PostId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: 投稿ID
+
+    PostIdPath:
+      name: post_id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: 投稿ID
+
+  responses:
+    Unauthorized:
+      description: 未認証（トークンなしまたは期限切れ）
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                enum: [unauthorized, token_expired]
+
+  schemas:
+    # ----------------------------------------------------------
+    # Auth
+    # ----------------------------------------------------------
+    AuthResponse:
+      type: object
+      properties:
+        user:
+          type: object
+          properties:
+            id:
+              type: integer
+            email:
+              type: string
+              format: email
+            display_name:
+              type: string
+            role:
+              type: string
+              enum: [user, admin]
+        token:
+          type: string
+          description: JWT（cookieにも設定される）
+        message:
+          type: string
+
+    # ----------------------------------------------------------
+    # User
+    # ----------------------------------------------------------
+    CurrentUser:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+          format: email
+        display_name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        role:
+          type: string
+          enum: [user, admin]
+        provider:
+          type: string
+          nullable: true
+          description: OAuthプロバイダー（google等）。メール/パスワードユーザーはnull
+        created_at:
+          type: string
+          format: date-time
+
+    UserSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+        display_name:
+          type: string
+        role:
+          type: string
+          enum: [user, admin]
+        created_at:
+          type: string
+          format: date-time
+
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+        display_name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    # ----------------------------------------------------------
+    # Post
+    # ----------------------------------------------------------
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        body:
+          type: string
+        user:
+          type: object
+          nullable: true
+          description: 論理削除されたユーザーの場合null
+          properties:
+            id:
+              type: integer
+            display_name:
+              type: string
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+        likes_count:
+          type: integer
+        current_user_liked:
+          type: boolean
+          description: 現在のユーザーがいいね済みか（未認証時はfalse）
+        comments_count:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    # ----------------------------------------------------------
+    # Comment
+    # ----------------------------------------------------------
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+        body:
+          type: string
+        user:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: integer
+            display_name:
+              type: string
+        created_at:
+          type: string
+          format: date-time
+
+    # ----------------------------------------------------------
+    # Tag
+    # ----------------------------------------------------------
+    Tag:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          example: 情報学部
+        category:
+          type: string
+          enum: [faculty, topic]
+
+    # ----------------------------------------------------------
+    # Admin
+    # ----------------------------------------------------------
+    AdminStats:
+      type: object
+      properties:
+        counts:
+          type: object
+          properties:
+            users:
+              type: integer
+            posts:
+              type: integer
+            comments:
+              type: integer
+        trends:
+          type: object
+          properties:
+            users_today:
+              type: integer
+            users_this_week:
+              type: integer
+            posts_today:
+              type: integer
+            posts_this_week:
+              type: integer
+            comments_today:
+              type: integer
+            comments_this_week:
+              type: integer
+        recent_activity:
+          type: object
+          properties:
+            posts:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  title:
+                    type: string
+                  user_display_name:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+            comments:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  body:
+                    type: string
+                    description: 最大50文字に切り詰め
+                  user_display_name:
+                    type: string
+                  post_title:
+                    type: string
+                    description: 最大30文字に切り詰め
+                  post_id:
+                    type: integer
+                  created_at:
+                    type: string
+                    format: date-time
+
+    # ----------------------------------------------------------
+    # Errors
+    # ----------------------------------------------------------
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+
+    Errors:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+
+    ValidationErrors:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+          example:
+            - Display name can't be blank
+            - Password は8文字以上で入力してください
