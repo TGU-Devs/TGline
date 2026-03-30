@@ -7,6 +7,7 @@ import {
     GraduationCap,
     BookOpen,
     FolderOpen,
+    Library,
     Monitor,
     Trophy,
     HouseHeart,
@@ -40,6 +41,15 @@ const externalSites: ExternalSite[] = [
         icon: FolderOpen,
         category: "教務・学習",
         iconClass: "text-chart-1 bg-chart-1/10",
+    },
+    {
+        title: "東北学院大学シラバスサイト",
+        description:
+            "2026年度シラバスについての情報を確認できるサイトです。",
+        url: "https://sites.google.com/g.tohoku-gakuin.jp/syllabus/home?authuser=0",
+        icon: Library,
+        category: "教務・学習",
+        iconClass: "text-secondary bg-secondary/10",
     },
     {
         title: "東北学院大学ITナビ",
@@ -90,7 +100,7 @@ const externalSites: ExternalSite[] = [
         title: "TGline公式X（旧Twitter）",
         description:
             "TGlineの公式X（旧Twitter）アカウントで、アプリ内のアップデート情報やイベント情報を発信しています。",
-        url: "https://l.instagram.com/?u=https%3A%2F%2Fx.com%2Four_tgline%3Fs%3D21%26fbclid%3DPAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQMMjU2MjgxMDQwNTU4AAGnzgF3VgTp9AdEC9lJEqmIY2VVp3F1LEUBEx5Zj-VlcIpWymxtPf1THSmCfh0_aem_GgCWGLZ0870I2fOsMHwamA&e=AT7COzcsClCuAdfluRMlkv9y34lQTEmu0kkgOmr-wsz4aoNwjCw7peB9jH1cSH9akEzwoAdh6aBJpj2gFadMLTGVkUlK6OHi20OWaXAzMQ",
+        url: "https://x.com/our_TGline?s=20",
         icon: FaXTwitter,
         category: "SNS・情報発信",
         iconClass: "text-foreground bg-foreground/10",

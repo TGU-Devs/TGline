@@ -16,32 +16,32 @@ if Rails.env.development?
   users_data = [
     {
       email: "tanaka@tgu.ac.jp",
-      password: "password123",
+      password: "Password123",
       display_name: "田中太郎",
       description: "自己紹介",
       role: "user"
     },
     {
       email: "suzuki@tgu.ac.jp",
-      password: "password123",
+      password: "Password123",
       display_name: "鈴木花子",
       role: "user"
     },
     {
       email: "yamada@tgu.ac.jp",
-      password: "password123",
+      password: "Password123",
       display_name: "山田次郎",
       role: "user"
     },
     {
       email: "admin@tgu.ac.jp",
-      password: "admin123",
+      password: "Password123",
       display_name: "管理者",
       role: "admin"
     },
     {
       email: "sato@tgu.ac.jp",
-      password: "password123",
+      password: "Password123",
       display_name: "佐藤三郎",
       role: "user"
     }
