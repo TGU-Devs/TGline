@@ -3,6 +3,8 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Plus, Calendar, User, ChevronDown, X, MessageCircle, Heart, Trash } from "lucide-react";
+
 import { useStatusToast } from "@/hooks/useStatusToast";
 import Toast from "@/components/ui/Toast";
 import { Button } from "@/components/ui/button";
@@ -12,30 +14,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Plus, Calendar, User, ChevronDown, X, MessageCircle, Heart, Trash } from "lucide-react";
 import LoginPromptModal from "@/components/features/auth/LoginPromptModal";
 
-interface Tag {
-  id: number;
-  name: string;
-  category: "faculty" | "topic";
-}
-
-interface Post {
-  id: number;
-  title: string;
-  body: string;
-  user: {
-    id: number;
-    display_name: string;
-  } | null;
-  tags: Tag[];
-  likes_count: number;
-  current_user_liked: boolean;
-  comments_count: number;
-  created_at: string;
-  updated_at: string;
-}
+import type { Post, Tag } from "../../../components/features/posts/types";
 
 const CATEGORY_CONFIG = {
   faculty: {
