@@ -2,9 +2,12 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+
 import { Trash } from "lucide-react";
 
 import { useStatusToast } from "@/hooks/useStatusToast";
+import { useTags } from "@/components/features/posts/hooks/useTag";
+
 import Loading from "@/components/ui/Loading";
 import ErrorUI from "@/components/ui/ErrorUI";
 import Toast from "@/components/ui/Toast";
@@ -14,18 +17,14 @@ import EnptyState from "@/components/features/posts/components/list/EnptyState";
 import PostList from "@/components/features/posts/components/list/PostList";
 import LoginPromptModal from "@/components/features/auth/LoginPromptModal";
 
-import type { Post, Tag } from "@/components/features/posts/types";
+import type { Post } from "@/components/features/posts/types";
 
 type FeedTab = "all" | "liked";
 
 export default function PostsPage() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
   const [posts, setPosts] = useState<Post[]>([]);
-  const [tags, setTags] = useState<Tag[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,22 +37,17 @@ export default function PostsPage() {
     const tagId = searchParams.get("tag_id");
     return tagId ? Number(tagId) : null;
   });
+  
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const { showToast, message } = useStatusToast("/posts", {
     deleted: { message: "投稿が削除されました。" },
   });
 
-  const fetchTags = async () => {
-    try {
-      const res = await fetch("/api/tags", { credentials: "include" });
-      if (res.ok) {
-        const data = await res.json();
-        setTags(data);
-      }
-    } catch {
-      // タグ取得失敗は無視
-    }
-  };
+   const { tags, groupedTags } = useTags();
+   // 選択中のタグを取得
+  const selectedTag = tags.find((t) => t.id === selectedTagId);
 
   const fetchPosts = useCallback(
     async (targetPage: number = 1) => {
@@ -131,21 +125,10 @@ export default function PostsPage() {
       .catch(() => setIsAuthenticated(false));
   }, []);
 
-  useEffect(() => {
-    fetchTags();
-  }, []);
 
   useEffect(() => {
     fetchPosts();
   }, [fetchPosts]);
-
-  const selectedTag = tags.find((t) => t.id === selectedTagId);
-
-  const groupedTags = tags.reduce<Record<string, Tag[]>>((acc, tag) => {
-    if (!acc[tag.category]) acc[tag.category] = [];
-    acc[tag.category].push(tag);
-    return acc;
-  }, {});
 
   const updateUrlParams = useCallback(
     (nextTagId: number | null, nextFeed: FeedTab) => {
