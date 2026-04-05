@@ -13,14 +13,7 @@ import {
 import { ArrowLeft, Plus, ChevronDown, X, Check } from "lucide-react";
 
 import { useFormValidate } from "@/components/features/posts/hooks/useFormValidate";
-
-interface Tag {
-  id: number;
-  name: string;
-  category: "faculty" | "topic";
-}
-
-
+import { useTags } from "@/components/features/posts/hooks/useTag";
 
 const CATEGORY_CONFIG = {
   faculty: {
@@ -44,7 +37,6 @@ export default function PostNewPage() {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [isCreating, setIsCreating] = useState(false);
-  const [tags, setTags] = useState<Tag[]>([]);
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>(() => {
     const tagId = searchParams.get("tag_id");
     return tagId ? [Number(tagId)] : [];
@@ -52,28 +44,7 @@ export default function PostNewPage() {
   const [openCategory, setOpenCategory] = useState<string | null>(null);
 
   const { FormErrors, validateForm, clearErrors } = useFormValidate();
-
-  useEffect(() => {
-    fetchTags();
-  }, []);
-
-  const fetchTags = async () => {
-    try {
-      const res = await fetch("/api/tags", { credentials: "include" });
-      if (res.ok) {
-        const data = await res.json();
-        setTags(data);
-      }
-    } catch {
-      // タグ取得失敗は無視
-    }
-  };
-
-  const groupedTags = tags.reduce<Record<string, Tag[]>>((acc, tag) => {
-    if (!acc[tag.category]) acc[tag.category] = [];
-    acc[tag.category].push(tag);
-    return acc;
-  }, {});
+  const { tags, groupedTags } = useTags();
 
   const handleFacultySelect = (tagId: number) => {
     const facultyTagIds = tags

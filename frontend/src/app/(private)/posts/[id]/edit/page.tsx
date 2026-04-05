@@ -13,6 +13,7 @@ import {
 import { ArrowLeft, Save, ChevronDown, X, Check } from "lucide-react";
 
 import { useFormValidate } from "@/components/features/posts/hooks/useFormValidate";
+import { useTags } from "@/components/features/posts/hooks/useTag";
 
 interface Tag {
   id: number;
@@ -59,15 +60,11 @@ export default function PostEditPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [tags, setTags] = useState<Tag[]>([]);
+  
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [openCategory, setOpenCategory] = useState<string | null>(null);
-
   const { FormErrors, validateForm, clearErrors } = useFormValidate();
-
-  useEffect(() => {
-    fetchTags();
-  }, []);
+  const { tags, groupedTags } = useTags();
 
   useEffect(() => {
     if (params.id) {
@@ -75,17 +72,6 @@ export default function PostEditPage() {
     }
   }, [params.id]);
 
-  const fetchTags = async () => {
-    try {
-      const res = await fetch("/api/tags", { credentials: "include" });
-      if (res.ok) {
-        const data = await res.json();
-        setTags(data);
-      }
-    } catch {
-      // タグ取得失敗は無視
-    }
-  };
 
   const fetchPost = async (id: string) => {
     try {
@@ -114,13 +100,6 @@ export default function PostEditPage() {
       setIsLoading(false);
     }
   };
-
-  // タグをグループ化
-  const groupedTags = tags.reduce<Record<string, Tag[]>>((acc, tag) => {
-    if (!acc[tag.category]) acc[tag.category] = [];
-    acc[tag.category].push(tag);
-    return acc;
-  }, {});
 
   // 学部タグを選択
   const handleFacultySelect = (tagId: number) => {
