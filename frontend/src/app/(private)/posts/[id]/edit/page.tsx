@@ -2,24 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
-
-import { ArrowLeft, Save, ChevronDown, X, Check } from "lucide-react";
 
 import { useFormValidate } from "@/components/features/posts/hooks/useFormValidate";
-import { useTags } from "@/components/features/posts/hooks/useTag";
 
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import Loading from "@/components/ui/Loading";
+import ErrorUi from "@/components/features/posts/components/form/Error";
+import TopButton from "@/components/features/posts/components/form/TopButton";
+import Form from "@/components/features/posts/components/form/Form";
 
 import type { Post, Tag } from "@/components/features/posts/types";
 
-import { CATEGORY_CONFIG } from "@/components/features/posts/constants";
 
 
 export default function PostEditPage() {
@@ -35,9 +27,9 @@ export default function PostEditPage() {
   const [error, setError] = useState<string | null>(null);
   
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
-  const [openCategory, setOpenCategory] = useState<string | null>(null);
-  const { FormErrors, validateForm, clearErrors } = useFormValidate();
-  const { tags, groupedTags } = useTags();
+
+  const { validateForm, clearErrors } = useFormValidate();
+  
 
   useEffect(() => {
     if (params.id) {
@@ -73,39 +65,6 @@ export default function PostEditPage() {
       setIsLoading(false);
     }
   };
-
-  // 学部タグを選択
-  const handleFacultySelect = (tagId: number) => {
-    const facultyTagIds = tags
-      .filter((t) => t.category === "faculty")
-      .map((t) => t.id);
-    const otherSelected = selectedTagIds.filter(
-      (id) => !facultyTagIds.includes(id)
-    );
-    if (selectedTagIds.includes(tagId)) {
-      setSelectedTagIds(otherSelected);
-    } else {
-      setSelectedTagIds([...otherSelected, tagId]);
-    }
-    setOpenCategory(null);
-  };
-
-  // トピックタグを選択
-  const handleTopicToggle = (tagId: number) => {
-    if (selectedTagIds.includes(tagId)) {
-      setSelectedTagIds(selectedTagIds.filter((id) => id !== tagId));
-    } else {
-      setSelectedTagIds([...selectedTagIds, tagId]);
-    }
-  };
-
-  // タグを削除
-  const removeTag = (tagId: number) => {
-    setSelectedTagIds(selectedTagIds.filter((id) => id !== tagId));
-  };
-
-  // 選択中のタグを取得
-  const selectedTags = tags.filter((t) => selectedTagIds.includes(t.id));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -153,28 +112,13 @@ export default function PostEditPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-muted-foreground">読み込み中...</p>
-        </div>
-      </div>
+        <Loading />
     );
   }
 
   if (error || !post) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-destructive mb-4">{error || "投稿が見つかりません"}</p>
-          <Button asChild variant="outline">
-            <Link href={`/posts?${searchParams.toString()}`}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              一覧に戻る
-            </Link>
-          </Button>
-        </div>
-      </div>
+      <ErrorUi error={error || "投稿が見つかりません"} />
     );
   }
 
@@ -182,199 +126,21 @@ export default function PostEditPage() {
     <div className="min-h-screen bg-background py-4 sm:py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         {/* 戻るボタン */}
-        <Button
-          asChild
-          variant="ghost"
-          className="mb-4 sm:mb-6 text-muted-foreground hover:text-foreground"
-        >
-          <Link href={`/posts/${params.id}?${searchParams.toString()}`}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            詳細に戻る
-          </Link>
-        </Button>
+        <TopButton searchParams={searchParams} newPost={false} />
 
         {/* 編集フォーム */}
-        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-4 sm:p-6 lg:p-8">
-          <h1 className="text-xl sm:text-2xl font-bold text-card-foreground mb-4 sm:mb-6">投稿を編集</h1>
-
-          <form onSubmit={handleSubmit} className="space-y-6" noValidate>
-            {/* タイトル */}
-            <div>
-              <label
-                htmlFor="title"
-                className="block text-sm font-medium text-foreground mb-2"
-              >
-                タイトル
-                <span className="text-destructive ml-1">※必須</span>
-              </label>
-              <input
-                id="title"
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                maxLength={100}
-                className="w-full px-4 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground placeholder:text-muted-foreground transition-shadow"
-                placeholder="投稿のタイトルを入力"
-                required
-              />
-              <div className="flex justify-between mt-1">
-                {FormErrors.title ? (
-                  <p className="text-sm text-destructive">{FormErrors.title}</p>
-                ) : <span />}
-                <span className={`text-xs ${title.length >= 100 ? "text-destructive" : "text-muted-foreground"}`}>{title.length}/100</span>
-              </div>
-            </div>
-
-            {/* 本文 */}
-            <div>
-              <label
-                htmlFor="body"
-                className="block text-sm font-medium text-foreground mb-2"
-              >
-                本文
-                <span className="text-destructive ml-1">※必須</span>
-              </label>
-              <textarea
-                id="body"
-                value={body}
-                onChange={(e) => setBody(e.target.value)}
-                maxLength={10000}
-                rows={12}
-                className="w-full px-4 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground placeholder:text-muted-foreground resize-y transition-shadow"
-                placeholder="投稿の本文を入力"
-                required
-              />
-              <div className="flex justify-between mt-1">
-                {FormErrors.body ? (
-                  <p className="text-sm text-destructive">{FormErrors.body}</p>
-                ) : <span />}
-                <span className={`text-xs ${body.length >= 10000 ? "text-destructive" : "text-muted-foreground"}`}>{body.length}/10000</span>
-              </div>
-            </div>
-
-            {/* タグ選択 */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-3">
-                タグ
-              </label>
-
-              {/* ドロップダウン */}
-              <div className="flex flex-wrap gap-2 mb-3">
-                {(
-                  Object.keys(CATEGORY_CONFIG) as Array<
-                    keyof typeof CATEGORY_CONFIG
-                  >
-                ).map((category) => {
-                  const config = CATEGORY_CONFIG[category];
-                  const categoryTags = groupedTags[category] || [];
-                  if (categoryTags.length === 0) return null;
-
-                  return (
-                    <Popover
-                      key={category}
-                      open={openCategory === category}
-                      onOpenChange={(open: boolean) =>
-                        setOpenCategory(open ? category : null)
-                      }
-                    >
-                      <PopoverTrigger asChild>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          className="h-9 gap-1 border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-                        >
-                          {config.label}
-                          <span className="text-xs text-slate-400">
-                            ({config.hint})
-                          </span>
-                          <ChevronDown className="h-3.5 w-3.5 opacity-50" />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-52 p-2" align="start">
-                        <div className="flex flex-col gap-0.5">
-                          {categoryTags.map((tag) => {
-                            const isSelected = selectedTagIds.includes(tag.id);
-                            return (
-                              <button
-                                key={tag.id}
-                                type="button"
-                                onClick={() =>
-                                  category === "faculty"
-                                    ? handleFacultySelect(tag.id)
-                                    : handleTopicToggle(tag.id)
-                                }
-                                className={`flex items-center justify-between rounded-md px-3 py-2 text-sm transition-colors text-left ${
-                                  isSelected
-                                    ? "bg-sky-50 text-sky-700"
-                                    : "text-slate-700 hover:bg-slate-50"
-                                }`}
-                              >
-                                <span className="flex items-center gap-2">
-                                  <span
-                                    className={`h-2 w-2 rounded-full ${config.dot}`}
-                                  />
-                                  {tag.name}
-                                </span>
-                                {isSelected && (
-                                  <Check className="h-4 w-4 text-sky-500" />
-                                )}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </PopoverContent>
-                    </Popover>
-                  );
-                })}
-              </div>
-
-              {/* 選択済みタグ */}
-              {selectedTags.length > 0 && (
-                <div className="flex flex-wrap gap-1.5">
-                  {selectedTags.map((tag) => {
-                    const config =
-                      CATEGORY_CONFIG[
-                        tag.category as keyof typeof CATEGORY_CONFIG
-                      ];
-                    return (
-                      <Badge
-                        key={tag.id}
-                        variant="outline"
-                        className={`${config?.badge} cursor-pointer gap-1`}
-                        onClick={() => removeTag(tag.id)}
-                      >
-                        {tag.name}
-                        <X className="h-3 w-3" />
-                      </Badge>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* ボタン */}
-            <div className="flex flex-col-reverse sm:flex-row gap-3 sm:gap-4 justify-end">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => router.push(`/posts/${params.id}?${searchParams.toString()}`)}
-                disabled={isSaving}
-                className="w-full sm:w-auto"
-              >
-                キャンセル
-              </Button>
-              <Button
-                type="submit"
-                disabled={isSaving}
-                className="w-full sm:w-auto"
-              >
-                <Save className="h-4 w-4 mr-2" />
-                {isSaving ? "保存中..." : "保存"}
-              </Button>
-            </div>
-          </form>
-        </div>
+        <Form
+          newPost={false}
+          handleSubmit={handleSubmit}
+          title={title}
+          setTitle={setTitle}
+          body={body}
+          setBody={setBody}
+          selectedTagIds={selectedTagIds}
+          setSelectedTagIds={setSelectedTagIds}
+          isSubmitting={isSaving}
+          cancelUrl={`/posts/${params.id}?${searchParams.toString()}`}
+        />
       </div>
     </div>
   );
