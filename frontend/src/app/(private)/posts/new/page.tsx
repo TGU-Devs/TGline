@@ -1,8 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+
+import { ArrowLeft, Plus, ChevronDown, X, Check } from "lucide-react";
+
+import { useFormValidate } from "@/components/features/posts/hooks/useFormValidate";
+import { useTags } from "@/components/features/posts/hooks/useTag";
+
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -10,25 +16,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { ArrowLeft, Plus, ChevronDown, X, Check } from "lucide-react";
 
-import { useFormValidate } from "@/components/features/posts/hooks/useFormValidate";
-import { useTags } from "@/components/features/posts/hooks/useTag";
+import { CATEGORY_CONFIG } from "@/components/features/posts/constants"; 
 
-const CATEGORY_CONFIG = {
-  faculty: {
-    label: "学部",
-    hint: "1つまで",
-    badge: "bg-blue-50 text-blue-700 border-blue-200",
-    dot: "bg-blue-400",
-  },
-  topic: {
-    label: "トピック",
-    hint: "複数選択可",
-    badge: "bg-orange-50 text-orange-700 border-orange-200",
-    dot: "bg-orange-400",
-  },
-} as const;
 
 export default function PostNewPage() {
   const router = useRouter();

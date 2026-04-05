@@ -3,6 +3,12 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+
+import { ArrowLeft, Save, ChevronDown, X, Check } from "lucide-react";
+
+import { useFormValidate } from "@/components/features/posts/hooks/useFormValidate";
+import { useTags } from "@/components/features/posts/hooks/useTag";
+
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -10,44 +16,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { ArrowLeft, Save, ChevronDown, X, Check } from "lucide-react";
 
-import { useFormValidate } from "@/components/features/posts/hooks/useFormValidate";
-import { useTags } from "@/components/features/posts/hooks/useTag";
+import type { Post, Tag } from "@/components/features/posts/types";
 
-interface Tag {
-  id: number;
-  name: string;
-  category: "faculty" | "topic";
-}
+import { CATEGORY_CONFIG } from "@/components/features/posts/constants";
 
-interface Post {
-  id: number;
-  title: string;
-  body: string;
-  user: {
-    id: number;
-    display_name: string;
-  } | null;
-  tags: Tag[];
-  created_at: string;
-  updated_at: string;
-}
-
-const CATEGORY_CONFIG = {
-  faculty: {
-    label: "学部",
-    hint: "1つまで",
-    badge: "bg-blue-50 text-blue-700 border-blue-200",
-    dot: "bg-blue-400",
-  },
-  topic: {
-    label: "トピック",
-    hint: "複数選択可",
-    badge: "bg-orange-50 text-orange-700 border-orange-200",
-    dot: "bg-orange-400",
-  },
-} as const;
 
 export default function PostEditPage() {
   const params = useParams();
