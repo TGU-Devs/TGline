@@ -7,17 +7,25 @@ type EnptyStateProps = {
     isAuthenticated: boolean;
     searchParams: URLSearchParams;
     setShowLoginModal: (show: boolean) => void;
+    title?: string;
+    description?: string;
 };
 
 
-const EnptyState = ({ isAuthenticated, searchParams, setShowLoginModal }: EnptyStateProps) => {
+const EnptyState = ({
+    isAuthenticated,
+    searchParams,
+    setShowLoginModal,
+    title = "まだ投稿がありません",
+    description = "最初の投稿を作成して、みんなと情報を共有しましょう",
+}: EnptyStateProps) => {
     return (
         <div className="text-center py-16">
             <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
               <MessageCircle className="h-10 w-10 text-muted-foreground" />
             </div>
-            <p className="text-foreground text-lg font-medium mb-2">まだ投稿がありません</p>
-            <p className="text-muted-foreground text-sm mb-6">最初の投稿を作成して、みんなと情報を共有しましょう</p>
+            <p className="text-foreground text-lg font-medium mb-2">{title}</p>
+            <p className="text-muted-foreground text-sm mb-6">{description}</p>
             {isAuthenticated ? (
               <Button asChild>
                 <Link href={`/posts/new?${searchParams.toString()}`}>

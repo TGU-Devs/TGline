@@ -7,13 +7,14 @@ type PostsHeaderProps = {
     isAuthenticated: boolean;
     setShowLoginModal: (show: boolean) => void;
     searchParams: URLSearchParams;
+    title?: string;
 }
 
-const PostsHeader = ({ isAuthenticated, setShowLoginModal, searchParams }: PostsHeaderProps) => {
+const PostsHeader = ({ isAuthenticated, setShowLoginModal, searchParams, title = "投稿一覧" }: PostsHeaderProps) => {
     return (
         <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
-                投稿一覧
+                {title}
             </h1>
             {isAuthenticated ? (
                 <Button asChild className="w-full sm:w-auto">
