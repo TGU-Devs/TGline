@@ -23,7 +23,7 @@ module Api
           return
         end
 
-        posts = posts.joins(:likes).where(likes: { user_id: current_user.id }).distinct
+        posts = posts.joins(:likes).where(likes: { user_id: current_user.id }).reorder("likes.created_at DESC")
       end
 
       # カテゴリで絞り込み
