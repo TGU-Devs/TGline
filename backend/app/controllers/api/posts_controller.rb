@@ -12,8 +12,19 @@ module Api
     def index
       per_page = 20
       page = (params[:page] || 1).to_i
+      liked_only = ActiveModel::Type::Boolean.new.cast(params[:liked])
 
       posts = Post.active.includes(:user, :tags, :likes, :comments).order(created_at: :desc)
+
+      # いいね済み投稿のみ表示（認証必須）
+      if liked_only
+        unless current_user
+          render json: { errors: ['Authentication required'] }, status: :unauthorized
+          return
+        end
+
+        posts = posts.joins(:likes).where(likes: { user_id: current_user.id }).distinct
+      end
 
       # カテゴリで絞り込み
       # もしクエリパラメーターがあれば、そのカテゴリの投稿を取得して上書き

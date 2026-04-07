@@ -37,6 +37,8 @@ interface Post {
   updated_at: string;
 }
 
+type FeedTab = "all" | "liked";
+
 const CATEGORY_CONFIG = {
   faculty: {
     label: "学部",
@@ -63,6 +65,9 @@ export default function PostsPage() {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [activeTab, setActiveTab] = useState<FeedTab>(() => {
+    return searchParams.get("feed") === "liked" ? "liked" : "all";
+  });
   const [selectedTagId, setSelectedTagId] = useState<number | null>(() => {
     const tagId = searchParams.get("tag_id");
     return tagId ? Number(tagId) : null;
@@ -89,7 +94,20 @@ export default function PostsPage() {
   };
 
   const fetchPosts = useCallback(async (targetPage: number = 1) => {
+    if (activeTab === "liked" && isAuthenticated === null) {
+      return;
+    }
+
+    if (activeTab === "liked" && !isAuthenticated) {
+      setPosts([]);
+      setHasMore(false);
+      setIsLoading(false);
+      setIsLoadingMore(false);
+      return;
+    }
+
     try {
+      setError(null);
       if (targetPage === 1) {
         setIsLoading(true);
       } else {
@@ -100,10 +118,26 @@ export default function PostsPage() {
       if (selectedTagId !== null) {
         params.set("tag_id", String(selectedTagId));
       }
+      if (activeTab === "liked") {
+        params.set("liked", "true");
+      }
       params.set("page", String(targetPage));
       const url = `/api/posts?${params.toString()}`;
       // バックエンドにリクエスト(今の場合route handlerを仲介させている)
       const res = await fetch(url, { credentials: "include" });
+
+      if (res.status === 401 && activeTab === "liked") {
+        setIsAuthenticated(false);
+        setShowLoginModal(true);
+        setActiveTab("all");
+        const fallbackParams = new URLSearchParams();
+        if (selectedTagId !== null) {
+          fallbackParams.set("tag_id", String(selectedTagId));
+        }
+        fallbackParams.set("feed", "all");
+        router.replace(`/posts?${fallbackParams.toString()}`, { scroll: false });
+        return;
+      }
 
       if (!res.ok) {
         throw new Error("投稿の取得に失敗しました");
@@ -123,7 +157,7 @@ export default function PostsPage() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [selectedTagId]);
+  }, [activeTab, isAuthenticated, router, selectedTagId]);
 
   useEffect(() => {
     fetch("/api/users/me", { credentials: "include" })
@@ -148,20 +182,39 @@ export default function PostsPage() {
     return acc;
   }, {});
 
-   const handleTagSelect = useCallback((tagId: number | null) => {
-    setSelectedTagId(tagId);
-    setPage(1);
-    setHasMore(true);
+  const updateUrlParams = useCallback((nextTagId: number | null, nextFeed: FeedTab) => {
     const params = new URLSearchParams(searchParams.toString());
-    if (tagId !== null) {
-      params.set("tag_id", String(tagId));
+    if (nextTagId !== null) {
+      params.set("tag_id", String(nextTagId));
     } else {
       params.delete("tag_id");
     }
+    params.set("feed", nextFeed);
     router.replace(`/posts?${params.toString()}`, { scroll: false });
   }, [router, searchParams]);
 
-  const handleLikeToggle = async (e: React.MouseEvent, postId: number, currentLiked: boolean) => {
+  const handleTagSelect = useCallback((tagId: number | null) => {
+    setSelectedTagId(tagId);
+    setPage(1);
+    setHasMore(true);
+    setError(null);
+    updateUrlParams(tagId, activeTab);
+  }, [activeTab, updateUrlParams]);
+
+  const handleFeedTabChange = useCallback((nextTab: FeedTab) => {
+    if (nextTab === "liked" && !isAuthenticated) {
+      setShowLoginModal(true);
+      return;
+    }
+
+    setActiveTab(nextTab);
+    setPage(1);
+    setHasMore(true);
+    setError(null);
+    updateUrlParams(selectedTagId, nextTab);
+  }, [isAuthenticated, selectedTagId, updateUrlParams]);
+
+  const handleLikeToggle = useCallback(async (e: React.MouseEvent, postId: number, currentLiked: boolean) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -171,31 +224,24 @@ export default function PostsPage() {
       return;
     }
 
+    const previousPosts = posts;
     const rollbackLike = () => {
-      setPosts((prev) =>
-        prev.map((p) =>
-          p.id === postId
-            ? {
-                ...p,
-                current_user_liked: currentLiked,
-                likes_count: currentLiked ? p.likes_count + 1 : p.likes_count - 1,
-              }
-            : p
-        )
-      );
+      setPosts(previousPosts);
     };
 
     // 楽観的 UI 更新
     setPosts((prev) =>
-      prev.map((p) =>
-        p.id === postId
-          ? {
-              ...p,
-              current_user_liked: !currentLiked,
-              likes_count: currentLiked ? p.likes_count - 1 : p.likes_count + 1,
-            }
-          : p
-      )
+      activeTab === "liked" && currentLiked
+        ? prev.filter((p) => p.id !== postId)
+        : prev.map((p) =>
+            p.id === postId
+              ? {
+                  ...p,
+                  current_user_liked: !currentLiked,
+                  likes_count: currentLiked ? p.likes_count - 1 : p.likes_count + 1,
+                }
+              : p
+          )
     );
 
     try {
@@ -218,7 +264,7 @@ export default function PostsPage() {
     } catch {
       rollbackLike();
     }
-  };
+  }, [activeTab, isAuthenticated, posts]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -257,9 +303,34 @@ export default function PostsPage() {
     <div className="min-h-screen bg-background py-4 sm:py-8">
       <Toast showToast={showToast} icon={Trash} message={message} bg="bg-red-500" />
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
+        {/* フィード切り替え */}
+        <div className="mb-6 rounded-full bg-slate-200/70 p-1 flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => handleFeedTabChange("all")}
+            className={`flex-1 rounded-full px-4 py-3 text-sm sm:text-base font-semibold transition-colors ${
+              activeTab === "all"
+                ? "bg-white text-slate-900 shadow-sm"
+                : "text-slate-500 hover:text-slate-700"
+            }`}
+          >
+            投稿一覧
+          </button>
+          <button
+            type="button"
+            onClick={() => handleFeedTabChange("liked")}
+            className={`flex-1 rounded-full px-4 py-3 text-sm sm:text-base font-semibold transition-colors ${
+              activeTab === "liked"
+                ? "bg-white text-slate-900 shadow-sm"
+                : "text-slate-500 hover:text-slate-700"
+            }`}
+          >
+            いいねした投稿
+          </button>
+        </div>
+
         {/* ヘッダー */}
         <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">投稿一覧</h1>
           {isAuthenticated ? (
             <Button asChild className="w-full sm:w-auto">
               <Link href={`/posts/new?${searchParams.toString()}`}>
@@ -356,8 +427,14 @@ export default function PostsPage() {
             <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
               <MessageCircle className="h-10 w-10 text-muted-foreground" />
             </div>
-            <p className="text-foreground text-lg font-medium mb-2">まだ投稿がありません</p>
-            <p className="text-muted-foreground text-sm mb-6">最初の投稿を作成して、みんなと情報を共有しましょう</p>
+            <p className="text-foreground text-lg font-medium mb-2">
+              {activeTab === "liked" ? "いいねした投稿がありません" : "まだ投稿がありません"}
+            </p>
+            <p className="text-muted-foreground text-sm mb-6">
+              {activeTab === "liked"
+                ? "気になる投稿にいいねすると、ここに表示されます"
+                : "最初の投稿を作成して、みんなと情報を共有しましょう"}
+            </p>
             {isAuthenticated ? (
               <Button asChild>
                 <Link href={`/posts/new?${searchParams.toString()}`}>
