@@ -13,7 +13,6 @@ import Form from "@/components/features/posts/components/form/Form";
 import type { Post, Tag } from "@/components/features/posts/types";
 
 
-
 export default function PostEditPage() {
   const params = useParams();
   const router = useRouter();
@@ -28,7 +27,7 @@ export default function PostEditPage() {
   
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
 
-  const { validateForm, clearErrors } = useFormValidate();
+  const { validateForm, clearErrors, FormErrors } = useFormValidate();
   
 
   useEffect(() => {
@@ -140,6 +139,7 @@ export default function PostEditPage() {
           setSelectedTagIds={setSelectedTagIds}
           isSubmitting={isSaving}
           cancelUrl={`/posts/${params.id}?${searchParams.toString()}`}
+          FormErrors={FormErrors}
         />
       </div>
     </div>

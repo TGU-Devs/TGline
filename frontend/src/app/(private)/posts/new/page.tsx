@@ -21,7 +21,7 @@ export default function PostNewPage() {
     return tagId ? [Number(tagId)] : [];
   });
 
-  const { validateForm, clearErrors } = useFormValidate();
+  const { validateForm, clearErrors, FormErrors } = useFormValidate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -88,6 +88,7 @@ export default function PostNewPage() {
           setSelectedTagIds={setSelectedTagIds}
           isSubmitting={isCreating}
           cancelUrl={`/posts?${searchParams.toString()}`}
+          FormErrors={FormErrors}
         />
       </div>
     </div>
