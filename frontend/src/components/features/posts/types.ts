@@ -25,3 +25,17 @@ export type Post = {
     updated_at: string;
 };
 
+export type Comment = {
+    id: number;
+    body: string;
+    user: {
+        id: number;
+        display_name: string;
+    } | null;
+    created_at: string;
+}
+
+export type CurrentUser = {
+    id: number;
+    role: string;
+}

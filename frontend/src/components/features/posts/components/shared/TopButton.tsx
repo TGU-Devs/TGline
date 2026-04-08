@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 
 type TopButtonProps = {
     searchParams: URLSearchParams;
-    newPost: boolean;
+    message: string;
 };
 
-const TopButton = ({ searchParams, newPost }: TopButtonProps) => {
+const TopButton = ({ searchParams, message }: TopButtonProps) => {
     return (
         <Button
           asChild
@@ -18,7 +18,7 @@ const TopButton = ({ searchParams, newPost }: TopButtonProps) => {
         >
           <Link href={`/posts?${searchParams.toString()}`}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            {newPost ? "一覧に戻る" : "詳細に戻る"}
+            {message}
           </Link>
         </Button>
     );
