@@ -7,6 +7,7 @@ import calendarEvents from "@/constants/calendarEvents";
 import Main from "@/components/ui/PageMain";
 import Header from "@/components/ui/PageHeader";
 import OfficeHours from "@/components/features/calendar/OfficeHours";
+import ClassPeriods from "@/components/features/calendar/ClassPeriods";
 import CalendarWidget from "@/components/features/calendar/CalendarWidget";
 import Modal from "@/components/features/calendar/Modal";
 import { SelectedEventType } from "@/types/calendarEventTypes";
@@ -45,6 +46,8 @@ const CalendarPage = () => {
             />
 
             <OfficeHours />
+
+            <ClassPeriods />
 
             <CalendarWidget eventClick={handleEventClick} events={events} />
         </Main>
