@@ -54,17 +54,25 @@ export default function PostsPage() {
 
     const fetchPosts = useCallback(
         async (targetPage: number = 1) => {
+        if (activeTab === "liked") {
             if (isAuthenticated === null) {
                 return;
             }
 
-            if (activeTab === "liked" && !isAuthenticated) {
-                setPosts([]);
-                setHasMore(false);
-                setIsLoading(false);
-                setIsLoadingMore(false);
+            if (!isAuthenticated) {
+                setShowLoginModal(true);
+                setActiveTab("all");
+                const fallbackParams = new URLSearchParams();
+                if (selectedTagId !== null) {
+                    fallbackParams.set("tag_id", String(selectedTagId));
+                }
+                fallbackParams.set("feed", "all");
+                router.replace(`/posts?${fallbackParams.toString()}`, {
+                    scroll: false,
+                });
                 return;
             }
+        }
 
             try {
                 setError(null);
@@ -86,21 +94,6 @@ export default function PostsPage() {
                 const res = await fetch(`/api/posts?${params.toString()}`, {
                     credentials: "include",
                 });
-
-                if (res.status === 401 && activeTab === "liked") {
-                    setIsAuthenticated(false);
-                    setShowLoginModal(true);
-                    setActiveTab("all");
-                    const fallbackParams = new URLSearchParams();
-                    if (selectedTagId !== null) {
-                        fallbackParams.set("tag_id", String(selectedTagId));
-                    }
-                    fallbackParams.set("feed", "all");
-                    router.replace(`/posts?${fallbackParams.toString()}`, {
-                        scroll: false,
-                    });
-                    return;
-                }
 
                 if (!res.ok) {
                     throw new Error("投稿の取得に失敗しました");
