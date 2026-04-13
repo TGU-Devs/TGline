@@ -54,25 +54,25 @@ export default function PostsPage() {
 
     const fetchPosts = useCallback(
         async (targetPage: number = 1) => {
-        if (activeTab === "liked") {
-            if (isAuthenticated === null) {
-                return;
-            }
-
-            if (!isAuthenticated) {
-                setShowLoginModal(true);
-                setActiveTab("all");
-                const fallbackParams = new URLSearchParams();
-                if (selectedTagId !== null) {
-                    fallbackParams.set("tag_id", String(selectedTagId));
+            if (activeTab === "liked") {
+                if (isAuthenticated === null) {
+                    return;
                 }
-                fallbackParams.set("feed", "all");
-                router.replace(`/posts?${fallbackParams.toString()}`, {
-                    scroll: false,
-                });
-                return;
+
+                if (!isAuthenticated) {
+                    setShowLoginModal(true);
+                    setActiveTab("all");
+                    const fallbackParams = new URLSearchParams();
+                    if (selectedTagId !== null) {
+                        fallbackParams.set("tag_id", String(selectedTagId));
+                    }
+                    fallbackParams.set("feed", "all");
+                    router.replace(`/posts?${fallbackParams.toString()}`, {
+                        scroll: false,
+                    });
+                    return;
+                }
             }
-        }
 
             try {
                 setError(null);
@@ -156,12 +156,12 @@ export default function PostsPage() {
 
     const handleFeedTabChange = useCallback(
         (nextTab: FeedTab) => {
-            if (nextTab === "liked" && !isAuthenticated === false) {
+            if (nextTab === "liked" && isAuthenticated === false) {
                 setShowLoginModal(true);
                 return;
             }
 
-            if (nextTab === "liked" && !isAuthenticated === null) {
+            if (nextTab === "liked" && isAuthenticated === null) {
                 return;
             }
 
@@ -183,8 +183,13 @@ export default function PostsPage() {
             e.preventDefault();
             e.stopPropagation();
 
-            if (!isAuthenticated) {
+            if (isAuthenticated === false) {
                 setShowLoginModal(true);
+                return;
+            }
+
+            if (isAuthenticated === null) {
+                // 認証確認中は何もしない
                 return;
             }
 
