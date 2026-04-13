@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { Trash } from "lucide-react";
@@ -125,9 +125,18 @@ export default function PostsPage() {
             .catch(() => setIsAuthenticated(false));
     }, []);
 
+    const prevAuthRef = useRef<boolean | null>(null);
+
     useEffect(() => {
+        const authChanged = prevAuthRef.current !== isAuthenticated;
+        prevAuthRef.current = isAuthenticated;
+
+        if (activeTab === "all" && authChanged && isAuthenticated !== null) {
+            return;
+        }
+
         fetchPosts();
-    }, [fetchPosts]);
+    }, [fetchPosts, activeTab, isAuthenticated]);
 
     const updateUrlParams = useCallback(
         (nextTagId: number | null, nextFeed: FeedTab) => {
