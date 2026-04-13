@@ -156,8 +156,12 @@ export default function PostsPage() {
 
     const handleFeedTabChange = useCallback(
         (nextTab: FeedTab) => {
-            if (nextTab === "liked" && !isAuthenticated) {
+            if (nextTab === "liked" && !isAuthenticated === false) {
                 setShowLoginModal(true);
+                return;
+            }
+
+            if (nextTab === "liked" && !isAuthenticated === null) {
                 return;
             }
 
