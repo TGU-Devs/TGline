@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
-import Link from "next/link";
 
 import {
     CheckCircle2,
@@ -101,8 +100,8 @@ export default function PostDetailPage() {
 
                 {/* コメントセクション */}
                 <CommentSection
-                    PostId={post.id}
-                    CommentsCount={post.comments_count}
+                    postId={post.id}
+                    commentsCount={post.comments_count}
                     onCommentCountChange={handleCommentCountChange}
                 />
             </div>

@@ -87,7 +87,7 @@ export default function PostNewPage() {
                     setSelectedTagIds={setSelectedTagIds}
                     isSubmitting={isCreating}
                     cancelUrl={`/posts?${searchParams.toString()}`}
-                    FormErrors={FormErrors}
+                    formErrors={FormErrors}
                 />
             </div>
         </div>

@@ -5,12 +5,15 @@ import Link from "next/link";
 import { User, Calendar, Heart, Trash2, Edit } from "lucide-react";
 
 import { useCurrentUser } from "@/components/features/posts/hooks/useCurrentUser";
+import  formatDate  from "@/utils/formatDate";
 
 import { linkify } from "@/utils/linkify";
 import Modal from "@/components/ui/Modal";
 import { Button } from "@/components/ui/button";
 
 import type { Post } from "@/components/features/posts/types";
+
+import { CATEGORY_CONFIG } from "../../constants";
 
 type PostDetailCardProps = {
     post: Post;
@@ -26,10 +29,7 @@ const PostDetailCard = ({ post, setPost }: PostDetailCardProps) => {
     const [showPostDeleteModal, setShowPostDeleteModal] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
 
-    const TAG_COLORS: Record<string, string> = {
-        faculty: "bg-blue-100 text-blue-700 border-blue-200",
-        topic: "bg-orange-100 text-orange-700 border-orange-200",
-    };
+    
 
     const handleDelete = async () => {
         try {
@@ -101,17 +101,6 @@ const PostDetailCard = ({ post, setPost }: PostDetailCardProps) => {
         }
     };
 
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString("ja-JP", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-        });
-    };
-
     return (
         <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-4 sm:p-6 lg:p-8">
             {showPostDeleteModal && (
@@ -131,17 +120,19 @@ const PostDetailCard = ({ post, setPost }: PostDetailCardProps) => {
                     {/* タグバッジ */}
                     {post.tags && post.tags.length > 0 && (
                         <div className="flex flex-wrap gap-1.5 mb-3 sm:mb-4">
-                            {post.tags.map((tag) => (
-                                <span
-                                    key={tag.id}
-                                    className={`px-2.5 py-1 rounded-full text-xs font-medium border ${
-                                        TAG_COLORS[tag.category] ||
-                                        "bg-slate-100 text-slate-600 border-slate-200"
-                                    }`}
-                                >
-                                    {tag.name}
-                                </span>
-                            ))}
+                            {post.tags.map((tag) => {
+                                const categoryConfig = CATEGORY_CONFIG[tag.category as keyof typeof CATEGORY_CONFIG];
+                                const badgeClass = categoryConfig?.badge || "bg-slate-100 text-slate-600 border-slate-200";
+
+                                return (
+                                    <span
+                                        key={tag.id}
+                                        className={`px-2.5 py-1 rounded-full text-xs font-medium border ${badgeClass}`}
+                                    >
+                                        {tag.name}
+                                    </span>
+                                );
+                            })}
                         </div>
                     )}
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-slate-500">

@@ -134,7 +134,7 @@ export default function PostEditPage() {
                     setSelectedTagIds={setSelectedTagIds}
                     isSubmitting={isSaving}
                     cancelUrl={`/posts/${params.id}?${searchParams.toString()}`}
-                    FormErrors={FormErrors}
+                    formErrors={FormErrors}
                 />
             </div>
         </div>

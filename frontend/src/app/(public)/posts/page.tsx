@@ -13,7 +13,7 @@ import ErrorUI from "@/components/ui/ErrorUI";
 import Toast from "@/components/ui/Toast";
 import PostsHeader from "@/components/features/posts/components/list/PostsHeader";
 import TagFilter from "@/components/features/posts/components/list/TagFilter";
-import EnptyState from "@/components/features/posts/components/list/EnptyState";
+import EmptyState from "@/components/features/posts/components/list/EmptyState";
 import PostList from "@/components/features/posts/components/list/PostList";
 import LoginPromptModal from "@/components/features/auth/LoginPromptModal";
 
@@ -308,7 +308,7 @@ export default function PostsPage() {
                 />
 
                 {posts.length === 0 ? (
-                    <EnptyState
+                    <EmptyState
                         isAuthenticated={!!isAuthenticated}
                         searchParams={searchParams}
                         setShowLoginModal={setShowLoginModal}

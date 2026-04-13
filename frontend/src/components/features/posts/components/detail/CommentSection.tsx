@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 
 import { MessageCircle, Send, Trash2, User } from "lucide-react";
 
+import formatDate from "@/utils/formatDate";
+
 import { useCurrentUser } from "@/components/features/posts/hooks/useCurrentUser";
 import { linkify } from "@/utils/linkify";
 import Modal from "@/components/ui/Modal";
@@ -10,14 +12,14 @@ import { Button } from "@/components/ui/button";
 import type { Comment } from "@/components/features/posts/types";
 
 type CommentSectionProps = {
-    PostId: number;
-    CommentsCount: number;
+    postId: number;
+    commentsCount: number;
     onCommentCountChange: (change: number) => void;
 };
 
 const CommentSection = ({
-    PostId,
-    CommentsCount,
+    postId,
+    commentsCount,
     onCommentCountChange,
 }: CommentSectionProps) => {
     const { isOwnerOrAdmin } = useCurrentUser();
@@ -29,10 +31,10 @@ const CommentSection = ({
     const [deletingCommentId, setDeletingCommentId] = useState<number | null>(null);
 
     useEffect(() => {
-        if (PostId) {
-            fetchComments(PostId);
+        if (postId) {
+            fetchComments(postId);
         }
-    }, [PostId]);
+    }, [postId]);
 
     const fetchComments = async (id: number) => {
         try {
@@ -49,11 +51,11 @@ const CommentSection = ({
     };
 
     const handleSubmitComment = async () => {
-        if (!commentBody.trim() || !PostId) return;
+        if (!commentBody.trim() || !postId) return;
 
         try {
             setIsSubmittingComment(true);
-            const res = await fetch(`/api/posts/${PostId}/comments`, {
+            const res = await fetch(`/api/posts/${postId}/comments`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
@@ -62,7 +64,7 @@ const CommentSection = ({
 
             if (res.ok || res.status === 201) {
                 setCommentBody("");
-                fetchComments(PostId);
+                fetchComments(postId);
                 // コメント数を更新
                 onCommentCountChange(1);
             }
@@ -74,11 +76,11 @@ const CommentSection = ({
     };
 
     const handleDeleteComment = async () => {
-        if (!deletingCommentId || !PostId) return;
+        if (!deletingCommentId || !postId) return;
 
         try {
             const res = await fetch(
-                `/api/posts/${PostId}/comments/${deletingCommentId}`,
+                `/api/posts/${postId}/comments/${deletingCommentId}`,
                 {
                     method: "DELETE",
                     credentials: "include",
@@ -105,17 +107,6 @@ const CommentSection = ({
         return isOwnerOrAdmin(comment.user?.id);
     };
 
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString("ja-JP", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-        });
-    };
-
     return (
         <div className="mt-6 bg-white rounded-3xl shadow-sm border border-slate-100 p-4 sm:p-6 lg:p-8">
             {showCommentDeleteModal && (
@@ -130,7 +121,7 @@ const CommentSection = ({
             <div className="flex items-center gap-2 mb-4 sm:mb-6">
                 <MessageCircle className="h-5 w-5 text-muted-foreground" />
                 <h2 className="text-lg font-semibold text-card-foreground">
-                    コメント ({CommentsCount})
+                    コメント ({commentsCount})
                 </h2>
             </div>
 
@@ -197,7 +188,7 @@ const CommentSection = ({
                                     </button>
                                 )}
                             </div>
-                            <p className="text-sm text-foreground whitespace-pre-wrap wrap-break-words">
+                            <p className="text-sm text-foreground whitespace-pre-wrap break-all">
                                 {linkify(comment.body)}
                             </p>
                         </div>

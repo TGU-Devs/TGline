@@ -1,10 +1,10 @@
-type FromTextareaProps = {
+type FormTextareaProps = {
     body: string;
     setBody: (body: string) => void;
     error?: string;
 };
 
-const FromTextarea = ({ body, setBody, error }: FromTextareaProps) => {
+const FormTextarea = ({ body, setBody, error }: FormTextareaProps) => {
     return (
         <div>
             <label
@@ -42,4 +42,4 @@ const FromTextarea = ({ body, setBody, error }: FromTextareaProps) => {
     );
 };
 
-export default FromTextarea;
+export default FormTextarea;

@@ -1,12 +1,10 @@
-import { useFormValidate } from "@/components/features/posts/hooks/useFormValidate";
-
-type FromInputProps = {
+type FormInputProps = {
     title: string;
     setTitle: (title: string) => void;
     error?: string;
 };
 
-const FromInput = ({ title, setTitle, error }: FromInputProps) => {
+const FormInput = ({ title, setTitle, error }: FormInputProps) => {
     return (
         <div>
             <label
@@ -44,4 +42,5 @@ const FromInput = ({ title, setTitle, error }: FromInputProps) => {
     );
 };
 
-export default FromInput;
+export default FormInput;
+    

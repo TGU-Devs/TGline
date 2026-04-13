@@ -1,5 +1,5 @@
-import FromInput from "./FormInput";
-import FromTextarea from "./FromTextarea";
+import FormInput from "./FormInput";
+import FormTextarea from "./FormTextarea";
 import TagSelector from "./TagSelector";
 import FormActions from "./FormActions";
 
@@ -14,7 +14,7 @@ type FormProps = {
     setSelectedTagIds: React.Dispatch<React.SetStateAction<number[]>>;
     handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
     cancelUrl: string;
-    FormErrors: {
+    formErrors: {
         title?: string;
         body?: string;
     };
@@ -31,7 +31,7 @@ const Form = ({
     setSelectedTagIds,
     isSubmitting,
     cancelUrl,
-    FormErrors,
+    formErrors,
 }: FormProps) => {
     return (
         <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-4 sm:p-6 lg:p-8">
@@ -41,10 +41,10 @@ const Form = ({
 
             <form onSubmit={handleSubmit} className="space-y-6" noValidate>
                 {/* タイトル */}
-                <FromInput title={title} setTitle={setTitle} error={FormErrors.title} />
+                <FormInput title={title} setTitle={setTitle} error={formErrors.title} />
 
                 {/* 本文 */}
-                <FromTextarea body={body} setBody={setBody} error={FormErrors.body} />
+                <FormTextarea body={body} setBody={setBody} error={formErrors.body} />
 
                 {/* タグ選択 */}
                 <TagSelector
