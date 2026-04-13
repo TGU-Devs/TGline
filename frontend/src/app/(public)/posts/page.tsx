@@ -54,7 +54,7 @@ export default function PostsPage() {
 
     const fetchPosts = useCallback(
         async (targetPage: number = 1) => {
-            if (activeTab === "liked" && isAuthenticated === null) {
+            if (isAuthenticated === null) {
                 return;
             }
 
