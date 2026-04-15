@@ -68,6 +68,7 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
     const [formErrors, setFormErrors] = useState<Errors>({});
     const [isLoading, setIsLoading] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [termsAccepted, setTermsAccepted] = useState(false);
 
     const onchangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -337,12 +338,43 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
                         )}
                     </div>
                 )}
+                {isRegister && (
+                  <div className="flex items-start gap-2">
+                    <input
+                      type="checkbox"
+                      id="termsAccepted"
+                      checked={termsAccepted}
+                      onChange={(e) => setTermsAccepted(e.target.checked)}
+                      className="mt-1 h-4 w-4 rounded border-input text-primary focus:ring-ring cursor-pointer"
+                    />
+                    <label htmlFor="termsAccepted" className="text-sm text-muted-foreground cursor-pointer">
+                      <a
+                        href="/terms"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline font-medium"
+                      >
+                        利用規約
+                      </a>
+                      {" と "}
+                      <a
+                        href="/privacy"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline font-medium"
+                      >
+                        セキュリティポリシー
+                      </a>
+                      {" に同意する"}
+                    </label>
+                  </div>
+                )}
                 {formErrors.main && (
                     <div className="bg-destructive/10 border border-destructive/30 text-destructive px-4 py-3 rounded-lg text-sm">
                         {formErrors.main}
                     </div>
                 )}
-                <Button className="w-full" type="submit" disabled={isLoading}>
+                <Button className="w-full" type="submit" disabled={isLoading || (isRegister && !termsAccepted)}>
                     {isLoading ? "処理中..." : isRegister ? "登録" : "ログイン"}
                 </Button>
                 <div className="relative my-4">
@@ -354,7 +386,7 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
                     </div>
                 </div>
 
-                <div className="flex justify-center">
+                <div className={`flex justify-center ${isRegister && !termsAccepted ? "pointer-events-none opacity-50" : ""}`}>
                     <GoogleLogin
                         onSuccess={handleGoogleLogin}
                         onError={() => setFormErrors({ main: "Googleログインに失敗しました" })}
