@@ -363,7 +363,7 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
                         rel="noopener noreferrer"
                         className="text-primary hover:underline font-medium"
                       >
-                        セキュリティポリシー
+                        プライバシーポリシー
                       </a>
                       {" に同意する"}
                     </label>

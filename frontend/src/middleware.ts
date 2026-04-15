@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 // 認証不要（未ログインユーザー向け）のパス
-const publicPaths = ["/", "/login", "/register", "/posts", "/forgot-password", "/reset-password"];
+const publicPaths = ["/", "/login", "/register", "/posts", "/forgot-password", "/reset-password", "/terms", "/privacy"];
 
 // middleware が適用されないパス
 // API routes, _next, static files は除外
