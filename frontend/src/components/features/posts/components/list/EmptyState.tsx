@@ -3,7 +3,7 @@ import { MessageCircle, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
-type EnptyStateProps = {
+type EmptyStateProps = {
     isAuthenticated: boolean;
     searchParams: URLSearchParams;
     setShowLoginModal: (show: boolean) => void;
@@ -12,13 +12,13 @@ type EnptyStateProps = {
 };
 
 
-const EnptyState = ({
+const EmptyState = ({
     isAuthenticated,
     searchParams,
     setShowLoginModal,
     title = "まだ投稿がありません",
     description = "最初の投稿を作成して、みんなと情報を共有しましょう",
-}: EnptyStateProps) => {
+}: EmptyStateProps) => {
     return (
         <div className="text-center py-16">
             <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
@@ -43,4 +43,4 @@ const EnptyState = ({
     );
 };
 
-export default EnptyState;
+export default EmptyState;
