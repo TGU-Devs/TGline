@@ -79,7 +79,6 @@ docker compose up --build    # 初回（5-10分）
 
 - フロントエンド: http://localhost:3000
 - バックエンド API: http://localhost:3001
-- 開発用ログイン: `admin@tgu.ac.jp` / `admin123`
 
 詳しい環境構築手順は [docs/SETUP.md](docs/SETUP.md) を参照。
 
@@ -90,7 +89,6 @@ docker compose up --build    # 初回（5-10分）
 | [docs/SETUP.md](docs/SETUP.md) | 環境構築・起動・トラブルシューティング |
 | [docs/API.md](docs/API.md) | バックエンド API 仕様 |
 | [docs/ER図.md](docs/ER図.md) | データベース ER 定義 |
-| [docs/SECURITY_AUDIT.md](docs/SECURITY_AUDIT.md) | セキュリティ監査レポート |
 | [CLAUDE.md](CLAUDE.md) | AI エージェント向け開発ガイド |
 
 ## 環境変数
@@ -98,7 +96,6 @@ docker compose up --build    # 初回（5-10分）
 | ファイル | 用途 | Git管理 |
 |---------|------|---------|
 | `.env.local` | 開発環境用（Docker Compose が参照） | コミット済み |
-| `.env` | 本番環境用 | **gitignore** |
 | `.env.template` | 本番用テンプレート | コミット済み |
 
 ## 本番環境
