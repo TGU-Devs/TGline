@@ -166,4 +166,3 @@ python3 -c "import yaml; yaml.safe_load(open('backend/swagger/v1/swagger.yaml'))
 - **OpenAPI 仕様**: `backend/swagger/v1/swagger.yaml`
 - **rswag 設定**: `backend/config/initializers/rswag_api.rb`, `backend/config/initializers/rswag_ui.rb`
 - **ルーティング**: `backend/config/routes.rb`
-- **BFF API スキル**: `prompts/skills/creating-bff-api/instruction.md`（新規リソース追加時は両方のスキルを実行）

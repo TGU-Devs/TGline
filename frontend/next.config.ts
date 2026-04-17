@@ -1,18 +1,22 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-    // Route Handlersでバックエンドへのプロキシを実装（cookieを正しく転送するため）
-    // rewritesは使わない（Set-Cookieヘッダーが正しく転送されないため）
     devIndicators: false,
-    // 本番用
     eslint: {
         ignoreDuringBuilds: true,
     },
-
-    // 本番用: standalone モードで軽量な独立実行可能サーバーを生成
     output: "standalone",
 
-    // Windowsでのホットリロード対応
+    // /api/* へのリクエストをRails APIに転送
+    async rewrites() {
+        return [
+            {
+                source: "/api/:path*",
+                destination: `${process.env.BACKEND_URL || "http://backend:3000"}/api/:path*`,
+            },
+        ];
+    },
+
     webpack: (config) => {
         config.watchOptions = {
             poll: 100,
