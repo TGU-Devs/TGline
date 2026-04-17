@@ -5,10 +5,10 @@
 ## アーキテクチャ
 
 ```
-ブラウザ → Next.js rewrites (port 3000) → Rails API (port 3001) → PostgreSQL
+ブラウザ → Next.js BFF (port 3000) → Rails API (port 3001) → PostgreSQL
 ```
 
-ブラウザからの `/api/*` リクエストは `next.config.ts` の `rewrites` 設定により Rails API に転送される。JWT トークンは Rails が直接 httpOnly Cookie として設定する。
+ブラウザは直接 Rails にアクセスせず、すべての API 呼び出しは Next.js の Route Handlers を経由する **BFF（Backend-for-Frontend）パターン** を採用。JWT トークンは httpOnly Cookie で管理。
 
 ### 技術スタック
 
@@ -38,7 +38,7 @@ TGU/
 │   │   ├── app/
 │   │   │   ├── (public)/    # 認証不要ページ（LP, ログイン, 登録）
 │   │   │   ├── (private)/   # 認証必須ページ（投稿一覧, 設定等）
-│   │   │   └── layout.tsx    # ルートレイアウト
+│   │   │   └── api/         # BFF プロキシルート
 │   │   ├── components/
 │   │   │   ├── features/    # 機能別コンポーネント
 │   │   │   └── ui/          # shadcn/ui プリミティブ

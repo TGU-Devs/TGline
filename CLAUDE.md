@@ -32,11 +32,11 @@ docker compose down -v        # DBボリュームも削除
 
 ## アーキテクチャ
 
-### APIプロキシ
-ブラウザからの `/api/*` リクエストは `next.config.ts` の `rewrites` 設定によりRails API（port 3001）に転送される。JWTトークンはRailsが直接httpOnly cookieとして設定する。
+### BFF（Backend-for-Frontend）パターン
+ブラウザは**直接Railsにアクセスしない**。すべてのAPI呼び出しは Next.js Route Handlers（`frontend/src/app/api/`）を経由してRails（port 3001）にプロキシされる。JWTトークンはNext.js API層が管理するhttpOnly cookieに保存。
 
 ```
-ブラウザ → Next.js rewrites (port 3000) → Rails API (port 3001) → PostgreSQL
+ブラウザ → Next.js Route Handlers (port 3000) → Rails API (port 3001) → PostgreSQL
 ```
 
 ### バックエンド: Rails API-only（`/backend`）
@@ -55,6 +55,7 @@ docker compose down -v        # DBボリュームも削除
 - **出力**: 本番用standaloneモード
 
 ### 主要ディレクトリ
+- `frontend/src/app/api/` — BFFプロキシルート（Rails APIの構造をミラー）
 - `frontend/src/components/features/` — 機能別コンポーネント（auth, posts等）
 - `frontend/src/components/ui/` — shadcn/ui プリミティブ
 - `backend/app/controllers/api/` — Rails APIコントローラ
