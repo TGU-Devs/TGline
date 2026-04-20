@@ -12,6 +12,10 @@ module Api
       def create
         user = User.new(user_params)
 
+        unless university_email?(user.email)
+          return render json: { error: '東北学院大学のメールアドレスで登録してください。' }, status: :forbidden
+        end
+
         if user.save
           token = JwtService.encode(user.id) # JWTServiceはlib/jwt_service.rbにあるクラスで、JWTトークンを生成する
           

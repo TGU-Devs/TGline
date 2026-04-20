@@ -14,6 +14,10 @@ class ApplicationController < ActionController::API
 
   private
 
+  def university_email?(email)
+    email.to_s.strip.downcase.end_with?("@g.tohoku-gakuin.ac.jp")
+  end
+
 
   def notify_discord(error)
     return unless Rails.env.production?

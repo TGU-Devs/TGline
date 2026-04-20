@@ -5,6 +5,7 @@ module Api
     # Google OAuthログイン用コントローラー
     class GoogleSessionsController < ApplicationController
       class EmailAlreadyTaken < StandardError; end
+      class ForbiddenUniversityEmail < StandardError; end
 
       skip_before_action :authenticate_user!, only: [:create]
 
@@ -40,6 +41,8 @@ module Api
           Rails.logger.warn("[GoogleOAuth] User creation failed - email: #{google_user[:email]}")
           render json: { error: 'ユーザーの作成に失敗しました' }, status: :unprocessable_entity
         end
+      rescue ForbiddenUniversityEmail
+        render json: { error: '東北学院大学のメールアドレスでログインしてください。' }, status: :forbidden
       rescue GoogleAuthService::InvalidToken => e
         Rails.logger.warn("[GoogleOAuth] Invalid token: #{e.message}")
         render json: { error: e.message }, status: :unauthorized
@@ -76,12 +79,14 @@ module Api
         end
 
         # 4. 新規ユーザー作成
+        raise ForbiddenUniversityEmail unless university_email?(google_user[:email])
         new_user = User.create!(
           email: google_user[:email],
           display_name: google_user[:name] || google_user[:email].split('@').first,
           provider: 'google',
           uid: google_user[:uid]
-        )
+          )
+        
         Rails.logger.info("[GoogleOAuth] Created new user - user_id: #{new_user.id}, email: #{new_user.email}")
         new_user
       end
