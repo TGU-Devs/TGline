@@ -12,6 +12,8 @@ class ApplicationController < ActionController::API
     raise e
   end
 
+  
+
   private
 
 
