@@ -293,20 +293,26 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
                     </div>
                 )}
                 {formItem.map((item) => (
-                    <FormItem
-                        key={item.id}
-                        item={item}
-                        value={formValues[item.id]}
-                        icon={item.icon}
-                        onchangeHandler={onchangeHandler}
-                        error={
-                            formErrors[item.id]
-                                ? Array.isArray(formErrors[item.id])
-                                    ? (formErrors[item.id]?.[0] as string)
-                                    : (formErrors[item.id] as string)
-                                : undefined
-                        }
-                    />
+                    <div key={item.id}>
+                        <FormItem
+                            item={item}
+                            value={formValues[item.id]}
+                            icon={item.icon}
+                            onchangeHandler={onchangeHandler}
+                            error={
+                                formErrors[item.id]
+                                    ? Array.isArray(formErrors[item.id])
+                                        ? (formErrors[item.id]?.[0] as string)
+                                        : (formErrors[item.id] as string)
+                                    : undefined
+                            }
+                        />
+                        {isRegister && item.id === "email" && (
+                            <p className="mt-1 text-xs text-muted-foreground">
+                                東北学院大学のメールアドレスで登録してください。
+                            </p>
+                        )}
+                    </div>
                 ))}
                 {isRegister && (
                     <div className="flex flex-col">
