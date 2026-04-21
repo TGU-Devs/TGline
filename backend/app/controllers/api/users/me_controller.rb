@@ -39,6 +39,10 @@ module Api
       # PATCH /users/me
       # 現在ログインしているユーザーのプロフィールを更新
       def update
+        if current_user.provider.present? && user_params.key?(:email)
+          return render json: { error: "OAuthユーザーはメールアドレスを変更できません" }, status: :forbidden
+        end
+
         if current_user.update(user_params)
           render json: user_response(current_user), status: :ok
         else

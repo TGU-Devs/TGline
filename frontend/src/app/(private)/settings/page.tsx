@@ -96,19 +96,28 @@ const SettingsPage = () => {
         setFormErrors({});
 
         try {
+            const payload = user?.provider
+                ? {
+                      user: {
+                          display_name: formValues.display_name,
+                          description: formValues.description,
+                      },
+                  }
+                : {
+                      user: {
+                          display_name: formValues.display_name,
+                          email: formValues.email,
+                          description: formValues.description,
+                      },
+                  };
+
             const res = await fetch("/api/users/me", {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 credentials: "include",
-                body: JSON.stringify({
-                    user: {
-                        display_name: formValues.display_name,
-                        email: formValues.email,
-                        description: formValues.description,
-                    },
-                }),
+                body: JSON.stringify(payload),
             });
             if (res.ok) {
                 setShowSaveToast(true);
@@ -138,10 +147,12 @@ const SettingsPage = () => {
             errors.display_name = "ユーザー名を入力してください。";
         }
 
-        if (!values.email.trim()) {
-            errors.email = "メールアドレスを入力してください。";
-        } else if (!emailRegex.test(values.email)) {
-            errors.email = "正しいメールアドレスを入力してください。";
+        if (!user?.provider) {
+            if (!values.email.trim()) {
+                errors.email = "メールアドレスを入力してください。";
+            } else if (!emailRegex.test(values.email)) {
+                errors.email = "正しいメールアドレスを入力してください。";
+            }
         }
         return errors;
     };
@@ -199,6 +210,7 @@ const SettingsPage = () => {
                     formValues={formValues}
                     formErrors={formErrors}
                     icon={UserIcon}
+                    isOAuthUser={!!user?.provider}
                     onchangeHandler={onchangeHandler}
                 />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -20,10 +20,12 @@ class User < ApplicationRecord
   validates :display_name, presence: true, length: { maximum: 20 }
   validates :role, presence: true, inclusion: { in: %w[user admin] }
   validates :description, length: { maximum: 200 }, allow_nil: true
+  validate :oauth_user_cannot_change_email, on: :update
 
   # スコープ
   scope :active, -> { where(deleted_at: nil) }
   scope :deleted, -> { where.not(deleted_at: nil) }
+
 
   def soft_delete
     update(deleted_at: Time.current)
@@ -46,5 +48,12 @@ class User < ApplicationRecord
     errors.add(:password, "には大文字を含めてください") unless password.match?(/[A-Z]/)
     errors.add(:password, "には小文字を含めてください") unless password.match?(/[a-z]/)
     errors.add(:password, "には数字を含めてください") unless password.match?(/[0-9]/)
+  end
+
+  def oauth_user_cannot_change_email
+    return unless provider.present?
+    return unless will_save_change_to_email?
+
+    errors.add(:email, "OAuthユーザーは変更できません")
   end
 end
