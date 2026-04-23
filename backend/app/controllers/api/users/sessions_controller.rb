@@ -13,6 +13,12 @@ module Api
         user = User.active.find_by(email: session_params[:email])
 
         if user&.valid_password?(session_params[:password])
+          if user.provider.blank? && !user.email_verified?
+            return render json: { 
+              error: "メールアドレスが認証されていません。確認メールを再送して認証してください。",
+              requires_email_verification: true
+            }, status: :forbidden
+          end
           token = JwtService.encode(user.id)
           
           # JWTトークンをcookieに設定

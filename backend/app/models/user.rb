@@ -39,6 +39,19 @@ class User < ApplicationRecord
     role == 'admin'
   end
 
+  def email_verified?
+    email_verified_at.present?
+  end
+
+  def generate_email_verification_token!
+    raw_token, encrypted_token = Devise.token_generator.generate(User, :email_verification_token)
+    update!(
+      email_verification_token: encrypted_token,
+      email_verification_sent_at: Time.current
+    )
+    raw_token
+  end
+
   private
 
   def password_complexity

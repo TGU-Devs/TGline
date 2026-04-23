@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useEffect, useState, FormEvent } from "react";
 import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
+import { useSearchParams } from "next/navigation";
 
 import Link from "next/link";
 import FormItem from "./FormItem";
@@ -12,6 +13,8 @@ import { User, Mail, KeyRound, RotateCcwKey, Eye, EyeOff } from "lucide-react";
 type RailsErrorResponse = {
     errors?: Record<string, string | string[]>;
     error?: string;
+    message?: string;
+    requires_email_verification?: boolean;
   };
 
 type AuthFormProps = {
@@ -64,11 +67,23 @@ const initFormValues = {
 };
 
 const AuthForm = ({ isRegister }: AuthFormProps) => {
+    const searchParams = useSearchParams();
+    const isVerificationSent = !isRegister && searchParams.get("verification") === "sent";
     const [formValues, setFormValues] = useState(initFormValues);
     const [formErrors, setFormErrors] = useState<Errors>({});
     const [isLoading, setIsLoading] = useState(false);
+    const [isResendingVerification, setIsResendingVerification] = useState(false);
+    const [canResendVerification, setCanResendVerification] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [termsAccepted, setTermsAccepted] = useState(false);
+    const [termsAccepted, setTermsAccepted] = useState(true);
+    const isSubmitDisabled = isLoading || (isRegister && !termsAccepted);
+
+    useEffect(() => {
+        if (isRegister) return;
+        const email = searchParams.get("email");
+        if (!email) return;
+        setFormValues((prev) => ({ ...prev, email: prev.email || email }));
+    }, [isRegister, searchParams]);
 
     const onchangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -93,6 +108,8 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
 
     // エラーハンドリング
     const handleError = (data: RailsErrorResponse, defaultMessage: string) => {
+        setCanResendVerification(Boolean(data.requires_email_verification));
+
         if (data.errors) {
             setFormErrors(formatErrors(data));
             return;
@@ -104,6 +121,40 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
         }
 
         setFormErrors({ main: defaultMessage });
+    };
+
+    const handleResendVerification = async () => {
+        const email = formValues.email.trim();
+        if (!email) {
+            setFormErrors({ main: "メールアドレスを入力してください" });
+            return;
+        }
+
+        setIsResendingVerification(true);
+        try {
+            const response = await fetch("/api/users/email_verification", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email_verification: { email } }),
+            });
+            const data = await response.json();
+
+            if (response.status === 429) {
+                setFormErrors({
+                    main: "リクエストが多すぎます。しばらく時間をおいて再度お試しください。",
+                });
+                return;
+            }
+
+            setCanResendVerification(false);
+            setFormErrors({
+                main: data.message || "認証メールを送信しました",
+            });
+        } catch {
+            setFormErrors({ main: "通信エラーが発生しました" });
+        } finally {
+            setIsResendingVerification(false);
+        }
     };
 
     // サインアップ処理
@@ -129,7 +180,9 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
             return;
         }
 
-        window.location.href = "/posts";
+        window.location.href = `/login?verification=sent&email=${encodeURIComponent(
+            formValues.email,
+        )}`;
     };
 
     // サインイン処理
@@ -263,6 +316,38 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
         return errors;
     };
 
+    if (isVerificationSent) {
+        return (
+            <div className="bg-card/80 backdrop-blur-lg p-6 rounded-xl shadow-lg border border-border/50 w-full max-w-md text-center space-y-4">
+                <h1 className="text-xl font-bold text-foreground">確認メールを送信しました</h1>
+                <p className="text-sm text-muted-foreground">
+                    {formValues.email
+                        ? `${formValues.email} 宛に認証メールを送信しました。`
+                        : "入力されたメールアドレス宛に認証メールを送信しました。"}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                    メール内リンクから認証後、ログインしてください。
+                </p>
+                <button
+                    type="button"
+                    onClick={handleResendVerification}
+                    disabled={isResendingVerification}
+                    className="w-full py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    {isResendingVerification ? "再送中..." : "認証メールを再送する"}
+                </button>
+                {formErrors.main && (
+                    <div className="bg-destructive/10 border border-destructive/30 text-destructive px-4 py-3 rounded-lg text-sm text-left">
+                        {formErrors.main}
+                    </div>
+                )}
+                <Link href="/login" className="inline-block text-sm text-primary hover:underline">
+                    ログイン画面を開く
+                </Link>
+            </div>
+        );
+    }
+
     return (
         <div className="bg-card/80 backdrop-blur-lg p-6 rounded-xl shadow-lg border border-border/50 w-full max-w-md">
             <form className="space-y-4" onSubmit={(e) => submitHandler(e)}>
@@ -375,13 +460,32 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
                     </label>
                   </div>
                 )}
+                {isRegister && !termsAccepted && (
+                    <p className="text-xs text-muted-foreground">
+                        利用規約とプライバシーポリシーに同意すると登録できます。
+                    </p>
+                )}
                 {formErrors.main && (
                     <div className="bg-destructive/10 border border-destructive/30 text-destructive px-4 py-3 rounded-lg text-sm">
                         {formErrors.main}
+                        {canResendVerification && (
+                            <button
+                                type="button"
+                                onClick={handleResendVerification}
+                                disabled={isResendingVerification}
+                                className="block mt-2 text-primary hover:underline disabled:opacity-60 disabled:cursor-not-allowed"
+                            >
+                                {isResendingVerification ? "再送中..." : "認証メールを再送する"}
+                            </button>
+                        )}
                     </div>
                 )}
-                <Button className="w-full" type="submit" disabled={isLoading || (isRegister && !termsAccepted)}>
-                    {isLoading ? "処理中..." : isRegister ? "登録" : "ログイン"}
+                <Button className="w-full" type="submit" disabled={isSubmitDisabled}>
+                    {isLoading
+                        ? "処理中..."
+                        : isRegister
+                          ? "登録"
+                          : "ログイン"}
                 </Button>
                 <div className="relative my-4">
                     <div className="absolute inset-0 flex items-center">
