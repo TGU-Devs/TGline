@@ -17,21 +17,16 @@ module Api
         end
 
         if user.save
-          token = JwtService.encode(user.id) # JWTServiceはlib/jwt_service.rbにあるクラスで、JWTトークンを生成する
-          
-          # JWTトークンをcookieに設定
-          cookies[:jwt_token] = {
-            value: token,
-            httponly: true, # JavaScriptからアクセス不可（XSS対策）
-            secure: Rails.env.production?, # HTTPS接続でのみ送信（本番環境）
-            same_site: :lax, # CSRF対策(同じドメイン間のみCookieを送信)
-            expires: 7.days.from_now # 7日間有効
-          }
-          
+          raw_token = user.generate_email_verification_token!
+          begin
+            EmailVerificationMailer.verification_email(user, raw_token).deliver_now
+          rescue StandardError => e
+            Rails.logger.error("Email verification send error: #{e.message}")
+          end
+
           render json: {
-            user: user_response(user),
-            token: token,
-            message: 'ユーザー登録が完了しました！'
+            message: 'ユーザー登録が完了しました。確認メールを送信したので、メール内リンクから認証してください。',
+            requires_email_verification: true
           }, status: :created
         else
           render json: { errors: user.errors }, status: :unprocessable_entity
@@ -42,16 +37,6 @@ module Api
 
       def user_params
         params.require(:user).permit(:email, :password, :password_confirmation, :display_name, :description)
-      end
-
-      def user_response(user)
-        {
-          id: user.id,
-          email: user.email,
-          display_name: user.display_name,
-          description: user.description,
-          role: user.role
-        }
       end
     end
   end
