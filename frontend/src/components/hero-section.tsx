@@ -41,6 +41,9 @@ export function HeroSection() {
               <br />
               なんでも投稿OK。
             </p>
+            <p className="mt-3 text-xs sm:text-sm text-muted-foreground/90 max-w-xl mx-auto lg:ml-2">
+              ※ 本サービスは東北学院大学の公式サービスではありません（学生有志による運営です）。
+            </p>
 
             {/* Feature Tags */}
             <div className="mt-6 flex flex-wrap justify-center lg:justify-start gap-2">
