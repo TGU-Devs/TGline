@@ -1,8 +1,11 @@
+import { Suspense } from "react";
 import AuthForm from "@/components/features/auth/AuthForm";
 
 const Register = () => {
     return (
-        <AuthForm isRegister={true} />
+        <Suspense>
+            <AuthForm isRegister={true} />
+        </Suspense>
     )
 };
 
