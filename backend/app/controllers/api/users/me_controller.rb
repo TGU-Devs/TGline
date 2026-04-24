@@ -2,18 +2,12 @@
 
 module Api
   module Users
-    # 現在ログイン中のユーザー情報取得・更新用コントローラー
     class MeController < ApplicationController
-      # GET /users/me
-      # 現在ログインしているユーザーの情報を取得
       def show
         render json: user_response(current_user), status: :ok
       end
 
-      # DELETE /users/me
-      # 現在ログインしているユーザーのアカウントを論理削除
       def destroy
-        # OAuthユーザー以外はパスワード検証が必要
         if current_user.provider.blank?
           current_password = params.dig(:password, :current_password)
           unless current_user.valid_password?(current_password)
@@ -21,7 +15,7 @@ module Api
             return
           end
         end
-        # soft_deleteがfalseの場合(updateが失敗)はアカウント削除に失敗したと判断してエラーを返す
+
         unless current_user.soft_delete
           render json: { error: "アカウント削除に失敗しました" }, status: :internal_server_error
           return
@@ -36,8 +30,6 @@ module Api
         head :no_content
       end
 
-      # PATCH /users/me
-      # 現在ログインしているユーザーのプロフィールを更新
       def update
         if current_user.provider.present? && user_params.key?(:email)
           return render json: { error: "OAuthユーザーはメールアドレスを変更できません" }, status: :forbidden

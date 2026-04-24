@@ -4,11 +4,8 @@ module Api
 
     def index
       tags = Tag.all
-      # カテゴリで絞り込み
-      # もしクエリパラメーターがあれば、そのカテゴリのタグを取得して上書き
       tags = tags.where(category: Tag.categories[params[:category]]) if params[:category].present?
 
-      # DEFINITIONS の定義順でソート
       ordered = tags.sort_by do |tag|
         names = Tag::DEFINITIONS[tag.category.to_sym] || []
         names.index(tag.name) || names.size

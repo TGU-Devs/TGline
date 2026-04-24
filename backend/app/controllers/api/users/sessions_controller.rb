@@ -2,34 +2,34 @@
 
 module Api
   module Users
-    # セッション管理（ログイン・ログアウト）用コントローラー
     class SessionsController < ApplicationController
-      # ログイン・ログアウトは認証不要（ログアウトは無効なトークンでもcookie削除を実行するため）
       skip_before_action :authenticate_user!, only: [:create, :destroy]
 
-      # POST /users/sign_in
-      # ログイン
       def create
         user = User.active.find_by(email: session_params[:email])
 
+        if user&.provider.present?
+          return render json: { error: 'このメールアドレスはGoogleアカウントで登録されています。Googleログインを使用してください。' }, status: :forbidden
+        end
+
         if user&.valid_password?(session_params[:password])
-          if user.provider.blank? && !user.email_verified?
-            return render json: { 
+          unless user.email_verified?
+            return render json: {
               error: "メールアドレスが認証されていません。確認メールを再送して認証してください。",
               requires_email_verification: true
             }, status: :forbidden
           end
+
           token = JwtService.encode(user.id)
-          
-          # JWTトークンをcookieに設定
+
           cookies[:jwt_token] = {
             value: token,
-            httponly: true, # JavaScriptからアクセス不可（XSS対策）
-            secure: Rails.env.production?, # HTTPS接続でのみ送信（本番環境のみ）
-            same_site: :lax, # CSRF対策
-            expires: 7.days.from_now # 7日間有効
+            httponly: true,
+            secure: Rails.env.production?,
+            same_site: :lax,
+            expires: 7.days.from_now
           }
-          
+
           render json: {
             user: user_response(user),
             token: token,
@@ -40,16 +40,14 @@ module Api
         end
       end
 
-      # DELETE /users/sign_out
-      # ログアウト（cookieからトークンを削除）
       def destroy
-        # cookieからトークンを削除
         cookies.delete(:jwt_token, {
           httponly: true,
           secure: Rails.env.production?,
           same_site: :lax
         })
-        head :no_content # 204でbodyを返さない
+
+        head :no_content
       end
 
       private

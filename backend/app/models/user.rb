@@ -1,31 +1,25 @@
 # frozen_string_literal: true
 
 class User < ApplicationRecord
-  # Devise設定
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
   has_many :posts, dependent: :destroy
   has_many :likes, dependent: :destroy
   has_many :comments, dependent: :destroy
 
-  # OAuthユーザーはパスワード不要
   def password_required?
     provider.blank? && super
   end
 
-  # パスワード強度バリデーション
   validate :password_complexity, if: :password_required?
 
-  # バリデーション
   validates :display_name, presence: true, length: { maximum: 20 }
   validates :role, presence: true, inclusion: { in: %w[user admin] }
   validates :description, length: { maximum: 200 }, allow_nil: true
   validate :oauth_user_cannot_change_email, on: :update
 
-  # スコープ
   scope :active, -> { where(deleted_at: nil) }
   scope :deleted, -> { where.not(deleted_at: nil) }
-
 
   def soft_delete
     update(deleted_at: Time.current)
