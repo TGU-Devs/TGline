@@ -328,6 +328,9 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
                 <p className="text-sm text-muted-foreground">
                     メール内リンクから認証後、ログインしてください。
                 </p>
+                <p className="text-xs text-muted-foreground">
+                    数分待っても届かない場合は、迷惑メールフォルダもご確認ください。
+                </p>
                 <button
                     type="button"
                     onClick={handleResendVerification}

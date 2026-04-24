@@ -2,7 +2,7 @@
 
 class EmailVerificationMailer < ApplicationMailer
   layout false
-  default from: ENV.fetch("MAILER_FROM_ADDRESS", "noreply@tgline.example.com")
+  default from: ENV.fetch("MAILER_FROM_ADDRESS", "support@tgline.dev")
 
   def verification_email(user, raw_token)
     @user = user

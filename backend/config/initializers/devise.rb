@@ -3,7 +3,7 @@
 Devise.setup do |config|
   require 'devise/orm/active_record'
 
-  config.mailer_sender = 'noreply@tgu-board.example.com'
+  config.mailer_sender = 'support@tgline.dev'
   config.password_length = 6..128
   config.email_regexp = /\A[^@\s]+@[^@\s]+\z/
   config.skip_session_storage = [:http_auth]
