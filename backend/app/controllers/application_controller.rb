@@ -1,12 +1,8 @@
 class ApplicationController < ActionController::API
-  # 認証モジュール（concerns/authenticable.rb）
   include Authenticable
-  # 認可モジュール（concerns/authorizable.rb）
   include Authorizable
-  # cookie許可
   include ActionController::Cookies
 
-  # エラーをDiscordに通知するためのコード
   rescue_from StandardError do |e|
     notify_discord(e)
     raise e
@@ -18,10 +14,9 @@ class ApplicationController < ActionController::API
     email.to_s.strip.downcase.end_with?("@g.tohoku-gakuin.ac.jp")
   end
 
-
   def notify_discord(error)
     return unless Rails.env.production?
-    
+
     payload = {
       embeds: [{
         title: "🚨 #{error.class}",
@@ -40,7 +35,7 @@ class ApplicationController < ActionController::API
       payload.to_json,
       'Content-Type' => 'application/json'
     )
-  rescue => e
+  rescue StandardError => e
     Rails.logger.error("Discord notify failed: #{e.message}")
   end
 end

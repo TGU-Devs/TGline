@@ -2,15 +2,11 @@
 
 module Api
   module Users
-    # メール認証（再送・認証実行）用コントローラー
     class EmailVerificationsController < ApplicationController
       TOKEN_EXPIRES_IN = 24.hours
 
-      # 未認証ユーザーが利用するため認証をスキップ
       skip_before_action :authenticate_user!
 
-      # POST /api/users/email_verification
-      # 認証メール再送（アカウント列挙防止のため常に同一レスポンス）
       def create
         user = User.active.find_by(email: create_params[:email])
 
@@ -25,8 +21,6 @@ module Api
         render json: { message: "認証メールを送信しました" }, status: :ok
       end
 
-      # PATCH /api/users/email_verification
-      # メール認証実行（トークン検証 + 認証状態更新）
       def update
         if update_params[:token].blank?
           return render json: { error: "認証リンクが無効です" }, status: :unprocessable_entity

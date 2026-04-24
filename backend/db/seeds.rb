@@ -1,17 +1,10 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-
-# ダミーユーザーデータを作成
 puts "Creating dummy users..."
 
-# 既存のユーザーを削除（開発環境のみ）
 if Rails.env.development?
   User.destroy_all
   puts "Cleared existing users"
 end
 
-# ダミーユーザーを作成(開発環境のみ)
 if Rails.env.development?
   users_data = [
     {
@@ -93,7 +86,6 @@ if Rails.env.development?
   puts "Created #{Post.count} posts!"
 end
 
-# タグのマスターデータ投入（全環境共通・冪等）
 puts "Creating tags..."
 Tag::DEFINITIONS.each do |category, names|
   names.each do |name|
@@ -102,7 +94,6 @@ Tag::DEFINITIONS.each do |category, names|
 end
 puts "Tags: #{Tag.count}"
 
-# 開発用: ダミー投稿にタグを紐付け
 if Rails.env.development?
   puts "Assigning tags to posts..."
 
