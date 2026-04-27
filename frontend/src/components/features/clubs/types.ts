@@ -12,7 +12,7 @@ export type Club = {
     schedule: string;
     costs: string;
     GenderRatio: { male: number; female: number };
-    imgUrl: string;
+    imgUrl: string[];
     color: string;
     contact?: contactInfo;
 };

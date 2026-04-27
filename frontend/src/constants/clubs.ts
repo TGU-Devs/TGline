@@ -33,7 +33,7 @@ export const clubs: Club[] = [
         schedule: "毎週木曜日 18:00-20:00",
         costs: "月額500円",
         GenderRatio: { male: 60, female: 40 },
-        imgUrl: "/clubs/club-a/club-a1.jpg",
+        imgUrl: ["/clubs/club-a/club-a1.jpg", "/clubs/club-a/club-a2.jpg", "/clubs/club-a/club-a3.jpg"],
         contact: {
             ...mockClubsContact,
         },
@@ -54,7 +54,7 @@ export const clubs: Club[] = [
         schedule: "毎週金曜日 16:00-18:00",
         costs: "月額300円",
         GenderRatio: { male: 40, female: 60 },
-        imgUrl: "/clubs/club-b/club-b1.jpg",      
+        imgUrl: ["/clubs/club-b/club-b1.jpg", "/clubs/club-b/club-b2.jpg", "/clubs/club-b/club-b3.jpg"],
         contact: {
             instagram: {
                 username: mockClubsContact.instagram.username,
@@ -83,7 +83,7 @@ export const clubs: Club[] = [
         schedule: "毎月第2水曜日 14:00-16:00",
         costs: "月額200円",
         GenderRatio: { male: 30, female: 70 },
-        imgUrl: "/clubs/club-c/club-c1.jpg",
+        imgUrl: ["/clubs/club-c/club-c1.jpg", "/clubs/club-c/club-c2.jpg", "/clubs/club-c/club-c3.jpg"],
         contact: {
             instagram: {
                 username: mockClubsContact.instagram.username,
@@ -108,7 +108,7 @@ export const clubs: Club[] = [
         schedule: "不定期",
         costs: "月額100円",
         GenderRatio: { male: 50, female: 50 },
-        imgUrl: "/clubs/club-d/club-d1.jpg",
+        imgUrl: ["/clubs/club-d/club-d1.jpg", "/clubs/club-d/club-d2.jpg"],
         contact: {
             email: mockClubsContact.email,
         },

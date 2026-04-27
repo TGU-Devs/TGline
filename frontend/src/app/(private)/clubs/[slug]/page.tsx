@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 import { FaXTwitter } from "react-icons/fa6";
 
+import ClubHeroCarousel from "@/components/features/clubs/ClubHeroCarousel";
+
 import Main from "@/components/ui/PageMain";
 import { clubs } from "@/constants/clubs";
 
@@ -36,13 +38,15 @@ const ClubDetailPage = async ({ params }: ClubDetailPageProps) => {
         return (
             <Main>
                 <div className="flex flex-col items-center justify-center h-96">
-                    <h2 className="text-2xl font-bold mb-4">サークルが見つかりません</h2>
+                    <h2 className="text-2xl font-bold mb-4">
+                        サークルが見つかりません
+                    </h2>
                     <p className="text-muted-foreground">
                         お探しのサークルは見つかりませんでした。
                     </p>
                 </div>
             </Main>
-        )
+        );
     }
 
     return (
@@ -66,19 +70,17 @@ const ClubDetailPage = async ({ params }: ClubDetailPageProps) => {
                     <ChevronLeft size={24} className="pr-0.5" />
                 </Link>
 
-                <div
-                    className="w-full h-70 md:h-100 lg:absolute lg:inset-0 lg:h-full z-0"
-                    style={{
-                        backgroundImage: `url(${club.imgUrl})`,
-                        backgroundSize: "cover",
-                        backgroundPosition: "center",
-                    }}
-                />
+                <div className="w-full h-70 md:h-100 lg:absolute lg:inset-0 lg:h-full z-0">
+                    <ClubHeroCarousel
+                        images={club.imgUrl}
+                        clubName={club.name}
+                    />
+                </div>
 
-                <div className="hidden lg:block absolute inset-0 bg-blue-600/50 mix-blend-multiply z-0 transition-opacity duration-300 group-hover:opacity-0" />
-                <div className="hidden lg:block absolute inset-0 bg-linear-to-r from-blue-900/80 to-transparent z-0 transition-opacity duration-300 group-hover:opacity-0" />
+                <div className="pointer-events-none hidden lg:block absolute inset-0 bg-blue-600/50 mix-blend-multiply z-0 transition-opacity duration-300 group-hover:opacity-0" />
+                <div className="pointer-events-none hidden lg:block absolute inset-0 bg-linear-to-r from-blue-900/80 to-transparent z-0 transition-opacity duration-300 group-hover:opacity-0" />
 
-                <div className="relative z-10 pt-6 pb-6 px-6 lg:p-12 bg-background lg:bg-transparent -mt-6 lg:mt-0 rounded-t-3xl lg:rounded-none lg:text-white transition-opacity duration-300 lg:group-hover:opacity-0">
+                <div className="relative z-10 pt-6 pb-6 px-6 lg:p-12 bg-background lg:bg-transparent -mt-6 lg:mt-0 rounded-t-3xl lg:rounded-none lg:text-white transition-opacity duration-300 lg:group-hover:opacity-0 lg:pointer-events-none">
                     <div className="flex flex-wrap items-center gap-3 mb-3 lg:mb-4">
                         <span className="flex items-center gap-1.5 bg-blue-50 lg:bg-white text-blue-600 px-4 py-1.5 rounded-full text-sm font-medium">
                             <club.categoryIcon size={16} />
@@ -88,14 +90,16 @@ const ClubDetailPage = async ({ params }: ClubDetailPageProps) => {
                             <User size={16} />
                             メンバー{club.members}
                         </span>
-                        <span 
+                        <span
                             className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-bold shadow-sm ${
-                                club.status === "募集中" 
-                                ? "bg-emerald-100 text-emerald-700 lg:bg-emerald-500 lg:text-white" 
-                                : "bg-gray-100 text-gray-500 lg:bg-gray-500 lg:text-white"
+                                club.status === "募集中"
+                                    ? "bg-emerald-100 text-emerald-700 lg:bg-emerald-500 lg:text-white"
+                                    : "bg-gray-100 text-gray-500 lg:bg-gray-500 lg:text-white"
                             }`}
                         >
-                            {club.status === "募集中" ? "✨ 募集中" : "募集終了"}
+                            {club.status === "募集中"
+                                ? "✨ 募集中"
+                                : "募集終了"}
                         </span>
                     </div>
 
@@ -109,8 +113,8 @@ const ClubDetailPage = async ({ params }: ClubDetailPageProps) => {
 
                     <div className="flex flex-wrap gap-2 mt-1 lg:mt-2">
                         {club.tags.map((tag) => (
-                            <span 
-                                key={tag} 
+                            <span
+                                key={tag}
                                 className="px-3 py-1 bg-muted lg:bg-white/20 text-muted-foreground lg:text-white rounded-md text-xs font-medium backdrop-blur-sm"
                             >
                                 #{tag}
