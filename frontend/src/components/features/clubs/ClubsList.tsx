@@ -13,8 +13,8 @@ const ClubsList = ({ clubs }: ClubsSectionProps) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-12 gap-x-6 mt-8">
             {clubs.map((club) => (
                 <Link
-                    href={club.url}
-                    key={club.name}
+                    href={`/clubs/${club.slug}`}
+                    key={club.slug}
                     className="bg-card rounded-2xl overflow-hidden border border-border shadow-sm hover:shadow-xl hover:shadow-sky-500/5 hover:-translate-y-1 transition-all group"
                 >
                     {/* サークル画像エリア */}
@@ -56,7 +56,7 @@ const ClubsList = ({ clubs }: ClubsSectionProps) => {
                             {club.name}
                         </h3>
                         <p className="text-sm text-muted-foreground/90 leading-relaxed mb-6 line-clamp-2">
-                            {club.description}
+                            {club.shortDescription}
                         </p>
 
                         <div className="space-y-3 pt-4 border-t border-sidebar-border/20">
@@ -67,15 +67,15 @@ const ClubsList = ({ clubs }: ClubsSectionProps) => {
                                 </span>
                             </div>
                             <div className="flex items-center gap-3 text-muted-foreground/70">
-                                <Clock size={16} className="text-primary" />
-                                <span className="text-xs font-bold">
-                                    {club.schedule}
-                                </span>
-                            </div>
-                            <div className="flex items-center gap-3 text-muted-foreground/70">
                                 <MapPin size={16} className="text-primary" />
                                 <span className="text-xs font-bold">
                                     {club.location}
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-3 text-muted-foreground/70">
+                                <Clock size={16} className="text-primary" />
+                                <span className="text-xs font-bold">
+                                    {club.schedule}
                                 </span>
                             </div>
                         </div>
