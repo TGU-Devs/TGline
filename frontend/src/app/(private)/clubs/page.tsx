@@ -3,9 +3,9 @@
 import { useState } from "react";
 
 import Main from "@/components/ui/PageMain";
-import ClubHeader from "@/components/features/clubs/ClubsHeader";
-import CategoriesButton from "@/components/features/clubs/CategoriesButton";
-import ClubsList from "@/components/features/clubs/ClubsList";
+import ClubHeader from "@/components/features/clubs/lists/ClubsHeader";
+import CategoriesButton from "@/components/features/clubs/lists/CategoriesButton";
+import ClubsList from "@/components/features/clubs/lists/ClubsList";
 
 import { clubs } from "@/constants/clubs";
 
