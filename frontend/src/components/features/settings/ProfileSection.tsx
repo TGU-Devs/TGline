@@ -7,7 +7,6 @@ type ProfileSectionProps = {
     formValues: FormValues;
     formErrors: Errors;
     icon: LucideIcon;
-    isOAuthUser: boolean;
     onchangeHandler: (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     ) => void;
@@ -17,7 +16,6 @@ const ProfileSection = ({
     formValues,
     formErrors,
     icon: Icon,
-    isOAuthUser,
     onchangeHandler,
 }: ProfileSectionProps) => {
     return (
@@ -67,19 +65,13 @@ const ProfileSection = ({
                             id="email"
                             value={formValues.email}
                             onChange={onchangeHandler}
-                            disabled={isOAuthUser}
-                            className={`w-full px-4 py-3 rounded-xl border border-slate-200 outline-none transition-all ${
-                                isOAuthUser
-                                    ? "bg-slate-100 text-slate-500 cursor-not-allowed"
-                                    : "bg-slate-50 focus:ring-2 focus:ring-sky-500"
-                            }`}
+                            disabled
+                            className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none transition-all bg-slate-100 text-slate-500 cursor-not-allowed"
                             required
                         />
-                        {isOAuthUser && (
-                            <p className="text-slate-500 text-sm mt-1">
-                                Googleログインユーザーはメールアドレスを変更できません。
-                            </p>
-                        )}
+                        <p className="text-slate-500 text-sm mt-1">
+                            現在、メールアドレスの変更はできません。
+                        </p>
                         {formErrors.email && (
                             <p className="text-red-500 text-sm mt-1">
                                 {formErrors.email}
