@@ -1,3 +1,4 @@
+import NotFoundClub from "@/components/features/clubs/details/NotFoundClub";
 import Main from "@/components/ui/PageMain";
 import BackButton from "@/components/features/clubs/details/BackButton";
 import HeroSection from "@/components/features/clubs/details/HeroSection";
@@ -21,18 +22,7 @@ const ClubDetailPage = async ({ params }: ClubDetailPageProps) => {
     const club: Club | undefined = clubs.find((c) => c.slug === clubSlug);
 
     if (!club) {
-        return (
-            <Main>
-                <div className="flex flex-col items-center justify-center h-96">
-                    <h2 className="text-2xl font-bold mb-4">
-                        サークルが見つかりません
-                    </h2>
-                    <p className="text-muted-foreground">
-                        お探しのサークルは見つかりませんでした。
-                    </p>
-                </div>
-            </Main>
-        );
+        return <NotFoundClub />;
     }
 
     return (
@@ -53,7 +43,10 @@ const ClubDetailPage = async ({ params }: ClubDetailPageProps) => {
                     />
                 </div>
                 <div className="col-span1 lg:col-span-1 ">
-                    <ClubContact clubName={club.name} clubContact={club.contact} />
+                    <ClubContact
+                        clubName={club.name}
+                        clubContact={club.contact}
+                    />
                 </div>
             </div>
         </Main>
