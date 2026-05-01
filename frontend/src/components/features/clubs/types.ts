@@ -16,7 +16,6 @@ export type Club = {
         logo: string;
         gallery: string[];
     };
-    color: string;
     contact?: contactInfo;
 };
 

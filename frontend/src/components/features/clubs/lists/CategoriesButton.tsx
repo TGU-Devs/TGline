@@ -3,7 +3,7 @@ type CategoriesButtonProps = {
     setActiveCategory: (category: string) => void;
 };
 
-const categories = ["すべて", "体育会系", "文化系", "ボランティア", "その他"];
+const categories = ["すべて", "部活動", "サークル・同好会", "インカレ"];
 
 const CategoriesButton = ({ activeCategory, setActiveCategory }: CategoriesButtonProps) => {
     return (
