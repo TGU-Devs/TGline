@@ -10,6 +10,13 @@ import {
 } from "lucide-react";
 import { FaXTwitter } from "react-icons/fa6";
 
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+
 import type { Club } from "@/components/features/clubs/types";
 
 type ContactModalProps = {
@@ -18,29 +25,22 @@ type ContactModalProps = {
     clubContact: Club["contact"];
 };
 
-const ContactModal = ({
-    isOpen,
-    onClose,
-    clubContact,
-}: ContactModalProps) => {
-    if (!isOpen) return null;
+const ContactModal = ({ isOpen, onClose, clubContact }: ContactModalProps) => {
+    const handleOpenChange = (open: boolean) => {
+        if (!open) {
+            onClose();
+        }
+    };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div
-                className="absolute inset-0 bg-background/80 backdrop-blur-sm transition-opacity cursor-pointer"
-                onClick={onClose}
-            />
-            <div className="relative bg-card text-card-foreground rounded-2xl shadow-xl max-w-sm w-full overflow-hidden transform transition-all border border-border animate-fade-in">
-                <div className="flex items-center justify-between p-5 border-b border-border">
-                    <h2 className="text-lg font-bold">お問い合わせ</h2>
-                    <button
-                        className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-full hover:bg-muted/80 cursor-pointer"
-                        onClick={onClose}
-                    >
-                        <X size={20} />
-                    </button>
-                </div>
+        <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+            {/* max-w-sm や rounded-2xl などの独自のスタイルは DialogContent に渡す */}
+            <DialogContent className="max-w-sm rounded-2xl p-0 overflow-hidden bg-card border-border shadow-xl">
+                <DialogHeader className="p-5 border-b border-border">
+                    <DialogTitle className="text-lg font-bold text-left">
+                        お問い合わせ
+                    </DialogTitle>
+                </DialogHeader>
                 <ul className="p-5 flex flex-col gap-3">
                     {clubContact?.instagram && (
                         <li>
@@ -186,8 +186,8 @@ const ContactModal = ({
                         </li>
                     )}
                 </ul>
-            </div>
-        </div>
+            </DialogContent>
+        </Dialog>
     );
 };
 

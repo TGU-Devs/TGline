@@ -32,7 +32,7 @@ export const clubs: Club[] = [
         location: "〇〇大学第一体育館",
         schedule: "毎週木曜日 18:00-20:00",
         costs: "月額500円",
-        GenderRatio: { male: 60, female: 40 },
+        genderRatio: { male: 60, female: 40 },
         imgUrl: {
             logo: "/clubs/club-a/logo.png",
             gallery: [
@@ -44,7 +44,7 @@ export const clubs: Club[] = [
         contact: {
             ...mockClubsContact,
         },
-        tags: ["初心者歓迎", "インカレ", "週2日活動", "飲み会少なめ"],
+        tags: ["初心者歓迎", "週2日活動", "飲み会少なめ"],
     },
     {
         slug: "club-b",
@@ -59,7 +59,7 @@ export const clubs: Club[] = [
         location: "文化館",
         schedule: "毎週金曜日 16:00-18:00",
         costs: "月額300円",
-        GenderRatio: { male: 40, female: 60 },
+        genderRatio: { male: 40, female: 60 },
         imgUrl: {
             logo: "/clubs/club-b/logo.png",
             gallery: [
@@ -94,7 +94,7 @@ export const clubs: Club[] = [
         location: "ボランティアセンター",
         schedule: "毎月第2水曜日 14:00-16:00",
         costs: "月額200円",
-        GenderRatio: { male: 30, female: 70 },
+        genderRatio: { male: 30, female: 70 },
         imgUrl: {
             logo: "/clubs/club-c/logo.png",
             gallery: [
@@ -125,7 +125,7 @@ export const clubs: Club[] = [
         location: "その他",
         schedule: "不定期",
         costs: "月額100円",
-        GenderRatio: { male: 50, female: 50 },
+        genderRatio: { male: 50, female: 50 },
         imgUrl: {
             logo: "/clubs/club-d/logo.png",
             gallery: [

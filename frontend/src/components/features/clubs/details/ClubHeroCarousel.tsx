@@ -42,7 +42,7 @@ const ClubHeroCarousel = ({ images, clubName }: ClubHeroCarouselProps) => {
     }, [emblaApi]);
 
     return (
-        <div className="relative w-full h-full touch-pan-y">
+        <div className="group relative w-full h-full touch-pan-y">
             <div ref={emblaRef} className="h-full overflow-hidden">
                 <div className="flex h-full">
                     {images.map((img, idx) => (

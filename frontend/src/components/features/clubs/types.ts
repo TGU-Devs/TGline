@@ -11,7 +11,7 @@ export type Club = {
     location: string;
     schedule: string;
     costs: string;
-    GenderRatio: { male: number; female: number };
+    genderRatio: { male: number; female: number };
     imgUrl: {
         logo: string;
         gallery: string[];

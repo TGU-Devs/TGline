@@ -11,6 +11,7 @@ const CategoriesButton = ({ activeCategory, setActiveCategory }: CategoriesButto
             {categories.map((category) => (
                 <button
                     key={category}
+                    type="button"
                     className={`px-6 py-2 rounded-full text-sm font-medium transition-colors cursor-pointer mt-8 ${
                         activeCategory === category
                             ? "bg-primary text-sidebar-primary-foreground shadow-sm"

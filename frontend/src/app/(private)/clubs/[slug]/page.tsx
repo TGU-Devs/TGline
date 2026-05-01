@@ -32,17 +32,17 @@ const ClubDetailPage = async ({ params }: ClubDetailPageProps) => {
             <HeroSection club={club} />
 
             <div className="mb-12 px-6 md:mt-4 lg:mt-12 lg:p-0 grid grid-cols-1 lg:grid-cols-3 gap-10">
-                <div className="col-span1 lg:col-span-2 space-y-10">
+                <div className="col-span-1 lg:col-span-2 space-y-10">
                     <ClubDescription description={club.longDescription} />
 
                     <ClubActivityInfo
                         location={club.location}
                         schedule={club.schedule}
                         costs={club.costs}
-                        GenderRatio={club.GenderRatio}
+                        GenderRatio={club.genderRatio}
                     />
                 </div>
-                <div className="col-span1 lg:col-span-1 ">
+                <div className="col-span-1 lg:col-span-1 ">
                     <ClubContact
                         clubContact={club.contact}
                     />
