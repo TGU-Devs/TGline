@@ -1,4 +1,4 @@
-import { Dumbbell, Palette, HeartHandshake, Shapes } from "lucide-react";
+import { Trophy , Shapes  , Globe } from "lucide-react";
 import type { Club } from "@/components/features/clubs/types";
 
 const mockClubsContact = {
@@ -23,7 +23,7 @@ export const clubs: Club[] = [
         slug: "club-a",
         name: "サークルA",
         category: "部活動",
-        categoryIcon: Dumbbell,
+        categoryIcon: Trophy,
         status: "募集中",
         shortDescription: "サークルAの説明",
         longDescription:
@@ -50,7 +50,7 @@ export const clubs: Club[] = [
         slug: "club-b",
         name: "サークルB",
         category: "部活動",
-        categoryIcon: Palette,
+        categoryIcon: Trophy,
         status: "締め切り",
         shortDescription: "サークルBの説明",
         longDescription:
@@ -85,7 +85,7 @@ export const clubs: Club[] = [
         slug: "club-c",
         name: "サークルC",
         category: "サークル・同好会",
-        categoryIcon: HeartHandshake,
+        categoryIcon: Shapes,
         status: "締め切り",
         shortDescription: "サークルCの説明",
         longDescription:
@@ -116,7 +116,7 @@ export const clubs: Club[] = [
         slug: "club-d",
         name: "サークルD",
         category: "インカレ",
-        categoryIcon: Shapes,
+        categoryIcon: Globe,
         status: "募集中",
         shortDescription: "サークルDの説明",
         longDescription:
