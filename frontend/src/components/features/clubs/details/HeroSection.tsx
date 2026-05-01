@@ -22,7 +22,7 @@ const HeroSection = ({ club }: HeroSectionProps) => {
 
                 <div className="w-full h-70 md:h-100 lg:absolute lg:inset-0 lg:h-full z-0">
                     <ClubHeroCarousel
-                        images={club.imgUrl}
+                        images={club.imgUrl.gallery}
                         clubName={club.name}
                     />
                 </div>

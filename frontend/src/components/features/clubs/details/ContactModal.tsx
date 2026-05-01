@@ -15,14 +15,12 @@ import type { Club } from "@/components/features/clubs/types";
 type ContactModalProps = {
     isOpen: boolean;
     onClose: () => void;
-    clubName: string;
     clubContact: Club["contact"];
 };
 
 const ContactModal = ({
     isOpen,
     onClose,
-    clubName,
     clubContact,
 }: ContactModalProps) => {
     if (!isOpen) return null;

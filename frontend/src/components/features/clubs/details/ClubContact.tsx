@@ -5,11 +5,10 @@ import ClubContactModal from "./ContactModal";
 import type { Club } from "@/components/features/clubs/types";
 
 type ClubContactProps = {
-    clubName: string;
     clubContact: Club["contact"];
 };
 
-const ClubContact = ({ clubName, clubContact }: ClubContactProps) => {
+const ClubContact = ({ clubContact }: ClubContactProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     return (
         <section className="lg:bg-card lg:p-4 lg:rounded-lg lg:shadow-sm">
@@ -28,7 +27,6 @@ const ClubContact = ({ clubName, clubContact }: ClubContactProps) => {
             <ClubContactModal 
                 isOpen={isModalOpen} 
                 onClose={() => setIsModalOpen(false)} 
-                clubName={clubName} 
                 clubContact={clubContact} 
             />
         </section>

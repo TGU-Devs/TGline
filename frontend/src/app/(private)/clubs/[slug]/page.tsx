@@ -44,7 +44,6 @@ const ClubDetailPage = async ({ params }: ClubDetailPageProps) => {
                 </div>
                 <div className="col-span1 lg:col-span-1 ">
                     <ClubContact
-                        clubName={club.name}
                         clubContact={club.contact}
                     />
                 </div>

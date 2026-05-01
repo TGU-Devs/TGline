@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 import { Users, Clock, MapPin } from "lucide-react";
 
@@ -17,17 +18,14 @@ const ClubsList = ({ clubs }: ClubsSectionProps) => {
                     key={club.slug}
                     className="bg-card rounded-2xl overflow-hidden border border-border shadow-sm hover:shadow-xl hover:shadow-sky-500/5 hover:-translate-y-1 transition-all group"
                 >
-                    {/* サークル画像エリア */}
-                    <div className="relative h-56 bg-muted/20 flex items-center justify-center overflow-hidden">
-                        <div
-                            className={`absolute inset-0 opacity-20 ${club.color.split(" ")[0]}`}
-                        ></div>
-
-                        <span
-                            className={`text-7xl font-black opacity-20 select-none ${club.color.split(" ")[1]}`}
-                        >
-                            {club.name.charAt(4)}
-                        </span>
+                    <div className="relative h-60 bg-primary-foreground flex items-center justify-center overflow-hidden lg:h-70">
+                        <Image
+                            src={club.imgUrl.logo}
+                            alt={`${club.name}の画像`}
+                            fill
+                            className="object-cover transition-transform duration-300 group-hover:scale-105" 
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        />
 
                         <div className="absolute top-4 left-4">
                             <span
@@ -50,7 +48,6 @@ const ClubsList = ({ clubs }: ClubsSectionProps) => {
                         </div>
                     </div>
 
-                    {/* サークル詳細 */}
                     <div className="p-6">
                         <h3 className="text-xl font-black text-foreground mb-3 group-hover:text-primary transition-colors">
                             {club.name}
