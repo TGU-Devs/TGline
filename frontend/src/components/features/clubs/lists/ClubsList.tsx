@@ -29,7 +29,7 @@ const ClubsList = ({ clubs }: ClubsSectionProps) => {
 
                         <div className="absolute top-4 left-4">
                             <span
-                                className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-sm ${club.color}`}
+                                className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-sm ${club.category === "部活動" ? "bg-red-500" : club.category === "サークル・同好会" ? "bg-blue-500" : "bg-green-500"} text-white`}
                             >
                                 {club.category}
                             </span>
