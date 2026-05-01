@@ -1,8 +1,9 @@
 puts "Creating dummy users..."
 
 if Rails.env.development?
+  Post.destroy_all
   User.destroy_all
-  puts "Cleared existing users"
+  puts "Cleared existing users and posts"
 end
 
 if Rails.env.development?
@@ -46,6 +47,7 @@ if Rails.env.development?
       u.display_name = user_data[:display_name]
       u.role = user_data[:role]
     end
+    user.update!(email_verified_at: Time.current) unless user.email_verified_at
     puts "Created/Updated user: #{user.display_name} (#{user.email})"
   end
 
