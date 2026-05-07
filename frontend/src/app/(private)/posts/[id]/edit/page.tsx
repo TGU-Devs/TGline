@@ -23,6 +23,8 @@ export default function PostEditPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [selectedImages, setSelectedImages] = useState<File[]>([]);
+    const [removedImageIds, setRemovedImageIds] = useState<number[]>([]);
 
     const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
 
@@ -74,19 +76,27 @@ export default function PostEditPage() {
 
         try {
             setIsSaving(true);
+            const formData = new FormData();
+            formData.append("post[title]", title.trim());
+            formData.append("post[body]", body.trim());
+            if (selectedTagIds.length > 0) {
+                selectedTagIds.forEach((tagId) => {
+                    formData.append("post[tag_ids][]", String(tagId));
+                });
+            } else {
+                formData.append("post[tag_ids][]", "");
+            }
+            selectedImages.forEach((image) => {
+                formData.append("post[images][]", image);
+            });
+            removedImageIds.forEach((imageId) => {
+                formData.append("post[remove_image_ids][]", String(imageId));
+            });
+
             const res = await fetch(`/api/posts/${params.id}`, {
                 method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                },
                 credentials: "include",
-                body: JSON.stringify({
-                    post: {
-                        title: title.trim(),
-                        body: body.trim(),
-                        tag_ids: selectedTagIds,
-                    },
-                }),
+                body: formData,
             });
 
             if (!res.ok) {
@@ -132,6 +142,11 @@ export default function PostEditPage() {
                     setBody={setBody}
                     selectedTagIds={selectedTagIds}
                     setSelectedTagIds={setSelectedTagIds}
+                    selectedImages={selectedImages}
+                    setSelectedImages={setSelectedImages}
+                    existingImages={post.images}
+                    removedImageIds={removedImageIds}
+                    setRemovedImageIds={setRemovedImageIds}
                     isSubmitting={isSaving}
                     cancelUrl={`/posts/${params.id}?${searchParams.toString()}`}
                     formErrors={FormErrors}
