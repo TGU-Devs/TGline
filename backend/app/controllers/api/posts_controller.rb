@@ -164,7 +164,7 @@ module Api
     end
 
     def public_backend_url
-      ENV.fetch('NEXT_PUBLIC_API_URL', request.base_url).delete_suffix('/')
+      ENV.fetch('BACKEND_PUBLIC_URL', request.base_url).delete_suffix('/')
     end
   end
 end
