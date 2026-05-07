@@ -122,7 +122,7 @@ module Api
     def purge_removed_images
       return if normalized_remove_image_ids.empty?
 
-      @post.images.attachments.where(id: normalized_remove_image_ids).find_each(&:purge_later)
+      @post.images.attachments.where(id: normalized_remove_image_ids).find_each(&:purge)
     end
 
     # 投稿レスポンス形式
