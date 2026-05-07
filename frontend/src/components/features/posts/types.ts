@@ -21,8 +21,17 @@ export type Post = {
     likes_count: number;
     current_user_liked: boolean;
     comments_count: number;
+    images: PostImage[];
     created_at: string;
     updated_at: string;
+};
+
+export type PostImage = {
+    id: number;
+    url: string;
+    filename: string;
+    content_type: string;
+    byte_size: number;
 };
 
 export type Comment = {
