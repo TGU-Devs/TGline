@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { User, Calendar, Heart, MessageCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -46,6 +47,8 @@ const PostList = ({
     page,
     isLoadingMore,
 }: PostListProps) => {
+    const router = useRouter();
+
     return (
         <div className="space-y-4">
             {posts.map((post) => {
@@ -75,12 +78,28 @@ const PostList = ({
                             </div>
                         )}
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
-                            <div className="flex items-center gap-1.5">
+                            <button
+                                type="button"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    
+                                    if (!isAuthenticated) {
+                                        setShowLoginModal(true);
+                                        return;
+                                    }
+
+                                    if (post.user?.id) {
+                                        router.push(`/users/${post.user.id}`);
+                                    }
+                                }}
+                                className="flex items-center gap-1.5 hover:text-primary transition-colors cursor-pointer"
+                            >
                                 <div className="w-5 h-5 bg-primary/15 rounded-full flex items-center justify-center">
                                     <User className="h-3 w-3 text-primary" />
                                 </div>
                                 <span>{post.user?.display_name || "匿名"}</span>
-                            </div>
+                            </button>
                             <div className="flex items-center gap-1">
                                 <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
                                 <span className="break-all">
