@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/contexts/UserContext";
 
 import DeleteAccountModal from "@/components/features/settings/security/DeleteAccountModal";
 import ReturnSettingsBtn from "@/components/features/settings/security/ReturnSettingsBtn";
@@ -36,29 +37,13 @@ const DeleteAccountPage = () => {
     const [errors, setErrors] = useState<FormErrors>({});
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
-    const [isOAuthUser, setIsOAuthUser] = useState(false);
     const [showDeletedToast, setShowDeletedToast] = useState(false);
     const [showErrorToast, setShowErrorToast] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
 
     const router = useRouter();
-
-    useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const res = await fetch("/api/users/me");
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data.provider) {
-                        setIsOAuthUser(true);
-                    }
-                }
-            } catch (error) {
-                console.error("ユーザー情報取得エラー:", error);
-            }
-        };
-        fetchUser();
-    }, []);
+    const { user } = useUser();
+    const isOAuthUser = !!user?.provider;
 
     const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = e.target;
