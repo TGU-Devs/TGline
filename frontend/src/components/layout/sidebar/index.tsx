@@ -13,8 +13,7 @@ import type { MenuItem } from "./types";
 
 const baseMenuList: MenuItem[] = [
     { name: "投稿一覧", path: "/posts", icon: Home },
-    { name: "授業評価", path: "/courses", icon: BookOpen },
-    { name: "通知", path: "/notifications", icon: Bell },
+    //{ name: "通知", path: "/notifications", icon: Bell },
     { name: "TGカレンダー", path: "/calendar", icon: Calendar },
     { name: "外部サイト", path: "/external", icon: ExternalLink },
     { name: "お問い合わせ", path: "/contact", icon: MessageSquare },
