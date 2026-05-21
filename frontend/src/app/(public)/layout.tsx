@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { UserProvider } from "@/contexts/UserContext";
+import { UserProvider, useUser } from "@/contexts/UserContext";
 import Sidebar from "@/components/layout/sidebar";
 import MobileNav from "@/components/layout/sidebar/MobileNav";
 import Logo from "@/components/layout/sidebar/Logo";
+import Header from "@/components/layout/sidebar/Header";
 
 type AuthState = "loading" | "authenticated" | "unauthenticated";
 
@@ -14,8 +15,17 @@ export default function PublicLayout({
 }: {
   children: React.ReactNode;
 }) {
+  return (
+    <UserProvider>
+      <LayoutContent>{children}</LayoutContent>
+    </UserProvider>
+  );
+}
+
+function LayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [authState, setAuthState] = useState<AuthState>("loading");
+  const { user: currentUser, isLoading } = useUser();
 
   useEffect(() => {
     // ランディングページでは認証チェック不要
@@ -53,11 +63,17 @@ export default function PublicLayout({
   if (authState === "authenticated") {
     return (
       <UserProvider>
-        <div className="lg:flex">
-          <Sidebar />
-          <main className="pt-16 min-h-screen lg:min-h-0 lg:flex-1 lg:pb-0">
-            {children}
-          </main>
+        <div className="flex flex-col min-h-screen bg-white">
+          <Header currentUser={currentUser} isLoading={isLoading} />
+          <div className="flex flex-1 bg-white">
+            <Sidebar />
+            <main className="flex-1 p-0 overflow-y-auto bg-white [&>*]:mt-0 [&>*]:pt-0">
+              <div className="pt-6">
+                {children}
+              </div>
+            </main>
+          </div>
+
         </div>
       </UserProvider>
     );

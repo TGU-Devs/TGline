@@ -20,10 +20,11 @@ const DesktopSidebar = ({
     isLoading,
 }: DesktopSidebarProps) => {
     return (
-        <aside className="hidden lg:flex w-64 bg-sidebar border-r border-sidebar-border h-screen flex-col sticky top-0">
-            <Logo isDesktop={true} />
-            <UserProfile currentUser={currentUser} isLoading={isLoading} />
-            <MenuList menuList={menuList} pathname={pathname} />
+        <aside className="hidden lg:flex w-64 bg-white border-r border-gray-100 h-[calc(100vh-64px)] flex-col sticky top-16 px-4 pb-4 pt-4">
+            {/*<UserProfile currentUser={currentUser} isLoading={isLoading} />*/}
+            <div className="flex-1">
+                <MenuList menuList={menuList} pathname={pathname} />
+            </div>
             <LogoutButton isDesktop={true} />
         </aside>
     );

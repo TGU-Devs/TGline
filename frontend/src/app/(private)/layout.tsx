@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { UserProvider } from "@/contexts/UserContext";
-
+import { UserProvider, useUser } from "@/contexts/UserContext";
+import Header from "@/components/layout/sidebar/Header";
 import Sidebar from "@/components/layout/sidebar";
 
 export default function PrivateLayout({
@@ -58,10 +58,20 @@ export default function PrivateLayout({
     // 認証済みの場合は子コンポーネントを表示
     return (
         <UserProvider>
-            <div className="lg:flex">
-                <Sidebar />
-                <main className="pt-16 min-h-screen lg:min-h-0 lg:flex-1 lg:pb-0 ">{children}</main>
+            <div className="flex flex-col min-h-screen bg-white">
+                <PrivateLayoutHeaderContent/>
+                <div className="flex flex-1 bg-white">
+                    <Sidebar />
+                    <main className="flex-1 p-0 overflow-y-auto bg-slate-50 [&>*]:mt-0 [&>*]:pt-0">
+                        {children}
+                    </main>
+                </div>
             </div>
         </UserProvider>
     );
+}
+
+function PrivateLayoutHeaderContent() {
+    const { user: currentUser, isLoading } = useUser();
+    return <Header currentUser={currentUser} isLoading={isLoading} />;
 }
