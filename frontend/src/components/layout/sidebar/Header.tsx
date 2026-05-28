@@ -47,14 +47,31 @@ const Header = ({ currentUser, isLoading }: HeaderProps) => {
                     {isNotificationOpen && (
                         <div className="absolute right-0 mt-2 w-72 rounded-2xl border border-gray-100 bg-white p-4 shadow-xl z-50">
                             {/* ヘッダー部分 */}
-                            <div className="pb-2 border-b border-gray-50">
+                            <div className="flex items-center justify-between pb-2 border-b border-gray-50">
                                 <span className="font-bold text-gray-800 text-sm">通知</span>
+                                <button 
+                                    onClick={() => {
+                                        console.log("すべての通知を既読にしました");
+                                    }}
+                                    className="text-xs font-semibold text-blue-500 hover:underline cursor-pointer"
+                                >
+                                    すべて既読にする
+                                </button>
                             </div>
 
                             <div className="py-6 text-center">
                                 <p className="text-xs text-gray-400 font-medium">
                                     通知機能は準備中です
                                 </p>
+                            </div>
+                            <div className="pt-2 text-center border-t border-gray-50">
+                                <Link 
+                                    href="/notifications" 
+                                    onClick={() => setIsNotificationOpen(false)} // ★ クリックしたら閉じる
+                                    className="text-xs font-bold text-blue-500 hover:underline block w-full py-1"
+                                >
+                                    すべての通知を見る
+                                </Link>
                             </div>
                         </div>
                     )}
