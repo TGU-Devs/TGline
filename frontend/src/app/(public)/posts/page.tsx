@@ -120,8 +120,16 @@ export default function PostsPage() {
     );
 
     const prevAuthRef = useRef<boolean | null>(null);
+    const isFirstRenderRef = useRef(true);
 
     useEffect(() => {
+        if (isFirstRenderRef.current) {
+            isFirstRenderRef.current = false;
+            prevAuthRef.current = isAuthenticated;
+            fetchPosts();
+            return;
+        }
+
         const authChanged = prevAuthRef.current !== isAuthenticated;
         prevAuthRef.current = isAuthenticated;
 
