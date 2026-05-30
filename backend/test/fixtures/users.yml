@@ -1,0 +1,49 @@
+one:
+  email: one@example.com
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'Password1') %>
+  display_name: One User
+  role: user
+  email_verified_at: <%= Time.current %>
+  provider:
+  uid:
+  deleted_at:
+
+two:
+  email: two@example.com
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'Password1') %>
+  display_name: Two User
+  role: user
+  email_verified_at: <%= Time.current %>
+  provider:
+  uid:
+  deleted_at:
+
+verified_user:
+  email: verified@example.com
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'Password1') %>
+  display_name: Verified User
+  role: user
+  email_verified_at: <%= Time.current %>
+  provider:
+  uid:
+  deleted_at:
+
+unverified_user:
+  email: unverified@example.com
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'Password1') %>
+  display_name: Unverified User
+  role: user
+  email_verified_at:
+  provider:
+  uid:
+  deleted_at:
+
+google_user:
+  email: google@example.com
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'Password1') %>
+  display_name: Google User
+  role: user
+  email_verified_at: <%= Time.current %>
+  provider: google_oauth2
+  uid: google-uid-123
+  deleted_at:
