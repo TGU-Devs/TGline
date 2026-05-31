@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 import { MessageCircle, Send, Trash2, User } from "lucide-react";
 
@@ -166,13 +167,27 @@ const CommentSection = ({
                         >
                             <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
-                                    <div className="w-5 h-5 bg-primary/15 rounded-full flex items-center justify-center">
-                                        <User className="h-3 w-3 text-primary" />
-                                    </div>
-                                    <span className="font-medium text-foreground">
-                                        {comment.user?.display_name || "匿名"}
-                                    </span>
-                                    <span>
+                                    {comment.user ? (
+                                        <Link 
+                                            href={`/users/${comment.user.id}`}
+                                            className="flex items-center gap-2 hover:opacity-70 transition-opacity"
+                                        >
+                                            <div className="w-5 h-5 bg-primary/15 rounded-full flex items-center justify-center shrink-0">
+                                                <User className="h-3 w-3 text-primary" />
+                                            </div>
+                                            <span className="font-medium text-foreground hover:text-primary transition-colors">
+                                                {comment.user.display_name}
+                                            </span>
+                                        </Link>
+                                    ) : (
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-5 h-5 bg-primary/15 rounded-full flex items-center justify-center shrink-0">
+                                                <User className="h-3 w-3 text-primary" />
+                                            </div>
+                                            <span className="font-medium text-foreground">匿名</span>
+                                        </div>
+                                    )}
+                                    <span className="ml-1">
                                         {formatDate(comment.created_at)}
                                     </span>
                                 </div>

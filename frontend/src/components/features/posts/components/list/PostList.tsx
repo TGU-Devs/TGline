@@ -90,7 +90,7 @@ const PostList = ({
                                     }
 
                                     if (post.user?.id) {
-                                        router.push(`/users/${post.user.id}`);
+                                        router.push(`/users/${post.user.id}?from=posts`);
                                     }
                                 }}
                                 className="flex items-center gap-1.5 hover:text-primary transition-colors cursor-pointer"

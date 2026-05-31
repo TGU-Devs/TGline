@@ -68,6 +68,7 @@ module Api
           comments: user.comments.map do |comment|
             {
               id: comment.id,
+              post_id: comment.post_id,
               body: comment.body,
               created_at: comment.created_at.iso8601,
               post_title: comment.post&.title
