@@ -40,7 +40,7 @@ const Header = ({ currentUser, isLoading }: HeaderProps) => {
                         type="button"
                         onClick={() => setIsNotificationOpen(!isNotificationOpen)}
                         className="relative flex items-center justify-center p-2 text-gray-500 hover:bg-gray-100 rounded-full cursor-pointer transition-colors"
-                        aria-label="Open notifications"
+                        aria-label="通知を開く"
                     >
                         <Bell className="w-6 h-6" />
                     </button>
