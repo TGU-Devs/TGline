@@ -52,7 +52,7 @@ const MobileNav = ({
                         type="button"
                         onClick={toggleMenu}
                         className="p-2  rounded-md transition-colors active:scale-90"
-                        aria-label="Toggle Menu"
+                        aria-label="メニューを開閉"
                         aria-controls="mobile-nav-menu"
                         aria-expanded={isMenuOpen}
                     >
@@ -89,7 +89,7 @@ const MobileNav = ({
                             type="button"
                             onClick={toggleMenu}
                             className="p-1 hover:bg-sidebar-border"
-                            aria-label={isMenuOpen ? "Close Menu" : "Open Menu"}
+                            aria-label={isMenuOpen ? "メニューを閉じる" : "メニューを開く"}
                             aria-controls="mobile-nav-menu"
                         >
                             <X size={20} />
