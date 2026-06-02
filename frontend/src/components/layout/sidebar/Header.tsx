@@ -36,9 +36,11 @@ const Header = ({ currentUser, isLoading }: HeaderProps) => {
             <div id="header-user-actions" className="relative flex items-center gap-6">
                 
                 <div ref={dropdownRef} className="relative">
-                    <button 
+                    <button
+                        type="button"
                         onClick={() => setIsNotificationOpen(!isNotificationOpen)}
                         className="relative flex items-center justify-center p-2 text-gray-500 hover:bg-gray-100 rounded-full cursor-pointer transition-colors"
+                        aria-label="通知を開く"
                     >
                         <Bell className="w-6 h-6" />
                     </button>
@@ -49,7 +51,8 @@ const Header = ({ currentUser, isLoading }: HeaderProps) => {
                             {/* ヘッダー部分 */}
                             <div className="flex items-center justify-between pb-2 border-b border-gray-50">
                                 <span className="font-bold text-gray-800 text-sm">通知</span>
-                                <button 
+                                <button
+                                    type="button"
                                     onClick={() => {
                                         console.log("すべての通知を既読にしました");
                                     }}

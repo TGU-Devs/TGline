@@ -32,6 +32,10 @@ const MobileNav = ({
         } else {
             document.body.style.overflow = "";
         }
+
+        return () => {
+            document.body.style.overflow = "";
+        };
     }, [isMenuOpen]);
 
     const toggleMenu = () => {
@@ -45,6 +49,7 @@ const MobileNav = ({
 
                 {currentUser && (
                     <button
+                        type="button"
                         onClick={toggleMenu}
                         className="p-2  rounded-md transition-colors active:scale-90"
                         aria-label="Toggle Menu"
@@ -81,6 +86,7 @@ const MobileNav = ({
                             <Bell size={20} />
                         </Link>
                         <button
+                            type="button"
                             onClick={toggleMenu}
                             className="p-1 hover:bg-sidebar-border"
                             aria-label={isMenuOpen ? "Close Menu" : "Open Menu"}
