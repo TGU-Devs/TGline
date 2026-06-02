@@ -51,7 +51,7 @@ const MobileNav = ({
                     <button
                         type="button"
                         onClick={toggleMenu}
-                        className="p-2  rounded-md transition-colors active:scale-90"
+                        className="p-2 rounded-md transition-colors active:scale-90"
                         aria-label="メニューを開閉"
                         aria-controls="mobile-nav-menu"
                         aria-expanded={isMenuOpen}
