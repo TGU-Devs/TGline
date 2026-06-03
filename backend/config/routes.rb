@@ -15,7 +15,6 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "posts#index"
   namespace :api do
-    get "time", to: "time#index"
 
     # 認証・ユーザー関連
     namespace :users do
@@ -28,6 +27,8 @@ Rails.application.routes.draw do
       patch "password", to: "passwords#update"
       post "password_reset", to: "password_resets#create"
       patch "password_reset", to: "password_resets#update"
+      post "email_verification", to: "email_verifications#create"
+      patch "email_verification", to: "email_verifications#update"
       delete "me", to: "me#destroy"
     end
     resources :users, only: [:index, :show]

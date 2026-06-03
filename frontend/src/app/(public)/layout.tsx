@@ -1,14 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { UserProvider, useUser } from "@/contexts/UserContext";
 import Sidebar from "@/components/layout/sidebar";
 import MobileNav from "@/components/layout/sidebar/MobileNav";
 import Logo from "@/components/layout/sidebar/Logo";
 import Header from "@/components/layout/sidebar/Header";
-
-type AuthState = "loading" | "authenticated" | "unauthenticated";
 
 export default function PublicLayout({
   children,
@@ -47,8 +44,20 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
+  return <PublicLayoutContent pathname={pathname}>{children}</PublicLayoutContent>;
+}
+
+function PublicLayoutContent({
+  pathname,
+  children,
+}: {
+  pathname: string;
+  children: React.ReactNode;
+}) {
+  const { user, isLoading } = useUser();
+
   // ローディング中
-  if (authState === "loading") {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -60,7 +69,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   }
 
   // 認証済み: Sidebar 付きレイアウト（private layout と同じ見た目）
-  if (authState === "authenticated") {
+  if (user) {
     return (
       <UserProvider>
         <div className="flex flex-col min-h-screen bg-white">

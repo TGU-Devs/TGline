@@ -7,16 +7,15 @@ module Api
     # postが存在するかどうかを確認するメソッド
     before_action :set_post, only: [:show, :update, :destroy]
 
-    # GET /posts
-    # 投稿一覧を取得（認証不要）
+
     def index
       per_page = 20
       page = (params[:page] || 1).to_i
       liked_only = ActiveModel::Type::Boolean.new.cast(params[:liked])
 
-      posts = Post.active.includes(:user, :tags, :likes, :comments).order(created_at: :desc)
+      posts = Post.active.with_attached_images.includes(:user, :tags, :likes, :comments).order(created_at: :desc)
 
-      # いいね済み投稿のみ表示（認証必須）
+
       if liked_only
         unless current_user
           render json: { errors: ['Authentication required'] }, status: :unauthorized
@@ -26,7 +25,7 @@ module Api
         posts = posts.joins(:likes).where(likes: { user_id: current_user.id }).reorder("likes.created_at DESC")
       end
 
-      # カテゴリで絞り込み
+
       # もしクエリパラメーターがあれば、そのカテゴリの投稿を取得して上書き
       if params[:category].present?
         category_value = Tag.categories[params[:category]]
@@ -48,17 +47,16 @@ module Api
       }, status: :ok
     end
 
-    # GET /posts/:id
-    # 投稿詳細を取得（認証必須）
+
     def show
       render json: post_response(@post), status: :ok
     end
 
-    # POST /posts
-    # 投稿を作成（認証必須、ログインユーザーのみ）
+
     def create
-      post = current_user.posts.build(post_params.except(:tag_ids))
-      post.tag_ids = post_params[:tag_ids] if post_params[:tag_ids].present?
+      post = current_user.posts.build(post_params.except(:tag_ids, :images, :remove_image_ids))
+      post.tag_ids = normalized_tag_ids if post_params.key?(:tag_ids)
+      post.images.attach(post_params[:images]) if post_params[:images].present?
 
       if post.save
         render json: post_response(post), status: :created
@@ -72,17 +70,25 @@ module Api
     def update
       authorize_owner!(@post)
 
-      @post.tag_ids = post_params[:tag_ids] if post_params.key?(:tag_ids)
+      @post.tag_ids = normalized_tag_ids if post_params.key?(:tag_ids)
+      @post.assign_attributes(post_params.except(:tag_ids, :images, :remove_image_ids))
 
-      if @post.update(post_params.except(:tag_ids))
+      unless @post.valid?
+        render json: { errors: @post.errors }, status: :unprocessable_entity
+        return
+      end
+
+      purge_removed_images
+      @post.images.attach(post_params[:images]) if post_params[:images].present?
+
+      if @post.save
         render json: post_response(@post.reload), status: :ok
       else
         render json: { errors: @post.errors }, status: :unprocessable_entity
       end
     end
 
-    # DELETE /posts/:id
-    # 投稿を論理削除（認証必須、所有者または管理者のみ）
+
     def destroy
       authorize_owner_or_admin!(@post)
 
@@ -102,7 +108,21 @@ module Api
 
     # Strong Parameters
     def post_params
-      params.require(:post).permit(:title, :body, tag_ids: [])
+      params.require(:post).permit(:title, :body, tag_ids: [], images: [], remove_image_ids: [])
+    end
+
+    def normalized_tag_ids
+      Array(post_params[:tag_ids]).reject(&:blank?)
+    end
+
+    def normalized_remove_image_ids
+      Array(post_params[:remove_image_ids]).reject(&:blank?)
+    end
+
+    def purge_removed_images
+      return if normalized_remove_image_ids.empty?
+
+      @post.images.attachments.where(id: normalized_remove_image_ids).find_each(&:purge)
     end
 
     # 投稿レスポンス形式
@@ -125,9 +145,26 @@ module Api
         likes_count: post.likes.size,
         current_user_liked: post.likes.any? { |l| l.user_id == current_user&.id },
         comments_count: post.comments.count { |c| c.deleted_at.nil? },
+        images: image_response(post),
         created_at: post.created_at.iso8601,
         updated_at: post.updated_at.iso8601
       }
+    end
+
+    def image_response(post)
+      post.images.map do |image|
+        {
+          id: image.id,
+          url: "#{public_backend_url}#{rails_blob_path(image, only_path: true)}",
+          filename: image.filename.to_s,
+          content_type: image.content_type,
+          byte_size: image.byte_size
+        }
+      end
+    end
+
+    def public_backend_url
+      ENV.fetch('BACKEND_PUBLIC_URL', request.base_url).delete_suffix('/')
     end
   end
 end

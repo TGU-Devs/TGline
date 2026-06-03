@@ -15,6 +15,7 @@ export default function PostNewPage() {
     const [title, setTitle] = useState("");
     const [body, setBody] = useState("");
     const [isCreating, setIsCreating] = useState(false);
+    const [selectedImages, setSelectedImages] = useState<File[]>([]);
     const [selectedTagIds, setSelectedTagIds] = useState<number[]>(() => {
         const tagId = searchParams.get("tag_id");
         return tagId ? [Number(tagId)] : [];
@@ -32,19 +33,24 @@ export default function PostNewPage() {
 
         try {
             setIsCreating(true);
+            const formData = new FormData();
+            formData.append("post[title]", title.trim());
+            formData.append("post[body]", body.trim());
+            if (selectedTagIds.length > 0) {
+                selectedTagIds.forEach((tagId) => {
+                    formData.append("post[tag_ids][]", String(tagId));
+                });
+            } else {
+                formData.append("post[tag_ids][]", "");
+            }
+            selectedImages.forEach((image) => {
+                formData.append("post[images][]", image);
+            });
+
             const res = await fetch("/api/posts", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
                 credentials: "include",
-                body: JSON.stringify({
-                    post: {
-                        title: title.trim(),
-                        body: body.trim(),
-                        tag_ids: selectedTagIds,
-                    },
-                }),
+                body: formData,
             });
 
             if (!res.ok) {
@@ -85,6 +91,8 @@ export default function PostNewPage() {
                     setBody={setBody}
                     selectedTagIds={selectedTagIds}
                     setSelectedTagIds={setSelectedTagIds}
+                    selectedImages={selectedImages}
+                    setSelectedImages={setSelectedImages}
                     isSubmitting={isCreating}
                     cancelUrl={`/posts?${searchParams.toString()}`}
                     formErrors={FormErrors}

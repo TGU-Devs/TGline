@@ -10,6 +10,7 @@ import  formatDate  from "@/utils/formatDate";
 import { linkify } from "@/utils/linkify";
 import Modal from "@/components/ui/Modal";
 import { Button } from "@/components/ui/button";
+import { getPostImageUrl } from "@/components/features/posts/utils/imageUrl";
 
 import type { Post } from "@/components/features/posts/types";
 
@@ -189,6 +190,19 @@ const PostDetailCard = ({ post, setPost }: PostDetailCardProps) => {
                     </div>
                 )}
             </div>
+
+            {post.images && post.images.length > 0 && (
+                <div className="mb-5 grid gap-3 sm:grid-cols-2">
+                    {post.images.map((image) => (
+                        <img
+                            key={image.id}
+                            src={getPostImageUrl(image.url)}
+                            alt={image.filename}
+                            className="max-h-[520px] w-full rounded-2xl object-cover"
+                        />
+                    ))}
+                </div>
+            )}
 
             {/* 本文 */}
             <div className="prose max-w-none">

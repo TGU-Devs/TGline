@@ -2,10 +2,7 @@
 
 module Api
   module Users
-    # パスワード変更用コントローラー
     class PasswordsController < ApplicationController
-      # PATCH /users/password
-      # 現在のパスワードを検証して新しいパスワードに変更
       def update
         if current_user.provider.present?
           return render json: { error: "ソーシャルログインユーザーはパスワードを変更できません" }, status: :forbidden

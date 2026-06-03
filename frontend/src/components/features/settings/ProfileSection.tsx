@@ -65,9 +65,13 @@ const ProfileSection = ({
                             id="email"
                             value={formValues.email}
                             onChange={onchangeHandler}
-                            className="w-full px-4 py-3 rounded-xl border bg-slate-50 border-slate-200 focus:ring-2 focus:ring-sky-500 outline-none transition-all"
+                            disabled
+                            className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none transition-all bg-slate-100 text-slate-500 cursor-not-allowed"
                             required
                         />
+                        <p className="text-slate-500 text-sm mt-1">
+                            現在、メールアドレスの変更はできません。
+                        </p>
                         {formErrors.email && (
                             <p className="text-red-500 text-sm mt-1">
                                 {formErrors.email}

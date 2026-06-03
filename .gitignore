@@ -1,10 +1,11 @@
 # Production environment secrets
 .env
-
+.env.local
 
 # Legacy env files (now consolidated to root)
 backend/.env
 frontend/.env
+
 
 # OS files
 .DS_Store

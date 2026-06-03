@@ -33,13 +33,6 @@ export default function PrivacyPage() {
                 <li>投稿内容（テキスト）</li>
                 <li>Google認証情報（Google OAuthを利用した場合）</li>
               </ul>
-              <h3 className="font-semibold text-foreground mb-2">自動的に収集する情報</h3>
-              <ul className="list-disc pl-6 space-y-1">
-                <li>IPアドレス</li>
-                <li>ブラウザの種類・バージョン</li>
-                <li>アクセス日時</li>
-                <li>Cookie情報（認証トークンの管理に使用）</li>
-              </ul>
             </section>
 
             <section>
@@ -59,7 +52,7 @@ export default function PrivacyPage() {
               <p>
                 本サービスでは、認証状態の維持のためにCookie（httpOnly Cookie）を使用しています。
                 このCookieにはJWTトークンが含まれ、ログイン状態の管理に使用されます。
-                ブラウザの設定でCookieを無効にした場合、本サービスの一部機能が利用できなくなります。
+                そのためブラウザの設定でCookieを無効にした場合、本サービスの一部機能が利用できなくなります。
               </p>
             </section>
 
@@ -109,7 +102,7 @@ export default function PrivacyPage() {
               <p>
                 アカウントやコンテンツの削除は論理削除方式で管理されます。
                 削除後もデータはデータベース上に保持されますが、サービス上では表示されなくなります。
-                論理削除されたデータは、削除日から1年経過後に物理削除される場合があります。
+                論理削除されたデータは、削除日から1年経過後に物理削除されます。
               </p>
             </section>
 
@@ -133,7 +126,7 @@ export default function PrivacyPage() {
               <p>
                 運営は、必要に応じて本ポリシーを変更できるものとします。
                 重要な変更がある場合は、本サービス内での通知またはメールでお知らせします。
-                変更後も本サービスの利用を継続した場合、利用者は変更後のポリシーに同意��たものとみなします。
+                変更後も本サービスの利用を継続した場合、利用者は変更後のポリシーに同意したものとみなします。
               </p>
             </section>
 

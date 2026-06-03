@@ -96,19 +96,20 @@ const SettingsPage = () => {
         setFormErrors({});
 
         try {
+            const payload = {
+                user: {
+                    display_name: formValues.display_name,
+                    description: formValues.description,
+                },
+            };
+
             const res = await fetch("/api/users/me", {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 credentials: "include",
-                body: JSON.stringify({
-                    user: {
-                        display_name: formValues.display_name,
-                        email: formValues.email,
-                        description: formValues.description,
-                    },
-                }),
+                body: JSON.stringify(payload),
             });
             if (res.ok) {
                 setShowSaveToast(true);
@@ -131,18 +132,11 @@ const SettingsPage = () => {
 
     const validateForm = (values: FormValues) => {
         const errors: Errors = {};
-        const emailRegex =
-            /^[a-zA-Z0-9_.+-]+@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/;
 
         if (!values.display_name.trim()) {
             errors.display_name = "ユーザー名を入力してください。";
         }
 
-        if (!values.email.trim()) {
-            errors.email = "メールアドレスを入力してください。";
-        } else if (!emailRegex.test(values.email)) {
-            errors.email = "正しいメールアドレスを入力してください。";
-        }
         return errors;
     };
 
