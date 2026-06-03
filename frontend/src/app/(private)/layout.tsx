@@ -44,11 +44,11 @@ export default function PrivateLayout({
 
     // 認証済みの場合は子コンポーネントを表示
     return (
-        <UserProvider>
-            <div className="lg:flex">
-                <Sidebar />
-                <main className="pt-16 min-h-screen lg:min-h-0 lg:flex-1 lg:pt-0 ">{children}</main>
-            </div>
-        </UserProvider>
+        <div className="lg:flex">
+            <Sidebar />
+            <main className="pt-16 min-h-screen lg:min-h-0 lg:flex-1 lg:pt-0 ">
+                {children}
+            </main>
+        </div>
     );
 }
