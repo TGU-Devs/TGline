@@ -12,7 +12,7 @@ import { useStatusToast } from "@/hooks/useStatusToast";
 import Loading from "@/components/ui/Loading";
 import ErrorUi from "@/components/features/posts/components/form/Error";
 import Toast from "@/components/ui/Toast";
-import TopButton from "@/components/features/posts/components/shared/TopButton";
+import BackButton from "@/components/features/posts/components/shared/BackButton";
 import PostDetailCard from "@/components/features/posts/components/detail/PostDetailCard";
 import CommentSection from "@/components/features/posts/components/detail/CommentSection";
 
@@ -36,7 +36,6 @@ export default function PostDetailPage() {
         created: { message: "新しい投稿が作成されました。" },
         updated: { message: "投稿が編集されました。" },
     });
-
 
     const fetchPost = async (id: string) => {
         try {
@@ -80,6 +79,9 @@ export default function PostDetailPage() {
         );
     }
 
+    const from = searchParams.get("from");
+    const backLabel = from === "profile" ? "プロフィールに戻る" : "一覧に戻る";
+
     return (
         <div className="min-h-screen bg-background py-4 sm:py-8">
             {showToast && (
@@ -93,7 +95,7 @@ export default function PostDetailPage() {
 
             <div className="max-w-4xl mx-auto px-4 sm:px-6">
                 {/* 戻るボタン */}
-                <TopButton searchParams={searchParams} message="一覧に戻る" />
+                <BackButton fallbackUrl={from === "profile" ? "/users/[id]" : "/posts"} label={backLabel} />
 
                 {/* 投稿カード */}
                 <PostDetailCard post={post} setPost={setPost} />

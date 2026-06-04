@@ -137,10 +137,21 @@ const PostDetailCard = ({ post, setPost }: PostDetailCardProps) => {
                         </div>
                     )}
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-slate-500">
-                        <div className="flex items-center gap-1">
+                        <button
+                            type="button"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+
+                                if (post.user?.id) {
+                                    router.push(`/users/${post.user.id}`);
+                                }
+                            }}
+                            className="flex items-center gap-1 hover:text-primary transition-colors cursor-pointer"
+                        >
                             <User className="h-3 w-3 sm:h-4 sm:w-4" />
                             <span>{post.user?.display_name || "匿名"}</span>
-                        </div>
+                        </button>
                         <div className="flex items-center gap-1">
                             <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
                             <span className="break-all">
@@ -198,7 +209,7 @@ const PostDetailCard = ({ post, setPost }: PostDetailCardProps) => {
                             key={image.id}
                             src={getPostImageUrl(image.url)}
                             alt={image.filename}
-                            className="max-h-[520px] w-full rounded-2xl object-cover"
+                            className="max-h-130 w-full rounded-2xl object-cover"
                         />
                     ))}
                 </div>

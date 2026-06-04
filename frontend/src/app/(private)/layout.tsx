@@ -46,7 +46,9 @@ export default function PrivateLayout({
     return (
         <div className="lg:flex">
             <Sidebar />
-            <main className="pt-16 min-h-screen lg:min-h-0 lg:flex-1 lg:pb-0 ">{children}</main>
+            <main className="pt-16 min-h-screen lg:min-h-0 lg:flex-1 lg:pt-0 ">
+                {children}
+            </main>
         </div>
     );
 }
