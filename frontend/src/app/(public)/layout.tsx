@@ -6,6 +6,7 @@ import { UserProvider, useUser } from "@/contexts/UserContext";
 import Sidebar from "@/components/layout/sidebar";
 import MobileNav from "@/components/layout/sidebar/MobileNav";
 import Logo from "@/components/layout/sidebar/Logo";
+import { useEffect, useState } from "react"; 
 import Header from "@/components/layout/sidebar/Header";
 
 type AuthState = "loading" | "authenticated" | "unauthenticated";
