@@ -5,7 +5,10 @@ import { UserProvider, useUser } from "@/contexts/UserContext";
 import Sidebar from "@/components/layout/sidebar";
 import MobileNav from "@/components/layout/sidebar/MobileNav";
 import Logo from "@/components/layout/sidebar/Logo";
+import { useEffect, useState } from "react"; 
 import Header from "@/components/layout/sidebar/Header";
+
+type AuthState = "loading" | "authenticated" | "unauthenticated";
 
 export default function PublicLayout({
   children,
@@ -54,7 +57,7 @@ function PublicLayoutContent({
   pathname: string;
   children: React.ReactNode;
 }) {
-  const { user, isLoading } = useUser();
+  const { user: currentUser, isLoading } = useUser();
 
   // ローディング中
   if (isLoading) {
@@ -69,7 +72,7 @@ function PublicLayoutContent({
   }
 
   // 認証済み: Sidebar 付きレイアウト（private layout と同じ見た目）
-  if (user) {
+  if (currentUser) {
     return (
       <UserProvider>
         <div className="flex flex-col min-h-screen bg-white">
