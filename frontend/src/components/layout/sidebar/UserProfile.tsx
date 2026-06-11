@@ -1,9 +1,10 @@
 import Link from "next/link";
 
-import { SquarePen } from "lucide-react";
+import { SquarePen,Bell} from "lucide-react";
 import Avatar from "boring-avatars";
 
 import { User } from "@/types/user";
+import { Button } from "@/components/ui/button";
 
 type UserProfileProps = {
     currentUser: User | null;
@@ -14,31 +15,44 @@ const UserProfile = ({ currentUser, isLoading }: UserProfileProps) => {
     return (
         <div className="border-b border-sidebar-border">
             <div className="p-4">
-                <Link href="/settings" className="flex items-center gap-3 mb-4 rounded-xl p-2 -m-2 hover:bg-sidebar-accent/10 transition-colors">
-                    <div className="w-10 h-10 shrink-0 bg-primary rounded-full flex items-center justify-center text-lg text-primary-foreground font-bold shadow-sm">
-                        {currentUser ? (
-                            <Avatar
-                                name={currentUser?.display_name || ""}
-                                variant="beam"
-                                size={60}
-                            />
-                        ) : (
-                            <div className="animate-pulse w-10 h-10 bg-primary/50 rounded-full" />
-                        )}
-                    </div>
-                    <div className="min-w-0">
-                        <h2 className="text-sm font-bold text-sidebar-foreground truncate">
-                            {isLoading
-                                ? "読み込み中..."
-                                : currentUser?.display_name || ""}
-                        </h2>
-                        {currentUser?.role && (
-                            <p className="text-xs text-sidebar-foreground/60 truncate">
-                                {currentUser.role}
-                            </p>
-                        )}
-                    </div>
-                </Link>
+                <div className="flex items-center justify-between mb-4">
+                    <Link href="/settings" className="flex items-center gap-3 mb-4 rounded-xl p-2 -m-2 hover:bg-sidebar-accent/10 transition-colors">
+                        <div className="w-10 h-10 shrink-0 bg-primary rounded-full flex items-center justify-center text-lg text-primary-foreground font-bold shadow-sm">
+                            {currentUser ? (
+                                <Avatar
+                                    name={currentUser?.display_name || ""}
+                                    variant="beam"
+                                    size={60}
+                                />
+                            ) : (
+                                <div className="animate-pulse w-10 h-10 bg-primary/50 rounded-full" />
+                            )}
+                        </div>
+                        <div className="min-w-0">
+                            <h2 className="text-sm font-bold text-sidebar-foreground truncate">
+                                {isLoading
+                                    ? "読み込み中..."
+                                    : currentUser?.display_name || ""}
+                            </h2>
+                            {currentUser?.role && (
+                                <p className="text-xs text-sidebar-foreground/60 truncate">
+                                    {currentUser.role}
+                                </p>
+                            )}
+                        </div>
+                    </Link>
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                        }}
+                        className="relative flex items-center justify-center p-2 text-gray-500 hover:bg-gray-100 rounded-full cursor-pointer"
+                    >
+                        <Bell className="w-6 h-6" />
+                        <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                            3
+                        </span>
+                    </button>
+                </div>  
                 <Link
                     href="/posts/new"
                     className="flex items-center justify-center w-full p-3 bg-primary text-primary-foreground font-medium rounded-xl cursor-pointer hover:bg-primary/90 transition-colors"
