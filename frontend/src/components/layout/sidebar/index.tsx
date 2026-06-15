@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { useUser } from "@/contexts/UserContext";
 
 import { useMemo } from "react";
-import { Home, Settings, Bell, Calendar, MessageSquare, ExternalLink, Shield } from "lucide-react";
+import { Home, Settings, Bell, Calendar, MessageSquare, ExternalLink, Shield, BookOpen } from "lucide-react";
 
 import DesktopSidebar from "./DesktopSidebar";
 import MobileNav from "./MobileNav";
@@ -13,6 +13,7 @@ import type { MenuItem } from "./types";
 
 const baseMenuList: MenuItem[] = [
     { name: "投稿一覧", path: "/posts", icon: Home },
+    { name: "授業評価", path: "/courses", icon: BookOpen },
     { name: "通知", path: "/notifications", icon: Bell },
     { name: "TGカレンダー", path: "/calendar", icon: Calendar },
     { name: "外部サイト", path: "/external", icon: ExternalLink },

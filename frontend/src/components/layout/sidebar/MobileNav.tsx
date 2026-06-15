@@ -39,6 +39,8 @@ const MobileNav = ({
         setIsMenuOpen((prev) => !prev);
     };
 
+    const isActive = (path: string) => pathname === path || pathname.startsWith(`${path}/`);
+
     return (
         <div className="lg:hidden">
             <header className="fixed inset-x-0 top-0 z-40 flex h-16 items-center justify-between border-b border-sidebar-border bg-sidebar px-3 shadow-sm">
@@ -86,7 +88,7 @@ const MobileNav = ({
                                 <Link
                                     href={menu.path}
                                     onClick={toggleMenu}
-                                    className={`flex items-center px-6 py-4 transition-colors ${pathname === menu.path ? "text-sidebar-primary" : "text-muted-foreground"}`}
+                                    className={`flex items-center px-6 py-4 transition-colors ${isActive(menu.path) ? "text-sidebar-primary" : "text-muted-foreground"}`}
                                 >
                                     <menu.icon className="mr-4" />
                                     <span className="text-xs mt-1 font-medium">

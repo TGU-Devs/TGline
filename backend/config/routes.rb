@@ -35,10 +35,19 @@ Rails.application.routes.draw do
     # 管理者用
     namespace :admin do
       get "stats", to: "stats#index"
+      resources :courses, only: [:index, :create, :update]
+      resources :course_offerings, only: [:index, :create, :update]
     end
 
     # タグ関連
     resources :tags, only: [:index]
+
+    # 授業評価関連
+    resources :courses, only: [:index, :show, :create, :update] do
+      resources :course_offerings, only: [:create]
+      resources :reviews, controller: "course_reviews", only: [:index, :create]
+    end
+    resources :course_reviews, only: [:update, :destroy]
 
     # 投稿関連
     resources :posts, only: [:index, :show, :create, :update, :destroy] do

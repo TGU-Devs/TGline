@@ -55,7 +55,7 @@ export default function PublicLayout({
       <UserProvider>
         <div className="lg:flex">
           <Sidebar />
-          <main className="pt-16 min-h-screen lg:min-h-0 lg:flex-1 lg:pb-0">
+          <main className="pt-16 min-h-screen lg:min-h-0 lg:min-w-0 lg:flex-1 lg:pb-0">
             {children}
           </main>
         </div>

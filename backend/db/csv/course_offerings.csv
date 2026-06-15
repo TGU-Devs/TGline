@@ -1,0 +1,3 @@
+name,faculty,department,academic_year,semester,teacher_name,day_of_week,delivery_method,target_grade,period,campus,classroom
+データベース論,情報学部,データサイエンス学科,2026,first,佐藤先生,monday,in_person,second_year,2,土樋キャンパス,101
+OS論,情報学部,データサイエンス学科,2026,second,田中先生,tuesday,remote,all_grades,3,五橋キャンパス,202

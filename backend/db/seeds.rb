@@ -1,3 +1,7 @@
+# frozen_string_literal: true
+
+require_relative "seeds/course_importer"
+
 puts "Creating dummy users..."
 
 if Rails.env.development?
@@ -115,3 +119,6 @@ if Rails.env.development?
 
   puts "Assigned tags to posts!"
 end
+
+puts "Importing course master data..."
+CourseImporter.new.import!
