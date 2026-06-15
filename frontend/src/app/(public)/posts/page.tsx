@@ -7,6 +7,7 @@ import { Trash } from "lucide-react";
 
 import { useStatusToast } from "@/hooks/useStatusToast";
 import { useTags } from "@/components/features/posts/hooks/useTag";
+import { useUser } from "@/contexts/UserContext";
 
 import Loading from "@/components/ui/Loading";
 import ErrorUI from "@/components/ui/ErrorUI";
@@ -24,6 +25,7 @@ type FeedTab = "all" | "liked";
 export default function PostsPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const { user, isLoading: isUserLoading } = useUser();
 
     const { showToast, message } = useStatusToast("/posts", {
         deleted: { message: "投稿が削除されました。" },
@@ -31,9 +33,6 @@ export default function PostsPage() {
 
     const { tags, groupedTags } = useTags();
 
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(
-        null,
-    );
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [posts, setPosts] = useState<Post[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -48,6 +47,7 @@ export default function PostsPage() {
         const tagId = searchParams.get("tag_id");
         return tagId ? Number(tagId) : null;
     });
+    const isAuthenticated = isUserLoading ? null : !!user;
 
     // 選択中のタグを取得
     const selectedTag = tags.find((t) => t.id === selectedTagId);
@@ -119,15 +119,17 @@ export default function PostsPage() {
         [activeTab, isAuthenticated, router, selectedTagId],
     );
 
-    useEffect(() => {
-        fetch("/api/users/me", { credentials: "include" })
-            .then((res) => setIsAuthenticated(res.ok))
-            .catch(() => setIsAuthenticated(false));
-    }, []);
-
     const prevAuthRef = useRef<boolean | null>(null);
+    const isFirstRenderRef = useRef(true);
 
     useEffect(() => {
+        if (isFirstRenderRef.current) {
+            isFirstRenderRef.current = false;
+            prevAuthRef.current = isAuthenticated;
+            fetchPosts();
+            return;
+        }
+
         const authChanged = prevAuthRef.current !== isAuthenticated;
         prevAuthRef.current = isAuthenticated;
 
@@ -230,7 +232,6 @@ export default function PostsPage() {
                 });
 
                 if (res.status === 401) {
-                    setIsAuthenticated(false);
                     setShowLoginModal(true);
                     rollbackLike();
                     return;

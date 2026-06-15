@@ -1,13 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { UserProvider } from "@/contexts/UserContext";
+import { useUser } from "@/contexts/UserContext";
 import Sidebar from "@/components/layout/sidebar";
 import MobileNav from "@/components/layout/sidebar/MobileNav";
 import Logo from "@/components/layout/sidebar/Logo";
-
-type AuthState = "loading" | "authenticated" | "unauthenticated";
 
 export default function PublicLayout({
   children,
@@ -15,30 +12,26 @@ export default function PublicLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const [authState, setAuthState] = useState<AuthState>("loading");
-
-  useEffect(() => {
-    // ランディングページでは認証チェック不要
-    if (pathname === "/") {
-      setAuthState("unauthenticated");
-      return;
-    }
-    fetch("/api/users/me", { credentials: "include" })
-      .then((res) => {
-        setAuthState(res.ok ? "authenticated" : "unauthenticated");
-      })
-      .catch(() => {
-        setAuthState("unauthenticated");
-      });
-  }, [pathname]);
 
   // ランディングページ（/）は独自レイアウトを持つのでそのまま表示
   if (pathname === "/") {
     return <>{children}</>;
   }
 
+  return <PublicLayoutContent pathname={pathname}>{children}</PublicLayoutContent>;
+}
+
+function PublicLayoutContent({
+  pathname,
+  children,
+}: {
+  pathname: string;
+  children: React.ReactNode;
+}) {
+  const { user, isLoading } = useUser();
+
   // ローディング中
-  if (authState === "loading") {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -50,16 +43,14 @@ export default function PublicLayout({
   }
 
   // 認証済み: Sidebar 付きレイアウト（private layout と同じ見た目）
-  if (authState === "authenticated") {
+  if (user) {
     return (
-      <UserProvider>
-        <div className="lg:flex">
-          <Sidebar />
-          <main className="pt-16 min-h-screen lg:min-h-0 lg:min-w-0 lg:flex-1 lg:pb-0">
-            {children}
-          </main>
-        </div>
-      </UserProvider>
+      <div className="lg:flex">
+        <Sidebar />
+        <main className="pt-16 min-h-screen lg:min-h-0 lg:flex-1 lg:pb-0">
+          {children}
+        </main>
+      </div>
     );
   }
 
