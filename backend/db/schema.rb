@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_05_06_000001) do
+ActiveRecord::Schema[7.2].define(version: 2026_06_15_000002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -52,6 +52,67 @@ ActiveRecord::Schema[7.2].define(version: 2026_05_06_000001) do
     t.index ["post_id", "created_at"], name: "index_comments_on_post_id_and_created_at"
     t.index ["post_id"], name: "index_comments_on_post_id"
     t.index ["user_id"], name: "index_comments_on_user_id"
+  end
+
+  create_table "course_offerings", force: :cascade do |t|
+    t.bigint "course_id", null: false
+    t.integer "academic_year", null: false
+    t.integer "semester", null: false
+    t.string "teacher_name", null: false
+    t.integer "day_of_week"
+    t.integer "period"
+    t.string "campus", null: false
+    t.string "classroom", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "delivery_method", default: 0, null: false
+    t.integer "target_grade", default: 0, null: false
+    t.index ["academic_year"], name: "index_course_offerings_on_academic_year"
+    t.index ["course_id", "academic_year", "semester", "teacher_name", "day_of_week", "delivery_method", "target_grade", "period"], name: "index_course_offerings_on_unique_schedule", unique: true
+    t.index ["course_id"], name: "index_course_offerings_on_course_id"
+    t.index ["delivery_method"], name: "index_course_offerings_on_delivery_method"
+    t.index ["semester"], name: "index_course_offerings_on_semester"
+    t.index ["target_grade"], name: "index_course_offerings_on_target_grade"
+  end
+
+  create_table "course_reviews", force: :cascade do |t|
+    t.bigint "course_id", null: false
+    t.bigint "course_offering_id"
+    t.bigint "user_id", null: false
+    t.integer "rating", null: false
+    t.integer "difficulty", null: false
+    t.integer "workload", null: false
+    t.integer "attendance", null: false
+    t.integer "grading", null: false
+    t.text "comment"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "exam_presence", default: 0, null: false
+    t.integer "attendance_check", default: 0, null: false
+    t.boolean "textbook_required", default: false, null: false
+    t.index ["attendance_check"], name: "index_course_reviews_on_attendance_check"
+    t.index ["course_id"], name: "index_course_reviews_on_course_id"
+    t.index ["course_offering_id"], name: "index_course_reviews_on_course_offering_id"
+    t.index ["deleted_at"], name: "index_course_reviews_on_deleted_at"
+    t.index ["exam_presence"], name: "index_course_reviews_on_exam_presence"
+    t.index ["user_id", "course_id"], name: "index_active_course_reviews_on_user_id_and_course_id", unique: true, where: "(deleted_at IS NULL)"
+    t.index ["user_id"], name: "index_course_reviews_on_user_id"
+  end
+
+  create_table "courses", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "faculty", null: false
+    t.string "department", null: false
+    t.string "category"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "created_by_id"
+    t.index ["created_by_id"], name: "index_courses_on_created_by_id"
+    t.index ["department"], name: "index_courses_on_department"
+    t.index ["faculty"], name: "index_courses_on_faculty"
+    t.index ["name", "faculty", "department", "category"], name: "index_courses_on_name_and_faculty_and_department_and_category"
+    t.index ["name"], name: "index_courses_on_name"
   end
 
   create_table "likes", force: :cascade do |t|
@@ -120,6 +181,11 @@ ActiveRecord::Schema[7.2].define(version: 2026_05_06_000001) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "comments", "posts"
   add_foreign_key "comments", "users"
+  add_foreign_key "course_offerings", "courses"
+  add_foreign_key "course_reviews", "course_offerings"
+  add_foreign_key "course_reviews", "courses"
+  add_foreign_key "course_reviews", "users"
+  add_foreign_key "courses", "users", column: "created_by_id"
   add_foreign_key "likes", "posts"
   add_foreign_key "likes", "users"
   add_foreign_key "post_tags", "posts"

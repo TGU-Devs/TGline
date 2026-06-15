@@ -10,6 +10,7 @@ type MenuListProps = {
 
 
 const MenuList = ({ menuList, pathname }: MenuListProps) => {
+    const isActive = (path: string) => pathname === path || pathname.startsWith(`${path}/`);
 
     return (
         <nav className="flex-1 border-b border-sidebar-border">
@@ -23,7 +24,7 @@ const MenuList = ({ menuList, pathname }: MenuListProps) => {
                                     <Link
                                         href={menu.path}
                                         className={`flex items-center p-3 h-10 font-medium rounded-xl transition-colors ${
-                                            pathname === menu.path
+                                            isActive(menu.path)
                                                 ? "bg-primary text-sidebar-primary-foreground shadow-sm"
                                                 : "text-sidebar-foreground hover:bg-sidebar-accent/10"
                                         }`}

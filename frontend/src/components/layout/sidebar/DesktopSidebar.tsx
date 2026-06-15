@@ -20,7 +20,7 @@ const DesktopSidebar = ({
     isLoading,
 }: DesktopSidebarProps) => {
     return (
-        <aside className="hidden lg:flex w-64 bg-sidebar border-r border-sidebar-border h-screen flex-col sticky top-0">
+        <aside className="hidden lg:flex w-64 shrink-0 bg-sidebar border-r border-sidebar-border h-screen flex-col sticky top-0">
             <Logo isDesktop={true} />
             <UserProfile currentUser={currentUser} isLoading={isLoading} />
             <MenuList menuList={menuList} pathname={pathname} />

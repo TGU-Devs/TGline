@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
 // 認証不要（未ログインユーザー向け）のパス
-const publicPaths = ["/", "/login", "/register", "/posts", "/forgot-password", "/reset-password", "/verify-email", "/terms", "/privacy"];
+const publicPaths = ["/", "/login", "/register", "/posts", "/courses", "/forgot-password", "/reset-password", "/verify-email", "/terms", "/privacy"];
+const publicPathPrefixes = ["/courses/"];
 const alwaysAccessiblePublicPaths = ["/terms", "/privacy"];
 
 // middleware が適用されないパス
@@ -14,13 +15,15 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get("jwt_token");
 
-  const isPublicPath = publicPaths.includes(pathname);
+  const isPublicPath = publicPaths.includes(pathname) || publicPathPrefixes.some((prefix) => pathname.startsWith(prefix));
 
   // 認証済み + public/auth ページ → /posts にリダイレクト
   if (
     token &&
     isPublicPath &&
     pathname !== "/posts" &&
+    pathname !== "/courses" &&
+    !pathname.startsWith("/courses/") &&
     !alwaysAccessiblePublicPaths.includes(pathname)
   ) {
     return NextResponse.redirect(new URL("/posts", request.url));
