@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_06_15_000002) do
+ActiveRecord::Schema[7.2].define(version: 2026_06_16_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -56,13 +56,13 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_15_000002) do
 
   create_table "course_offerings", force: :cascade do |t|
     t.bigint "course_id", null: false
-    t.integer "academic_year", null: false
+    t.integer "academic_year"
     t.integer "semester", null: false
     t.string "teacher_name", null: false
     t.integer "day_of_week"
     t.integer "period"
     t.string "campus", null: false
-    t.string "classroom", null: false
+    t.string "classroom"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "delivery_method", default: 0, null: false
@@ -84,13 +84,13 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_15_000002) do
     t.integer "workload", null: false
     t.integer "attendance", null: false
     t.integer "grading", null: false
+    t.integer "exam_presence", default: 0, null: false
+    t.integer "attendance_check", default: 0, null: false
+    t.boolean "textbook_required", default: false, null: false
     t.text "comment"
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "exam_presence", default: 0, null: false
-    t.integer "attendance_check", default: 0, null: false
-    t.boolean "textbook_required", default: false, null: false
     t.index ["attendance_check"], name: "index_course_reviews_on_attendance_check"
     t.index ["course_id"], name: "index_course_reviews_on_course_id"
     t.index ["course_offering_id"], name: "index_course_reviews_on_course_offering_id"

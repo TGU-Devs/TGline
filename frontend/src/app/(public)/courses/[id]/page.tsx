@@ -268,7 +268,7 @@ export default function CourseDetailPage() {
         body: JSON.stringify({
           course_offering: {
             teacher_name: offeringForm.teacher_name,
-            academic_year: Number(offeringForm.academic_year),
+            academic_year: offeringForm.academic_year.trim() ? Number(offeringForm.academic_year) : null,
             semester: offeringForm.semester,
             day_of_week: offeringForm.day_of_week || null,
             delivery_method: offeringForm.delivery_method,
@@ -391,7 +391,7 @@ export default function CourseDetailPage() {
                   {offerings.map((offering) => (
                     <div key={offering.id} className="rounded-md border border-border bg-background p-4">
                       <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-slate-900">
-                        <span>{offering.academic_year}年度</span>
+                        <span>{offering.academic_year ? `${offering.academic_year}年度` : "年度未設定"}</span>
                         <span>{formatSemester(offering.semester)}</span>
                         <span>{formatDayOfWeek(offering.day_of_week)}{offering.period ? `${offering.period}限` : ""}</span>
                         <span>{formatDeliveryMethod(offering.delivery_method)}</span>
@@ -437,7 +437,6 @@ export default function CourseDetailPage() {
                         label="受講年度"
                         value={offeringForm.academic_year}
                         onChange={(value) => setOfferingForm((prev) => ({ ...prev, academic_year: value }))}
-                        required
                         inputMode="numeric"
                       />
                       <OfferingSelect
@@ -488,7 +487,6 @@ export default function CourseDetailPage() {
                         label="教室"
                         value={offeringForm.classroom}
                         onChange={(value) => setOfferingForm((prev) => ({ ...prev, classroom: value }))}
-                        required
                       />
                     </div>
 
@@ -594,7 +592,7 @@ export default function CourseDetailPage() {
                       <option value="">指定しない</option>
                       {offerings.map((offering) => (
                         <option key={offering.id} value={offering.id}>
-                          {offering.academic_year}年度 {formatSemester(offering.semester)} {offering.teacher_name} {formatDeliveryMethod(offering.delivery_method)} {formatTargetGrade(offering.target_grade)}
+                          {offering.academic_year ? `${offering.academic_year}年度` : "年度未設定"} {formatSemester(offering.semester)} {offering.teacher_name} {formatDeliveryMethod(offering.delivery_method)} {formatTargetGrade(offering.target_grade)}
                         </option>
                       ))}
                     </select>

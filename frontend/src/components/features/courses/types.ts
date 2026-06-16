@@ -1,6 +1,6 @@
 export type CourseOffering = {
   id: number;
-  academic_year: number;
+  academic_year: number | null;
   semester: string;
   teacher_name: string;
   day_of_week: string | null;

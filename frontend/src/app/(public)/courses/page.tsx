@@ -280,7 +280,7 @@ export default function CoursesPage() {
                     <h2 className="truncate text-lg font-bold text-slate-900">{course.name}</h2>
                     {course.primary_course_offering && (
                       <p className="mt-2 text-sm text-muted-foreground">
-                        {course.primary_course_offering.teacher_name}・{course.primary_course_offering.academic_year}年度・
+                        {course.primary_course_offering.teacher_name}・{course.primary_course_offering.academic_year ? `${course.primary_course_offering.academic_year}年度` : "年度未設定"}・
                         {formatSemester(course.primary_course_offering.semester)}
                         {course.primary_course_offering.day_of_week ? `・${formatDayOfWeek(course.primary_course_offering.day_of_week)}` : ""}
                         ・{formatDeliveryMethod(course.primary_course_offering.delivery_method)}

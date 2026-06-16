@@ -112,7 +112,7 @@ export default function NewCoursePage() {
           },
           course_offering: {
             teacher_name: courseForm.teacher_name,
-            academic_year: Number(courseForm.academic_year),
+            academic_year: courseForm.academic_year.trim() ? Number(courseForm.academic_year) : null,
             semester: courseForm.semester,
             day_of_week: courseForm.day_of_week || null,
             delivery_method: courseForm.delivery_method,
@@ -177,7 +177,7 @@ export default function NewCoursePage() {
             <SelectInput label="学部" value={courseForm.faculty} onChange={handleFacultyChange} options={FACULTY_DEPARTMENT_OPTIONS.map((option) => option.faculty)} required />
             <SelectInput label="学科" value={courseForm.department} onChange={(value) => setCourseForm((prev) => ({ ...prev, department: value }))} options={departmentOptions} required />
 
-            <TextInput label="受講年度" value={courseForm.academic_year} onChange={(value) => setCourseForm((prev) => ({ ...prev, academic_year: value }))} required inputMode="numeric" />
+            <TextInput label="受講年度" value={courseForm.academic_year} onChange={(value) => setCourseForm((prev) => ({ ...prev, academic_year: value }))} inputMode="numeric" />
             <SelectInput label="カテゴリ" value={courseForm.category} onChange={(value) => setCourseForm((prev) => ({ ...prev, category: value }))} options={[...COURSE_CATEGORY_OPTIONS]} required />
             <SelectInput label="学期" value={courseForm.semester} onChange={(value) => setCourseForm((prev) => ({ ...prev, semester: value }))} options={SEMESTER_OPTIONS.map((option) => option.value)} getLabel={(value) => SEMESTER_OPTIONS.find((option) => option.value === value)?.label ?? value} />
             <SelectInput label="曜日" value={courseForm.day_of_week} onChange={(value) => setCourseForm((prev) => ({ ...prev, day_of_week: value }))} options={DAY_OF_WEEK_OPTIONS.map((option) => option.value)} getLabel={(value) => DAY_OF_WEEK_OPTIONS.find((option) => option.value === value)?.label ?? value} />
@@ -194,7 +194,7 @@ export default function NewCoursePage() {
 
           <div className="grid gap-4 md:grid-cols-2">
             <SelectInput label="キャンパス" value={courseForm.campus} onChange={(value) => setCourseForm((prev) => ({ ...prev, campus: value }))} options={[...CAMPUS_OPTIONS]} required />
-            <TextInput label="教室" value={courseForm.classroom} onChange={(value) => setCourseForm((prev) => ({ ...prev, classroom: value }))} required />
+            <TextInput label="教室" value={courseForm.classroom} onChange={(value) => setCourseForm((prev) => ({ ...prev, classroom: value }))} />
           </div>
 
           {error && <p className="mt-4 rounded-md bg-destructive/10 p-3 text-sm font-medium text-destructive">{error}</p>}
