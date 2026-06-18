@@ -30,7 +30,7 @@ import {
   TEXTBOOK_REQUIRED_OPTIONS,
 } from "@/components/features/courses/options";
 
-import type { Course, CourseReview, CourseReviewsResponse } from "@/components/features/courses/types";
+import type { Course, CourseOffering, CourseReview, CourseReviewsResponse } from "@/components/features/courses/types";
 
 const scoreFields = ["rating", "difficulty", "workload", "grading"] as const;
 const COURSE_REQUEST_FORM_URL = "https://forms.gle/9UmZSNiZZWhZxE4JA";
@@ -389,16 +389,14 @@ export default function CourseDetailPage() {
                   {offerings.map((offering) => (
                     <div key={offering.id} className="rounded-md border border-border bg-background p-4">
                       <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-slate-900">
-                        <span>{offering.academic_year ? `${offering.academic_year}年度` : "年度未設定"}</span>
-                        <span>{formatSemester(offering.semester)}</span>
-                        <span>{formatDayOfWeek(offering.day_of_week)}{offering.period ? `${offering.period}限` : ""}</span>
-                        <span>{formatDeliveryMethod(offering.delivery_method)}</span>
-                        <span>{formatTargetGrade(offering.target_grade)}</span>
+                        {courseOfferingBadges(offering).map((label) => (
+                          <span key={label}>{label}</span>
+                        ))}
                       </div>
                       <div className="mt-2 grid gap-1 text-sm text-muted-foreground sm:grid-cols-2">
                         <p>担当: {offering.teacher_name}</p>
                         <p>キャンパス: {offering.campus || "-"}</p>
-                        <p>教室: {offering.classroom || "-"}</p>
+                        {offering.classroom && <p>教室: {offering.classroom}</p>}
                       </div>
                     </div>
                   ))}
@@ -589,7 +587,7 @@ export default function CourseDetailPage() {
                       <option value="">指定しない</option>
                       {offerings.map((offering) => (
                         <option key={offering.id} value={offering.id}>
-                          {offering.academic_year ? `${offering.academic_year}年度` : "年度未設定"} {formatSemester(offering.semester)} {offering.teacher_name} {formatDeliveryMethod(offering.delivery_method)} {formatTargetGrade(offering.target_grade)}
+                          {formatCourseOfferingOption(offering)}
                         </option>
                       ))}
                     </select>
@@ -692,6 +690,39 @@ function ReviewMeta({ label, value }: { label: string; value: string }) {
       <p className="font-bold text-slate-900">{value}</p>
     </div>
   );
+}
+
+function courseOfferingBadges(offering: CourseOffering) {
+  const labels = [visibleLabel(formatTargetGrade(offering.target_grade)), visibleLabel(formatDeliveryMethod(offering.delivery_method))].filter(Boolean);
+  const semester = formatOptionalSemester(offering.semester);
+  const schedule = formatSchedule(offering);
+
+  if (semester) labels.push(semester);
+  if (schedule) labels.push(schedule);
+  if (offering.academic_year) labels.push(`${offering.academic_year}年度`);
+
+  return labels;
+}
+
+function formatCourseOfferingOption(offering: CourseOffering) {
+  return [offering.teacher_name, ...courseOfferingBadges(offering)].filter(Boolean).join(" ");
+}
+
+function formatOptionalSemester(value: string | null | undefined) {
+  if (!value || value === "other") return "";
+
+  return formatSemester(value);
+}
+
+function formatSchedule(offering: CourseOffering) {
+  const day = offering.day_of_week && offering.day_of_week !== "other_day" ? formatDayOfWeek(offering.day_of_week) : "";
+  const period = offering.period ? `${offering.period}限` : "";
+
+  return `${day}${period}`;
+}
+
+function visibleLabel(value: string) {
+  return value === "-" ? "" : value;
 }
 
 function FieldLabel({ label, required }: { label: string; required: boolean }) {
