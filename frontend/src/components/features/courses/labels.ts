@@ -40,8 +40,14 @@ export const ratingLabels = {
   rating: "総合評価",
   difficulty: "難易度",
   workload: "課題量",
-  attendance: "出席",
   grading: "単位の取りやすさ",
+} as const;
+
+export const ratingScaleHints = {
+  rating: { min: "低い", max: "高い" },
+  difficulty: { min: "易しい", max: "難しい" },
+  workload: { min: "少ない", max: "多い" },
+  grading: { min: "厳しい", max: "取りやすい" },
 } as const;
 
 export function formatSemester(value: string | null | undefined) {

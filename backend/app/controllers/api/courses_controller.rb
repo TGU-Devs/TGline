@@ -131,10 +131,9 @@ module Api
                     Arel.sql("AVG(rating)"),
                     Arel.sql("AVG(difficulty)"),
                     Arel.sql("AVG(workload)"),
-                    Arel.sql("AVG(attendance)"),
                     Arel.sql("AVG(grading)")
                   )
-                  .to_h do |course_id, reviews_count, average_rating, average_difficulty, average_workload, average_attendance, average_grading|
+                  .to_h do |course_id, reviews_count, average_rating, average_difficulty, average_workload, average_grading|
         [
           course_id,
           {
@@ -142,7 +141,6 @@ module Api
             average_rating: rounded_average(average_rating),
             average_difficulty: rounded_average(average_difficulty),
             average_workload: rounded_average(average_workload),
-            average_attendance: rounded_average(average_attendance),
             average_grading: rounded_average(average_grading)
           }
         ]
@@ -171,7 +169,6 @@ module Api
         average_rating: aggregate[:average_rating],
         average_difficulty: aggregate[:average_difficulty],
         average_workload: aggregate[:average_workload],
-        average_attendance: aggregate[:average_attendance],
         average_grading: aggregate[:average_grading],
         created_at: course.created_at.iso8601,
         updated_at: course.updated_at.iso8601

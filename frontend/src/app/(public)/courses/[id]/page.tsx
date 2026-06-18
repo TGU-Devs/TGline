@@ -18,6 +18,7 @@ import {
   formatSemester,
   formatTargetGrade,
   ratingLabels,
+  ratingScaleHints,
 } from "@/components/features/courses/labels";
 import {
   CAMPUS_OPTIONS,
@@ -31,7 +32,7 @@ import {
 
 import type { Course, CourseReview, CourseReviewsResponse } from "@/components/features/courses/types";
 
-const scoreFields = ["rating", "difficulty", "workload", "attendance", "grading"] as const;
+const scoreFields = ["rating", "difficulty", "workload", "grading"] as const;
 const COURSE_REQUEST_FORM_URL = "https://forms.gle/9UmZSNiZZWhZxE4JA";
 
 type ScoreField = (typeof scoreFields)[number];
@@ -61,7 +62,6 @@ const initialForm: ReviewForm = {
   rating: 5,
   difficulty: 3,
   workload: 3,
-  attendance: 3,
   grading: 3,
   exam_presence: "none",
   attendance_check: "none",
@@ -179,7 +179,6 @@ export default function CourseDetailPage() {
           rating: form.rating,
           difficulty: form.difficulty,
           workload: form.workload,
-          attendance: form.attendance,
           grading: form.grading,
           exam_presence: form.exam_presence,
           attendance_check: form.attendance_check,
@@ -369,7 +368,6 @@ export default function CourseDetailPage() {
           <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <ScoreSummary label={ratingLabels.difficulty} value={course.average_difficulty} />
             <ScoreSummary label={ratingLabels.workload} value={course.average_workload} />
-            <ScoreSummary label={ratingLabels.attendance} value={course.average_attendance} />
             <ScoreSummary label={ratingLabels.grading} value={course.average_grading} />
           </div>
         </section>
@@ -537,7 +535,6 @@ export default function CourseDetailPage() {
                       <div className="mt-3 grid gap-2 text-sm sm:grid-cols-4">
                         <ReviewScore label="難易度" value={review.difficulty} />
                         <ReviewScore label="課題量" value={review.workload} />
-                        <ReviewScore label="出席" value={review.attendance} />
                         <ReviewScore label="単位" value={review.grading} />
                       </div>
                       <div className="mt-3 grid gap-2 text-sm sm:grid-cols-4">
@@ -603,6 +600,8 @@ export default function CourseDetailPage() {
                   <ScoreInput
                     key={field}
                     label={ratingLabels[field]}
+                    minLabel={ratingScaleHints[field].min}
+                    maxLabel={ratingScaleHints[field].max}
                     value={form[field]}
                     onChange={(value) => handleScoreChange(field, value)}
                   />
@@ -706,7 +705,19 @@ function FieldLabel({ label, required }: { label: string; required: boolean }) {
   );
 }
 
-function ScoreInput({ label, value, onChange }: { label: string; value: number; onChange: (value: number) => void }) {
+function ScoreInput({
+  label,
+  minLabel,
+  maxLabel,
+  value,
+  onChange,
+}: {
+  label: string;
+  minLabel: string;
+  maxLabel: string;
+  value: number;
+  onChange: (value: number) => void;
+}) {
   return (
     <div className="rounded-md border border-border bg-background p-4">
       <div className="mb-4 flex items-center justify-between">
@@ -736,6 +747,13 @@ function ScoreInput({ label, value, onChange }: { label: string; value: number; 
               {score}
             </button>
           ))}
+        </div>
+        <div className="mt-1 grid grid-cols-5 text-center text-[11px] font-semibold text-muted-foreground">
+          <span>{minLabel}</span>
+          <span />
+          <span />
+          <span />
+          <span>{maxLabel}</span>
         </div>
       </div>
     </div>

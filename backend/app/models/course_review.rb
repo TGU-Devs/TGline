@@ -10,7 +10,7 @@ class CourseReview < ApplicationRecord
   enum :exam_presence, { none: 0, sometimes: 1, yes: 2 }, prefix: true
   enum :attendance_check, { none: 0, sometimes: 1, yes: 2 }, prefix: true
 
-  validates :rating, :difficulty, :workload, :attendance, :grading,
+  validates :rating, :difficulty, :workload, :grading,
             presence: true,
             numericality: { only_integer: true },
             inclusion: { in: SCORE_RANGE }

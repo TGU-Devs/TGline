@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_06_16_000001) do
+ActiveRecord::Schema[7.2].define(version: 2026_06_18_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -82,15 +82,14 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_16_000001) do
     t.integer "rating", null: false
     t.integer "difficulty", null: false
     t.integer "workload", null: false
-    t.integer "attendance", null: false
     t.integer "grading", null: false
-    t.integer "exam_presence", default: 0, null: false
-    t.integer "attendance_check", default: 0, null: false
-    t.boolean "textbook_required", default: false, null: false
     t.text "comment"
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "exam_presence", default: 0, null: false
+    t.integer "attendance_check", default: 0, null: false
+    t.boolean "textbook_required", default: false, null: false
     t.index ["attendance_check"], name: "index_course_reviews_on_attendance_check"
     t.index ["course_id"], name: "index_course_reviews_on_course_id"
     t.index ["course_offering_id"], name: "index_course_reviews_on_course_offering_id"

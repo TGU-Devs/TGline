@@ -21,7 +21,6 @@ export type Course = {
   average_rating: number | null;
   average_difficulty: number | null;
   average_workload: number | null;
-  average_attendance: number | null;
   average_grading: number | null;
   created_by_id: number | null;
   can_manage: boolean;
@@ -42,7 +41,6 @@ export type CourseReview = {
   rating: number;
   difficulty: number;
   workload: number;
-  attendance: number;
   grading: number;
   exam_presence: string;
   attendance_check: string;
