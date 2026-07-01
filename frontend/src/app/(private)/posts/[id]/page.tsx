@@ -66,6 +66,19 @@ export default function PostDetailPage() {
         setPost((prev) => prev ? { ...prev, comments_count: prev.comments_count + delta } : prev);
     };
 
+    // プロフィール経由（一覧→プロフィール→投稿）で来た場合はプロフィールに戻す
+    const from = searchParams.get("from");
+    const userId = searchParams.get("userId");
+    const returnPostId = searchParams.get("returnPostId");
+    const isFromProfile = from === "profile" && userId;
+
+    const backUrl = isFromProfile
+        ? returnPostId
+            ? `/users/${userId}?from=post&postId=${returnPostId}`
+            : `/users/${userId}?from=posts`
+        : `/posts?${searchParams.toString()}`;
+    const backLabel = isFromProfile ? "プロフィールに戻る" : "一覧に戻る";
+
     if (isLoading) {
         return (   
             <Loading />
@@ -93,7 +106,7 @@ export default function PostDetailPage() {
 
             <div className="max-w-4xl mx-auto px-4 sm:px-6">
                 {/* 戻るボタン */}
-                <TopButton searchParams={searchParams} message="一覧に戻る" />
+                <TopButton backUrl={backUrl} message={backLabel} />
 
                 {/* 投稿カード */}
                 <PostDetailCard post={post} setPost={setPost} />

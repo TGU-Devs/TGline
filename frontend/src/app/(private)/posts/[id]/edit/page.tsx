@@ -130,7 +130,7 @@ export default function PostEditPage() {
         <div className="min-h-screen bg-background py-4 sm:py-8">
             <div className="max-w-4xl mx-auto px-4 sm:px-6">
                 {/* 戻るボタン */}
-                <TopButton searchParams={searchParams} message="詳細に戻る" />
+                <TopButton backUrl={`/posts/${params.id}?${searchParams.toString()}`} message="詳細に戻る" />
 
                 {/* 編集フォーム */}
                 <Form
