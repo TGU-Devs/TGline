@@ -35,7 +35,7 @@ module Api
           display_name: user.display_name,
           description: user.description,
           created_at: user.created_at.iso8601,
-          posts: user.posts.map do |post|
+          posts: user.posts.select { |post| post.deleted_at.nil? }.map do |post|
             {
               id: post.id,
               title: post.title,
@@ -65,7 +65,9 @@ module Api
               end
             }
           end,
-          comments: user.comments.map do |comment|
+          comments: user.comments.select { |comment|
+            comment.deleted_at.nil? && (comment.post.nil? || comment.post.deleted_at.nil?)
+          }.map do |comment|
             {
               id: comment.id,
               post_id: comment.post_id,
