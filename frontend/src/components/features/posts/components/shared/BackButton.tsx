@@ -13,12 +13,10 @@ type BackButtonProps = {
 const BackButton = ({ fallbackUrl = "/posts", label = "戻る", className }: BackButtonProps) => {
     const router = useRouter();
 
+    // ブラウザ履歴に依存すると、無関係な中間ページ（フォーム等）を経由した際に
+    // 意図しない戻り先になるため、常に計算済みのURLへ確実に遷移する。
     const handleBack = () => {
-        if (window.history.length > 1) {
-            router.back();
-        } else {
-            router.push(fallbackUrl);
-        }
+        router.push(fallbackUrl);
     };
 
     return (
