@@ -57,7 +57,7 @@ const readSnapshot = (): PostListSnapshot | null => {
         return null;
     }
 
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = sessionStorage.getItem(STORAGE_KEY);
     if (!raw) {
         return null;
     }
@@ -90,6 +90,50 @@ const matchesQuery = (
     tagId: number | null,
 ): boolean => {
     return snapshot.feed === feed && snapshot.tagId === tagId;
+};
+
+/** マウント直後に同期的に復元可能なスナップショットを参照する（削除はしない） */
+export const peekRestorableSnapshot = (
+    feed: FeedTab,
+    tagId: number | null,
+): PostListSnapshot | null => {
+    const snapshot = readSnapshot();
+    if (!snapshot) return null;
+    if (!matchesQuery(snapshot, feed, tagId)) return null;
+    return snapshot;
+};
+
+/** 初回レンダー用: スナップショットを読み込んでストレージから削除する */
+export const consumeRestorableSnapshot = (
+    feed: FeedTab,
+    tagId: number | null,
+): PostListSnapshot | null => {
+    const snapshot = peekRestorableSnapshot(feed, tagId);
+    if (snapshot) {
+        removeSnapshot();
+    }
+    return snapshot;
+};
+
+const parseFeedFromUrl = (): FeedTab => {
+    if (typeof window === "undefined") return "all";
+    const feed = new URLSearchParams(window.location.search).get("feed");
+    return feed === "liked" ? "liked" : "all";
+};
+
+const parseTagIdFromUrl = (): number | null => {
+    if (typeof window === "undefined") return null;
+    const tagId = new URLSearchParams(window.location.search).get("tag_id");
+    return tagId ? Number(tagId) : null;
+};
+
+/** page.tsx の useState 初期化用（ストレージを1回だけ消費） */
+export const readInitialPostsListState = (): PostListSnapshot | null => {
+    if (typeof window === "undefined") return null;
+    if (new URLSearchParams(window.location.search).get("deleted")) {
+        return null;
+    }
+    return consumeRestorableSnapshot(parseFeedFromUrl(), parseTagIdFromUrl());
 };
 
 //保存するための入力型
@@ -129,13 +173,14 @@ export const usePostsListRestore = () => {
     }, []);
 
     const applyScroll = useCallback((scrollY: number) => {
-        //描画完了後に二段階でスクロール
+        const scroll = () => window.scrollTo({ top: scrollY, behavior: "instant" });
+
         requestAnimationFrame(() => {
-            window.scrollTo(0, scrollY);
-            requestAnimationFrame(() => {
-                window.scrollTo(0, scrollY);
-            });
+            scroll();
+            requestAnimationFrame(scroll);
         });
+
+        window.setTimeout(scroll, 100);
     }, []);
 
     return {
