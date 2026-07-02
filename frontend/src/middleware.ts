@@ -15,6 +15,10 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get("jwt_token");
 
+  if (pathname === "/courses" || pathname.startsWith("/courses/")) {
+    return NextResponse.redirect(new URL("/posts", request.url));
+  }
+
   const isPublicPath = publicPaths.includes(pathname) || publicPathPrefixes.some((prefix) => pathname.startsWith(prefix));
 
   // 認証済み + public/auth ページ → /posts にリダイレクト
