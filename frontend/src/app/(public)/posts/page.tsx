@@ -224,9 +224,7 @@ export default function PostsPage() {
             hasAttemptedInitialLoad.current = true;
             prevAuthRef.current = isAuthenticated;
 
-            if (deletedOnMountRef.current) {
-                fetchPosts();
-            } else if (posts.length === 0) {
+            if (deletedOnMountRef.current || initialListState === null) {
                 fetchPosts();
             }
             return;
@@ -243,9 +241,9 @@ export default function PostsPage() {
     }, [
         activeTab,
         fetchPosts,
+        initialListState,
         isAuthenticated,
         pathname,
-        posts.length,
         selectedTagId,
     ]);
 
