@@ -23,6 +23,7 @@ type PostListProps = {
     fetchPosts: (page: number) => void;
     page: number;
     isLoadingMore: boolean;
+    onBeforeNavigate?: () => void;
 };
 
 const formatDate = (dateString: string) => {
@@ -46,6 +47,7 @@ const PostList = ({
     fetchPosts,
     page,
     isLoadingMore,
+    onBeforeNavigate,
 }: PostListProps) => {
     const router = useRouter();
 
@@ -138,6 +140,7 @@ const PostList = ({
                         key={post.id}
                         href={`/posts/${post.id}?${searchParams.toString()}`}
                         className="block"
+                        onClick={() => onBeforeNavigate?.()}
                     >
                         {cardContent}
                     </Link>

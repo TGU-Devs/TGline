@@ -1,12 +1,17 @@
 "use client";
 
-import { useCallback, useEffect, useState, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useLayoutEffect, useState, useRef } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { Trash } from "lucide-react";
 
 import { useStatusToast } from "@/hooks/useStatusToast";
 import { useTags } from "@/components/features/posts/hooks/useTag";
+import {
+    readInitialPostsListState,
+    usePostsListRestore,
+    type FeedTab,
+} from "@/components/features/posts/hooks/usePostsListRestore";
 import { useUser } from "@/contexts/UserContext";
 
 import Loading from "@/components/ui/Loading";
@@ -20,10 +25,9 @@ import LoginPromptModal from "@/components/features/auth/LoginPromptModal";
 
 import type { Post } from "@/components/features/posts/types";
 
-type FeedTab = "all" | "liked";
-
 export default function PostsPage() {
     const router = useRouter();
+    const pathname = usePathname();
     const searchParams = useSearchParams();
     const { user, isLoading: isUserLoading } = useUser();
 
@@ -32,14 +36,28 @@ export default function PostsPage() {
     });
 
     const { tags, groupedTags } = useTags();
+    const { saveSnapshot, restoreSnapshot, clearSnapshot, applyScroll } =
+        usePostsListRestore();
+
+    const initialListStateRef = useRef<
+        ReturnType<typeof readInitialPostsListState> | undefined
+    >(undefined);
+    if (initialListStateRef.current === undefined) {
+        initialListStateRef.current = readInitialPostsListState();
+    }
+    const initialListState = initialListStateRef.current;
 
     const [showLoginModal, setShowLoginModal] = useState(false);
-    const [posts, setPosts] = useState<Post[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const [posts, setPosts] = useState<Post[]>(
+        () => initialListState?.posts ?? [],
+    );
+    const [isLoading, setIsLoading] = useState(() => initialListState === null);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [page, setPage] = useState(1);
-    const [hasMore, setHasMore] = useState(true);
+    const [page, setPage] = useState(() => initialListState?.page ?? 1);
+    const [hasMore, setHasMore] = useState(
+        () => initialListState?.hasMore ?? true,
+    );
     const [activeTab, setActiveTab] = useState<FeedTab>(() =>
         searchParams.get("feed") === "liked" ? "liked" : "all",
     );
@@ -120,13 +138,97 @@ export default function PostsPage() {
     );
 
     const prevAuthRef = useRef<boolean | null>(null);
-    const isFirstRenderRef = useRef(true);
+    const hasAttemptedInitialLoad = useRef(false);
+    const skipNextFetchRef = useRef(initialListState !== null);
+    const pendingScrollYRef = useRef<number | null>(
+        initialListState?.scrollY ?? null,
+    );
+    const deletedOnMountRef = useRef(searchParams.get("deleted"));
+    const restoreRef = useRef({
+        clearSnapshot,
+        restoreSnapshot,
+        applyScroll,
+    });
+    restoreRef.current = { clearSnapshot, restoreSnapshot, applyScroll };
+
+    const applyRestoredSnapshot = useCallback(
+        (snapshot: {
+            posts: Post[];
+            page: number;
+            hasMore: boolean;
+            scrollY: number;
+        }) => {
+            setPosts(snapshot.posts);
+            setPage(snapshot.page);
+            setHasMore(snapshot.hasMore);
+            setIsLoading(false);
+            setError(null);
+            pendingScrollYRef.current = snapshot.scrollY;
+            skipNextFetchRef.current = true;
+        },
+        [],
+    );
+
+    useLayoutEffect(() => {
+        if (pendingScrollYRef.current === null || isLoading) {
+            return;
+        }
+
+        const scrollY = pendingScrollYRef.current;
+        pendingScrollYRef.current = null;
+        restoreRef.current.applyScroll(scrollY);
+    }, [posts, isLoading]);
 
     useEffect(() => {
-        if (isFirstRenderRef.current) {
-            isFirstRenderRef.current = false;
+        if (pathname !== "/posts") {
+            return;
+        }
+
+        const { clearSnapshot, restoreSnapshot } = restoreRef.current;
+
+        if (deletedOnMountRef.current) {
+            clearSnapshot();
+            return;
+        }
+
+        const snapshot = restoreSnapshot(activeTab, selectedTagId);
+        if (!snapshot) {
+            return;
+        }
+
+        applyRestoredSnapshot(snapshot);
+        clearSnapshot();
+    }, [
+        activeTab,
+        applyRestoredSnapshot,
+        pathname,
+        selectedTagId,
+    ]);
+
+    useEffect(() => {
+        if (pathname !== "/posts") {
+            return;
+        }
+
+        if (activeTab === "liked" && isAuthenticated === null) {
+            return;
+        }
+
+        if (skipNextFetchRef.current) {
+            skipNextFetchRef.current = false;
             prevAuthRef.current = isAuthenticated;
-            fetchPosts();
+            return;
+        }
+
+        if (!hasAttemptedInitialLoad.current) {
+            hasAttemptedInitialLoad.current = true;
+            prevAuthRef.current = isAuthenticated;
+
+            if (deletedOnMountRef.current) {
+                fetchPosts();
+            } else if (posts.length === 0) {
+                fetchPosts();
+            }
             return;
         }
 
@@ -138,7 +240,32 @@ export default function PostsPage() {
         }
 
         fetchPosts();
-    }, [fetchPosts, activeTab, isAuthenticated]);
+    }, [
+        activeTab,
+        fetchPosts,
+        isAuthenticated,
+        pathname,
+        posts.length,
+        selectedTagId,
+    ]);
+
+    const handleBeforeNavigate = useCallback(() => {
+        saveSnapshot({
+            scrollY: window.scrollY,
+            page,
+            posts,
+            hasMore,
+            feed: activeTab,
+            tagId: selectedTagId,
+        });
+    }, [
+        activeTab,
+        hasMore,
+        page,
+        posts,
+        saveSnapshot,
+        selectedTagId,
+    ]);
 
     const updateUrlParams = useCallback(
         (nextTagId: number | null, nextFeed: FeedTab) => {
@@ -156,13 +283,14 @@ export default function PostsPage() {
 
     const handleTagSelect = useCallback(
         (tagId: number | null) => {
+            clearSnapshot();
             setSelectedTagId(tagId);
             setPage(1);
             setHasMore(true);
             setError(null);
             updateUrlParams(tagId, activeTab);
         },
-        [activeTab, updateUrlParams],
+        [activeTab, clearSnapshot, updateUrlParams],
     );
 
     const handleFeedTabChange = useCallback(
@@ -176,13 +304,14 @@ export default function PostsPage() {
                 return;
             }
 
+            clearSnapshot();
             setActiveTab(nextTab);
             setPage(1);
             setHasMore(true);
             setError(null);
             updateUrlParams(selectedTagId, nextTab);
         },
-        [isAuthenticated, selectedTagId, updateUrlParams],
+        [clearSnapshot, isAuthenticated, selectedTagId, updateUrlParams],
     );
 
     const handleLikeToggle = useCallback(
@@ -338,6 +467,7 @@ export default function PostsPage() {
                         fetchPosts={fetchPosts}
                         page={page}
                         isLoadingMore={isLoadingMore}
+                        onBeforeNavigate={handleBeforeNavigate}
                     />
                 )}
             </div>

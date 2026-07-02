@@ -19,7 +19,7 @@ const TopButton = ({ backUrl, message }: TopButtonProps) => {
           variant="ghost"
           className="mb-4 sm:mb-6 text-muted-foreground hover:text-foreground"
         >
-          <Link href={backUrl}>
+          <Link href={backUrl} scroll={false}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             {message}
           </Link>
