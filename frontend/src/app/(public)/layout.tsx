@@ -7,6 +7,7 @@ import Sidebar from "@/components/layout/sidebar";
 import MobileNav from "@/components/layout/sidebar/MobileNav";
 import Logo from "@/components/layout/sidebar/Logo";
 import Header from "@/components/layout/sidebar/Header";
+import OnboardingModal from "../../components/layout/sidebar/OnboardingModal";
 
 type AuthState = "loading" | "authenticated" | "unauthenticated";
 
@@ -73,6 +74,17 @@ function PublicLayoutContent({
 
   // 認証済み: Sidebar 付きレイアウト（private layout と同じ見た目）
   if (currentUser) {
+
+    const userFaculty = (currentUser as any).faculty;
+    const userDepartment = (currentUser as any).department;
+
+    const isProfileIncomplete = !userFaculty || !userDepartment;
+
+    const handleSaveProfile = async (faculty: string, department: string) => {
+      console.log("保存するデータ:", { faculty, department });
+      // TODO: RailsへのPUTリクエスト処理をここに書く
+    };
+
     return (
       <UserProvider>
         <div className="flex flex-col min-h-screen bg-white">
@@ -85,7 +97,10 @@ function PublicLayoutContent({
               </div>
             </main>
           </div>
-
+          <OnboardingModal
+            isOpen={isProfileIncomplete}
+            onSave={handleSaveProfile}
+          />
         </div>
       </UserProvider>
     );
