@@ -4,7 +4,7 @@ import { useState } from "react";
 
 type OnboardingModalProps = {
   isOpen: boolean;
-  onSave: (faculty: string, department: string) => void;
+  onSave: (faculty: string, department: string, grade: string) => void;
 };
 
 const FACULTY_DATA: Record<string, string[]> = {
@@ -19,19 +19,22 @@ const FACULTY_DATA: Record<string, string[]> = {
   "国際学部": ["国際教養学科"],
 };
 
+const GRADE_DATA = ["1年生", "2年生", "3年生", "4年生"];
+
 export default function OnboardingModal({ isOpen, onSave }: OnboardingModalProps) {
   const [faculty, setFaculty] = useState("");
   const [department, setDepartment] = useState("");
+  const [grade, setGrade] = useState("");
 
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!faculty || !department) {
-      alert("学部と学科を選択してください。");
+    if (!faculty || !department || !grade) {
+      alert("学部,学科,学年を選択してください。");
       return;
     }
-    onSave(faculty, department);
+    onSave(faculty, department, grade);
   };
 
   return (
@@ -75,6 +78,22 @@ export default function OnboardingModal({ isOpen, onSave }: OnboardingModalProps
                 FACULTY_DATA[faculty].map((d) => (
                   <option key={d} value={d}>{d}</option>
                 ))}
+            </select>
+          </div>
+
+          
+          {/* 学年選択 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">学年</label>
+            <select
+              value={grade}
+              onChange={(e) => setGrade(e.target.value)}
+              className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+            >
+              <option value="">学年を選択してください</option>
+              {GRADE_DATA.map((g) => (
+                <option key={g} value={g}>{g}</option>
+              ))}
             </select>
           </div>
 
