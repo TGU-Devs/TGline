@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
-
 import Logo from "./Logo";
 import LogoutButton from "./LogoutButton";
 
-import { Menu, X } from "lucide-react";
+import { Menu, X, Bell} from "lucide-react";
 import Avatar from "boring-avatars";
 
 import { User } from "@/types/user";
@@ -33,6 +32,10 @@ const MobileNav = ({
         } else {
             document.body.style.overflow = "";
         }
+
+        return () => {
+            document.body.style.overflow = "";
+        };
     }, [isMenuOpen]);
 
     const toggleMenu = () => {
@@ -48,9 +51,10 @@ const MobileNav = ({
 
                 {currentUser && (
                     <button
+                        type="button"
                         onClick={toggleMenu}
-                        className="p-2  rounded-md transition-colors active:scale-90"
-                        aria-label="Toggle Menu"
+                        className="p-2 rounded-md transition-colors active:scale-90"
+                        aria-label="メニューを開閉"
                         aria-controls="mobile-nav-menu"
                         aria-expanded={isMenuOpen}
                     >
@@ -72,14 +76,27 @@ const MobileNav = ({
                     <span className="text-xs text-muted-foreground font-semibold uppercase tracking-widest">
                         Menu
                     </span>
-                    <button
-                        onClick={toggleMenu}
-                        className="p-1 hover:bg-sidebar-border"
-                        aria-label={isMenuOpen ? "Close Menu" : "Open Menu"}
-                        aria-controls="mobile-nav-menu"
-                    >
-                        <X size={20} />
-                    </button>
+
+                    <div className="flex items-center gap-1">
+                        {/*  スマホ版ベルマーク*/}
+                        <Link
+                            href="/notifications"
+                            onClick={toggleMenu} 
+                            className="p-2 text-muted-foreground hover:bg-sidebar-border rounded-md transition-colors"
+                            aria-label="通知一覧を見る"
+                        >
+                            <Bell size={20} />
+                        </Link>
+                        <button
+                            type="button"
+                            onClick={toggleMenu}
+                            className="p-1 hover:bg-sidebar-border"
+                            aria-label={isMenuOpen ? "メニューを閉じる" : "メニューを開く"}
+                            aria-controls="mobile-nav-menu"
+                        >
+                            <X size={20} />
+                        </button>
+                    </div>
                 </div>
                 <nav className="flex-1 overflow-y-auto py-4">
                     <ul className="space-y-1 border-b border-sidebar-border">
