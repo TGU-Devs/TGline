@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { useUser } from "@/contexts/UserContext";
 
 import { useMemo } from "react";
-import { Home, Settings, Bell, Calendar, MessageSquare, ExternalLink, Shield, BookOpen } from "lucide-react";
+import { Home, Settings, Bell, Calendar, MessageSquare, ExternalLink, Shield } from "lucide-react";
 
 import DesktopSidebar from "./DesktopSidebar";
 import MobileNav from "./MobileNav";
