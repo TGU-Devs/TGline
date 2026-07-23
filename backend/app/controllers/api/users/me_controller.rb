@@ -35,8 +35,14 @@ module Api
           return render json: { error: "OAuthユーザーはメールアドレスを変更できません" }, status: :forbidden
         end
 
-        if current_user.update(user_params)
-          render json: user_response(current_user), status: :ok
+        current_user.avatar.purge if ActiveModel::Type::Boolean.new.cast(user_params[:remove_avatar])
+
+        if user_params[:avatar].present?
+          current_user.avatar.attach(user_params[:avatar])
+        end
+
+        if current_user.update(user_params.except(:avatar, :remove_avatar))
+          render json: user_response(current_user.reload), status: :ok
         else
           render json: { errors: current_user.errors }, status: :unprocessable_entity
         end
@@ -44,8 +50,12 @@ module Api
 
       private
 
+      def public_backend_url
+        ENV.fetch('BACKEND_PUBLIC_URL', request.base_url).delete_suffix('/')
+      end
+
       def user_params
-        params.require(:user).permit(:display_name, :description, :email)
+        params.require(:user).permit(:display_name, :description, :email, :avatar, :remove_avatar)
       end
 
       def user_response(user)
@@ -56,7 +66,18 @@ module Api
           description: user.description,
           role: user.role,
           provider: user.provider,
-          created_at: user.created_at.iso8601
+          created_at: user.created_at.iso8601,
+          avatar: avatar_response(user)
+        }
+      end
+
+      def avatar_response(user)
+        return nil unless user.avatar.attached?
+
+        {
+          url: "#{public_backend_url}#{rails_blob_path(user.avatar, only_path: true)}",
+          content_type: user.avatar.content_type,
+          byte_size: user.avatar.byte_size
         }
       end
     end
