@@ -15,7 +15,7 @@ module Api
           id: user.id,
           display_name: user.display_name,
           role: user.role,
-          created_at: user.created_at.iso8601
+          created_at: user.created_at.iso8601,
         }
       }, status: :ok
     end
@@ -24,7 +24,7 @@ module Api
     # 指定されたユーザーの公開情報を取得
     def show
       # 画像のincludesを images_attachments: :blob に変更し、likes と comments も追加
-      user = User.active.includes(
+      user = User.active.with_attached_avatar.includes(
         posts: [:tags, :likes, :comments, { images_attachments: :blob }],
         comments: :post
       ).find_by(id: params[:id])
@@ -35,6 +35,7 @@ module Api
           display_name: user.display_name,
           description: user.description,
           created_at: user.created_at.iso8601,
+          avatar: avatar_response(user),
           posts: user.posts.select { |post| post.deleted_at.nil? }.map do |post|
             {
               id: post.id,
@@ -80,6 +81,22 @@ module Api
       else
         render json: { errors: ['User not found'] }, status: :not_found
       end
+    end
+
+    private
+
+    def avatar_response(user)
+      return nil unless user.avatar.attached?
+
+      {
+        url: "#{public_backend_url}#{rails_blob_path(user.avatar, only_path: true)}",
+        content_type: user.avatar.content_type,
+        byte_size: user.avatar.byte_size
+      }
+    end
+
+    def public_backend_url
+      ENV.fetch('BACKEND_PUBLIC_URL', request.base_url).delete_suffix('/')
     end
   end
 end
