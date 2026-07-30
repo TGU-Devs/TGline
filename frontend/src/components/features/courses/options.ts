@@ -5,7 +5,7 @@ export const FACULTY_DEPARTMENT_OPTIONS = [
   },
   {
     faculty: "経済学部",
-    departments: ["経済学科", "共生社会経済学科"],
+    departments: ["経済学科"],
   },
   {
     faculty: "経営学部",

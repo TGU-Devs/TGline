@@ -3,8 +3,7 @@
 import { usePathname } from "next/navigation";
 import { useUser } from "@/contexts/UserContext";
 import Sidebar from "@/components/layout/sidebar";
-import MobileNav from "@/components/layout/sidebar/MobileNav";
-import Logo from "@/components/layout/sidebar/Logo";
+import { Navigation } from "@/components/navigation";
 
 export default function PublicLayout({
   children,
@@ -18,14 +17,12 @@ export default function PublicLayout({
     return <>{children}</>;
   }
 
-  return <PublicLayoutContent pathname={pathname}>{children}</PublicLayoutContent>;
+  return <PublicLayoutContent>{children}</PublicLayoutContent>;
 }
 
 function PublicLayoutContent({
-  pathname,
   children,
 }: {
-  pathname: string;
   children: React.ReactNode;
 }) {
   const { user, isLoading } = useUser();
@@ -54,22 +51,9 @@ function PublicLayoutContent({
     );
   }
 
-  // 未認証:
-  // - PC: ロゴのみの固定ヘッダー（MobileNav と同じスタイル）
-  // - スマホ: MobileNav ヘッダー（currentUser=null でハンバーガー非表示）
   return (
     <>
-      {/* PC: ロゴのみの固定ヘッダー */}
-      <header className="hidden lg:flex fixed inset-x-0 top-0 z-40 h-16 items-center border-b border-sidebar-border bg-sidebar px-6 shadow-sm">
-        <Logo isDesktop={false} href="/" />
-      </header>
-      {/* スマホ: MobileNav ヘッダー（currentUser=null でハンバーガー非表示） */}
-      <MobileNav
-        currentUser={null}
-        isLoading={false}
-        menuList={[]}
-        pathname={pathname}
-      />
+      <Navigation />
       <main className="pt-16 min-h-screen">
         {children}
       </main>

@@ -14,16 +14,22 @@ module Api
       has_next = courses.size > per_page
       courses = courses.first(per_page)
       aggregates = review_aggregates_for(courses.map(&:id))
+      primary_offering_ids = primary_offering_ids_for(courses.map(&:id))
 
       render json: {
-        courses: courses.map { |course| course_response(course, aggregates[course.id]) },
+        courses: courses.map do |course|
+          course_response(
+            course,
+            aggregates[course.id],
+            primary_offering_id: primary_offering_ids[course.id]
+          )
+        end,
         has_next: has_next
       }, status: :ok
     end
 
     def show
       aggregate = review_aggregates_for([@course.id])[@course.id]
-
       render json: course_response(@course, aggregate, include_offerings: true), status: :ok
     end
 
@@ -31,10 +37,17 @@ module Api
       course = nil
 
       Course.transaction do
-        course = current_user.created_courses.build(course_params)
-        course.save!
+        course = Course.find_or_initialize_by(
+          name: course_params[:name].to_s.strip,
+          category: course_params[:category]
+        )
+        if course.new_record?
+          course.created_by = current_user
+          course.assign_attributes(legacy_course_target_attributes)
+          course.save!
+        end
 
-        course.course_offerings.create!(course_offering_params)
+        course.course_offerings.create!(course_offering_params(course))
       end
 
       render json: course_response(course.reload, nil, include_offerings: true), status: :created
@@ -50,7 +63,7 @@ module Api
 
         if params[:course_offering].present?
           offering = @course.course_offerings.order(created_at: :asc).first || @course.course_offerings.build
-          offering.update!(course_offering_params)
+          offering.update!(course_offering_params(@course))
         end
       end
 
@@ -70,17 +83,17 @@ module Api
 
     def filtered_courses
       courses = Course.all
-      courses = courses.where(faculty: params[:faculty]) if params[:faculty].present?
-      courses = courses.where(department: params[:department]) if params[:department].present?
       courses = courses.where(category: params[:category]) if params[:category].present?
-      courses = courses.left_joins(:course_offerings).where(course_offerings: { academic_year: params[:academic_year] }) if params[:academic_year].present?
-      courses = courses.left_joins(:course_offerings).where(course_offerings: { semester: params[:semester] }) if params[:semester].present?
-      courses = courses.left_joins(:course_offerings).where(course_offerings: { target_grade: params[:target_grade] }) if params[:target_grade].present?
+
+      if offering_filter_present?
+        courses = courses.joins(:course_offerings)
+                         .where(course_offerings: { id: filtered_course_offerings.select(:id) })
+      end
 
       if params[:q].present?
         q = "%#{ActiveRecord::Base.sanitize_sql_like(params[:q].to_s.strip)}%"
         courses = courses.left_joins(:course_offerings).where(
-          "courses.name ILIKE :q OR courses.faculty ILIKE :q OR courses.department ILIKE :q OR course_offerings.teacher_name ILIKE :q",
+          "courses.name ILIKE :q OR course_offerings.teacher_name ILIKE :q OR course_offerings.faculty ILIKE :q OR course_offerings.department ILIKE :q",
           q: q
         )
       end
@@ -97,10 +110,10 @@ module Api
     end
 
     def course_params
-      params.require(:course).permit(:name, :faculty, :department, :category)
+      params.require(:course).permit(:name, :category)
     end
 
-    def course_offering_params
+    def course_offering_params(course)
       permitted = params.require(:course_offering).permit(
         :academic_year,
         :semester,
@@ -108,6 +121,8 @@ module Api
         :day_of_week,
         :delivery_method,
         :target_grade,
+        :faculty,
+        :department,
         :period,
         :campus,
         :classroom
@@ -116,7 +131,61 @@ module Api
       permitted[:semester] = "other" if permitted[:semester].blank?
       permitted[:delivery_method] = "in_person" if permitted[:delivery_method].blank?
       permitted[:target_grade] = "all_grades" if permitted[:target_grade].blank?
+      if course.category == "教養科目"
+        permitted[:faculty] = nil
+        permitted[:department] = nil
+      end
       permitted
+    end
+
+    def legacy_course_target_attributes
+      return { faculty: nil, department: nil } if course_params[:category] == "教養科目"
+
+      {
+        faculty: params.dig(:course_offering, :faculty),
+        department: params.dig(:course_offering, :department)
+      }
+    end
+
+    def filtered_course_offerings
+      offerings = CourseOffering.joins(:course)
+      offerings = offerings.where(academic_year: params[:academic_year]) if params[:academic_year].present?
+      offerings = offerings.where(semester: params[:semester]) if params[:semester].present?
+      offerings = filter_offerings_by_target(offerings)
+      offerings = filter_offerings_by_grade(offerings)
+      offerings
+    end
+
+    def filter_offerings_by_target(offerings)
+      return offerings unless params[:faculty].present? || params[:department].present?
+
+      matching = offerings
+      matching = matching.where(faculty: params[:faculty]) if params[:faculty].present?
+      matching = matching.where(department: params[:department]) if params[:department].present?
+
+      offerings.where(courses: { category: "教養科目" }).or(matching)
+    end
+
+    def filter_offerings_by_grade(offerings)
+      return offerings unless params[:target_grade].present?
+
+      offerings.where(target_grade: ["all_grades", params[:target_grade]])
+    end
+
+    def offering_filter_present?
+      %i[academic_year semester faculty department target_grade].any? { |key| params[key].present? }
+    end
+
+    def primary_offering_ids_for(course_ids)
+      return {} unless offering_filter_present?
+
+      filtered_course_offerings
+        .where(course_id: course_ids)
+        .order(academic_year: :desc, semester: :asc, id: :asc)
+        .pluck(:course_id, :id)
+        .each_with_object({}) do |(course_id, offering_id), result|
+          result[course_id] ||= offering_id
+        end
     end
 
     def review_aggregates_for(course_ids)
@@ -153,18 +222,21 @@ module Api
       value.to_d.round(1).to_f
     end
 
-    def course_response(course, aggregate = nil, include_offerings: false)
+    def course_response(course, aggregate = nil, include_offerings: false, primary_offering_id: nil)
       aggregate ||= {}
+      primary_offering = if primary_offering_id
+                           course.course_offerings.find { |offering| offering.id == primary_offering_id }
+                         else
+                           course.course_offerings.first
+                         end
 
       response = {
         id: course.id,
         name: course.name,
-        faculty: course.faculty,
-        department: course.department,
         category: course.category,
         created_by_id: course.created_by_id,
         can_manage: admin? || course.created_by_id == current_user&.id,
-        primary_course_offering: course_offering_response(course.course_offerings.first),
+        primary_course_offering: course_offering_response(primary_offering),
         reviews_count: aggregate.fetch(:reviews_count, 0),
         average_rating: aggregate[:average_rating],
         average_difficulty: aggregate[:average_difficulty],
@@ -192,6 +264,8 @@ module Api
         day_of_week: offering.day_of_week,
         delivery_method: offering.delivery_method,
         target_grade: offering.target_grade,
+        faculty: offering.faculty,
+        department: offering.department,
         period: offering.period,
         campus: offering.campus,
         classroom: offering.classroom

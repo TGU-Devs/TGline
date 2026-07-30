@@ -5,13 +5,10 @@ module Api
     before_action :set_course
 
     def create
-      offering = @course.course_offerings.build(course_offering_params)
-
-      if offering.save
-        render json: course_offering_response(offering), status: :created
-      else
-        render json: { errors: offering.errors }, status: :unprocessable_entity
-      end
+      offering = @course.course_offerings.create!(course_offering_params)
+      render json: course_offering_response(offering), status: :created
+    rescue ActiveRecord::RecordInvalid => e
+      render json: { errors: e.record.errors }, status: :unprocessable_entity
     end
 
     private
@@ -31,6 +28,8 @@ module Api
         :day_of_week,
         :delivery_method,
         :target_grade,
+        :faculty,
+        :department,
         :period,
         :campus,
         :classroom
@@ -39,6 +38,10 @@ module Api
       permitted[:semester] = "other" if permitted[:semester].blank?
       permitted[:delivery_method] = "in_person" if permitted[:delivery_method].blank?
       permitted[:target_grade] = "all_grades" if permitted[:target_grade].blank?
+      if @course.category == "教養科目"
+        permitted[:faculty] = nil
+        permitted[:department] = nil
+      end
       permitted
     end
 
@@ -51,6 +54,8 @@ module Api
         day_of_week: offering.day_of_week,
         delivery_method: offering.delivery_method,
         target_grade: offering.target_grade,
+        faculty: offering.faculty,
+        department: offering.department,
         period: offering.period,
         campus: offering.campus,
         classroom: offering.classroom,

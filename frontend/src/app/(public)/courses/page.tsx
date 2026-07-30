@@ -6,17 +6,31 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { BookOpen, CalendarDays, ChevronRight, Plus, Search, SlidersHorizontal, Star } from "lucide-react";
 
+import LoginPromptModal from "@/components/features/auth/LoginPromptModal";
 import Loading from "@/components/ui/Loading";
 import ErrorUI from "@/components/ui/ErrorUI";
 import { Button } from "@/components/ui/button";
-import { formatAverage, formatDayOfWeek, formatDeliveryMethod, formatSemester, formatTargetGrade } from "@/components/features/courses/labels";
-import { COURSE_CATEGORY_OPTIONS, FACULTY_DEPARTMENT_OPTIONS, TARGET_GRADE_OPTIONS } from "@/components/features/courses/options";
+import { useUser } from "@/contexts/UserContext";
+import {
+  formatAverage,
+  formatDayOfWeek,
+  formatDeliveryMethod,
+  formatSemester,
+  formatTargetGrade,
+} from "@/components/features/courses/labels";
+import {
+  COURSE_CATEGORY_OPTIONS,
+  FACULTY_DEPARTMENT_OPTIONS,
+  TARGET_GRADE_OPTIONS,
+  departmentsForFaculty,
+} from "@/components/features/courses/options";
 
-import type { Course, CoursesResponse } from "@/components/features/courses/types";
+import type { Course, CourseOffering, CoursesResponse } from "@/components/features/courses/types";
 
 export default function CoursesPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { user } = useUser();
 
   const [courses, setCourses] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -24,15 +38,19 @@ export default function CoursesPage() {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
   const [faculty, setFaculty] = useState(() => searchParams.get("faculty") ?? "");
+  const [department, setDepartment] = useState(() => searchParams.get("department") ?? "");
   const [category, setCategory] = useState(() => searchParams.get("category") ?? "");
   const [targetGrade, setTargetGrade] = useState(() => searchParams.get("target_grade") ?? "");
 
   const currentQuery = searchParams.get("q") ?? "";
   const currentFaculty = searchParams.get("faculty") ?? "";
+  const currentDepartment = searchParams.get("department") ?? "";
   const currentCategory = searchParams.get("category") ?? "";
   const currentTargetGrade = searchParams.get("target_grade") ?? "";
+  const departmentOptions = departmentsForFaculty(faculty);
 
   const fetchCourses = useCallback(
     async (targetPage = 1) => {
@@ -47,6 +65,7 @@ export default function CoursesPage() {
         const params = new URLSearchParams();
         if (currentQuery) params.set("q", currentQuery);
         if (currentFaculty) params.set("faculty", currentFaculty);
+        if (currentDepartment) params.set("department", currentDepartment);
         if (currentCategory) params.set("category", currentCategory);
         if (currentTargetGrade) params.set("target_grade", currentTargetGrade);
         params.set("page", String(targetPage));
@@ -70,26 +89,28 @@ export default function CoursesPage() {
         setIsLoadingMore(false);
       }
     },
-    [currentCategory, currentFaculty, currentQuery, currentTargetGrade],
+    [currentCategory, currentDepartment, currentFaculty, currentQuery, currentTargetGrade],
   );
 
   const selectedFilters = useMemo(() => {
     return [
       currentFaculty,
+      currentDepartment,
       currentCategory,
       currentTargetGrade && formatTargetGrade(currentTargetGrade),
     ].filter(
       (filter): filter is string => Boolean(filter),
     );
-  }, [currentCategory, currentFaculty, currentTargetGrade]);
+  }, [currentCategory, currentDepartment, currentFaculty, currentTargetGrade]);
 
   useEffect(() => {
     setQuery(currentQuery);
     setFaculty(currentFaculty);
+    setDepartment(currentDepartment);
     setCategory(currentCategory);
     setTargetGrade(currentTargetGrade);
     fetchCourses(1);
-  }, [currentCategory, currentFaculty, currentQuery, currentTargetGrade, fetchCourses]);
+  }, [currentCategory, currentDepartment, currentFaculty, currentQuery, currentTargetGrade, fetchCourses]);
 
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -105,6 +126,12 @@ export default function CoursesPage() {
       params.set("faculty", faculty.trim());
     } else {
       params.delete("faculty");
+    }
+
+    if (department.trim()) {
+      params.set("department", department.trim());
+    } else {
+      params.delete("department");
     }
 
     if (category.trim()) {
@@ -126,6 +153,7 @@ export default function CoursesPage() {
   const handleClear = () => {
     setQuery("");
     setFaculty("");
+    setDepartment("");
     setCategory("");
     setTargetGrade("");
     router.replace("/courses", { scroll: false });
@@ -153,16 +181,23 @@ export default function CoursesPage() {
               授業名・先生名・学部から検索して、レビューと開講情報を確認できます。
             </p>
           </div>
-          <Button asChild className="h-11 rounded-md">
-            <Link href="/courses/new">
+          {user ? (
+            <Button asChild className="h-11 rounded-md">
+              <Link href="/courses/new">
+                <Plus className="size-4" />
+                授業を追加
+              </Link>
+            </Button>
+          ) : (
+            <Button type="button" onClick={() => setShowLoginModal(true)} className="h-11 rounded-md">
               <Plus className="size-4" />
               授業を追加
-            </Link>
-          </Button>
+            </Button>
+          )}
         </div>
 
         <form onSubmit={handleSearch} className="mb-6 rounded-lg border border-border bg-card p-4 shadow-sm">
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-[minmax(180px,1fr)_minmax(140px,180px)_minmax(140px,150px)_minmax(120px,130px)_auto]">
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-6">
             <label className="block">
               <span className="mb-1 block text-xs font-semibold text-muted-foreground">キーワード</span>
               <div className="relative">
@@ -180,13 +215,33 @@ export default function CoursesPage() {
               <span className="mb-1 block text-xs font-semibold text-muted-foreground">学部</span>
               <select
                 value={faculty}
-                onChange={(event) => setFaculty(event.target.value)}
+                onChange={(event) => {
+                  setFaculty(event.target.value);
+                  setDepartment("");
+                }}
                 className="h-11 w-full rounded-md border border-input bg-background px-3 text-base outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
               >
                 <option value="">すべて</option>
                 {FACULTY_DEPARTMENT_OPTIONS.map((option) => (
                   <option key={option.faculty} value={option.faculty}>
                     {option.faculty}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="block">
+              <span className="mb-1 block text-xs font-semibold text-muted-foreground">学科</span>
+              <select
+                value={department}
+                onChange={(event) => setDepartment(event.target.value)}
+                disabled={!faculty}
+                className="h-11 w-full rounded-md border border-input bg-background px-3 text-base outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-muted"
+              >
+                <option value="">すべて</option>
+                {departmentOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
                   </option>
                 ))}
               </select>
@@ -209,7 +264,7 @@ export default function CoursesPage() {
             </label>
 
             <label className="block">
-              <span className="mb-1 block text-xs font-semibold text-muted-foreground">対象学年</span>
+              <span className="mb-1 block text-xs font-semibold text-muted-foreground">学年</span>
               <select
                 value={targetGrade}
                 onChange={(event) => setTargetGrade(event.target.value)}
@@ -253,56 +308,55 @@ export default function CoursesPage() {
             <p className="mt-2 text-sm text-muted-foreground">検索条件を変えて探してください。</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="grid gap-4 md:grid-cols-2">
             {courses.map((course) => (
               <Link
                 key={course.id}
                 href={`/courses/${course.id}`}
-                className="block rounded-lg border border-border bg-card p-4 shadow-sm transition hover:border-primary/40 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                className="group flex h-full flex-col rounded-lg border border-border bg-card p-5 shadow-sm transition hover:border-primary/40 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
               >
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="min-w-0">
-                    <div className="mb-2 flex flex-wrap gap-2">
-                      <span className="rounded-md bg-primary/10 px-2 py-1 text-xs font-semibold text-primary">
-                        {course.faculty}
-                      </span>
-                      {course.department && (
-                        <span className="rounded-md bg-secondary px-2 py-1 text-xs font-semibold text-secondary-foreground">
-                          {course.department}
-                        </span>
-                      )}
-                      {course.category && (
-                        <span className="rounded-md bg-muted px-2 py-1 text-xs font-semibold text-muted-foreground">
-                          {course.category}
-                        </span>
-                      )}
-                    </div>
-                    <h2 className="truncate text-lg font-bold text-slate-900">{course.name}</h2>
-                    {course.primary_course_offering && (
-                      <p className="mt-2 text-sm text-muted-foreground">
-                        {course.primary_course_offering.teacher_name}・{course.primary_course_offering.academic_year ? `${course.primary_course_offering.academic_year}年度` : "年度未設定"}・
-                        {formatSemester(course.primary_course_offering.semester)}
-                        {course.primary_course_offering.day_of_week ? `・${formatDayOfWeek(course.primary_course_offering.day_of_week)}` : ""}
-                        ・{formatDeliveryMethod(course.primary_course_offering.delivery_method)}
-                        ・{formatTargetGrade(course.primary_course_offering.target_grade)}
-                      </p>
-                    )}
-                  </div>
+                <div className="mb-3 flex min-h-7 flex-wrap items-start gap-2">
+                  {course.category && (
+                    <span className="rounded-md bg-muted px-2.5 py-1 text-xs font-semibold text-muted-foreground">
+                      {course.category}
+                    </span>
+                  )}
+                </div>
 
-                  <div className="grid grid-cols-[auto_auto_auto] items-center gap-3 sm:flex sm:gap-5">
-                    <div className="text-center">
-                      <div className="flex items-center justify-center gap-1 font-bold text-slate-900">
-                        <Star className="size-4 fill-amber-400 text-amber-400" />
+                <h2 className="line-clamp-2 min-h-14 text-xl font-bold leading-7 text-slate-900">
+                  {course.name}
+                </h2>
+
+                <div className="mt-4 min-h-28 space-y-2 text-sm leading-5">
+                  <p className="font-medium text-slate-700">
+                    {formatCourseTarget(course)}
+                  </p>
+                  <p className="text-slate-700">
+                    {course.primary_course_offering?.teacher_name
+                      ? `${course.primary_course_offering.teacher_name}先生`
+                      : "担当教員未登録"}
+                  </p>
+                  {course.primary_course_offering && (
+                    <p className="line-clamp-2 text-muted-foreground">
+                      {formatCourseOfferingSummary(course.primary_course_offering)}
+                    </p>
+                  )}
+                </div>
+
+                <div className="mt-auto flex items-end justify-between gap-3 border-t border-border pt-4">
+                  <div>
+                    <p className="mb-1.5 text-xs font-semibold text-muted-foreground">平均評価</p>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <RatingStars rating={course.average_rating} />
+                      <span className="font-bold tabular-nums text-slate-900">
                         {formatAverage(course.average_rating)}
-                      </div>
-                      <p className="mt-1 text-xs text-muted-foreground">平均</p>
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        ({course.reviews_count}件)
+                      </span>
                     </div>
-                    <div className="text-center">
-                      <div className="font-bold text-slate-900">{course.reviews_count}</div>
-                      <p className="mt-1 text-xs text-muted-foreground">レビュー</p>
-                    </div>
-                    <ChevronRight className="size-5 text-muted-foreground" />
                   </div>
+                  <ChevronRight className="mb-0.5 size-5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
                 </div>
               </Link>
             ))}
@@ -324,6 +378,59 @@ export default function CoursesPage() {
           </div>
         )}
       </div>
+      <LoginPromptModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
     </main>
   );
+}
+
+function formatCourseOfferingSummary(offering: CourseOffering) {
+  const labels = [
+    offering.academic_year ? `${offering.academic_year}年度` : "",
+    offering.semester && offering.semester !== "other" ? formatSemester(offering.semester) : "",
+    offering.day_of_week && offering.day_of_week !== "other_day" ? formatDayOfWeek(offering.day_of_week) : "",
+    visibleLabel(formatDeliveryMethod(offering.delivery_method)),
+    visibleLabel(formatTargetGrade(offering.target_grade)),
+  ];
+
+  return labels.filter(Boolean).join("・");
+}
+
+function formatCourseTarget(course: Course) {
+  const offering = course.primary_course_offering;
+
+  if (offering?.faculty) {
+    return offering.department
+      ? `${offering.faculty} ${offering.department}`
+      : offering.faculty;
+  }
+
+  return course.category === "教養科目" ? "全学部共通" : "対象学部未登録";
+}
+
+function RatingStars({ rating }: { rating: number | null }) {
+  const normalizedRating = Math.min(Math.max(rating ?? 0, 0), 5);
+
+  return (
+    <span
+      className="flex items-center gap-0.5"
+      aria-label={rating === null ? "評価なし" : `5点満点中${formatAverage(rating)}点`}
+    >
+      {Array.from({ length: 5 }, (_, index) => {
+        const fillPercentage = Math.min(Math.max(normalizedRating - index, 0), 1) * 100;
+
+        return (
+          <span key={index} className="relative size-4" aria-hidden="true">
+            <Star className="absolute inset-0 size-4 text-slate-300" />
+            <span className="absolute inset-0 overflow-hidden" style={{ width: `${fillPercentage}%` }}>
+              <Star className="size-4 fill-amber-400 text-amber-400" />
+            </span>
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
+function visibleLabel(value: string) {
+  return value === "-" ? "" : value;
 }

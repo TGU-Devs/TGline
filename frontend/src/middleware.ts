@@ -5,6 +5,14 @@ const publicPaths = ["/", "/login", "/register", "/posts", "/courses", "/forgot-
 const publicPathPrefixes = ["/courses/"];
 const alwaysAccessiblePublicPaths = ["/terms", "/privacy"];
 
+function isCourseWritePath(pathname: string) {
+  return (
+    pathname === "/courses/new" ||
+    /^\/courses\/[^/]+\/offerings\/new$/.test(pathname) ||
+    /^\/courses\/[^/]+\/offerings\/[^/]+\/reviews\/new$/.test(pathname)
+  );
+}
+
 // middleware が適用されないパス
 // API routes, _next, static files は除外
 export const config = {
@@ -15,11 +23,9 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get("jwt_token");
 
-  if (pathname === "/courses" || pathname.startsWith("/courses/")) {
-    return NextResponse.redirect(new URL("/posts", request.url));
-  }
-
-  const isPublicPath = publicPaths.includes(pathname) || publicPathPrefixes.some((prefix) => pathname.startsWith(prefix));
+  const isPublicPath =
+    !isCourseWritePath(pathname) &&
+    (publicPaths.includes(pathname) || publicPathPrefixes.some((prefix) => pathname.startsWith(prefix)));
 
   // 認証済み + public/auth ページ → /posts にリダイレクト
   if (

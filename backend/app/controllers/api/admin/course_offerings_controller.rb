@@ -15,21 +15,17 @@ module Api
       end
 
       def create
-        offering = CourseOffering.new(course_offering_params)
-
-        if offering.save
-          render json: course_offering_response(offering), status: :created
-        else
-          render json: { errors: offering.errors }, status: :unprocessable_entity
-        end
+        offering = CourseOffering.create!(course_offering_params)
+        render json: course_offering_response(offering), status: :created
+      rescue ActiveRecord::RecordInvalid => e
+        render json: { errors: e.record.errors }, status: :unprocessable_entity
       end
 
       def update
-        if @course_offering.update(course_offering_params)
-          render json: course_offering_response(@course_offering.reload), status: :ok
-        else
-          render json: { errors: @course_offering.errors }, status: :unprocessable_entity
-        end
+        @course_offering.update!(course_offering_params)
+        render json: course_offering_response(@course_offering.reload), status: :ok
+      rescue ActiveRecord::RecordInvalid => e
+        render json: { errors: e.record.errors }, status: :unprocessable_entity
       end
 
       private
@@ -42,7 +38,7 @@ module Api
       end
 
       def course_offering_params
-        params.require(:course_offering).permit(
+        permitted = params.require(:course_offering).permit(
           :course_id,
           :academic_year,
           :semester,
@@ -50,10 +46,19 @@ module Api
           :day_of_week,
           :delivery_method,
           :target_grade,
+          :faculty,
+          :department,
           :period,
           :campus,
           :classroom
         )
+
+        course = @course_offering&.course || Course.find_by(id: permitted[:course_id])
+        if course&.category == "教養科目"
+          permitted[:faculty] = nil
+          permitted[:department] = nil
+        end
+        permitted
       end
 
       def course_offering_response(offering)
@@ -69,6 +74,8 @@ module Api
           day_of_week: offering.day_of_week,
           delivery_method: offering.delivery_method,
           target_grade: offering.target_grade,
+          faculty: offering.faculty,
+          department: offering.department,
           period: offering.period,
           campus: offering.campus,
           classroom: offering.classroom,

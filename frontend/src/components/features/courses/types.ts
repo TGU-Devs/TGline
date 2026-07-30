@@ -6,6 +6,8 @@ export type CourseOffering = {
   day_of_week: string | null;
   delivery_method: string;
   target_grade: string;
+  faculty: string | null;
+  department: string | null;
   period: number | null;
   campus: string | null;
   classroom: string | null;
@@ -14,8 +16,6 @@ export type CourseOffering = {
 export type Course = {
   id: number;
   name: string;
-  faculty: string;
-  department: string | null;
   category: string | null;
   reviews_count: number;
   average_rating: number | null;
