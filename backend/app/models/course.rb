@@ -8,7 +8,5 @@ class Course < ApplicationRecord
   has_many :course_reviews, dependent: :restrict_with_error
 
   validates :name, presence: true
-  validates :faculty, presence: true
-  validates :department, presence: true
   validates :category, presence: true, inclusion: { in: CATEGORIES }
 end

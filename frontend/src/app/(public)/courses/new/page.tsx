@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -31,6 +31,7 @@ type CourseForm = {
   semester: string;
   day_of_week: string;
   delivery_method: string;
+  period: string;
   target_grade: string;
   campus: string;
   classroom: string;
@@ -46,6 +47,7 @@ const initialCourseForm: CourseForm = {
   semester: "other",
   day_of_week: "",
   delivery_method: "in_person",
+  period: "",
   target_grade: "all_grades",
   campus: CAMPUS_OPTIONS[0],
   classroom: "",
@@ -59,8 +61,8 @@ export default function NewCoursePage() {
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [courseForm, setCourseForm] = useState<CourseForm>(initialCourseForm);
-
-  const departmentOptions = useMemo(() => departmentsForFaculty(courseForm.faculty), [courseForm.faculty]);
+  const departmentOptions = departmentsForFaculty(courseForm.faculty);
+  const requiresDepartment = courseForm.category !== "教養科目";
 
   useEffect(() => {
     fetch("/api/users/me", { credentials: "include" })
@@ -106,8 +108,6 @@ export default function NewCoursePage() {
         body: JSON.stringify({
           course: {
             name: courseForm.name,
-            faculty: courseForm.faculty,
-            department: courseForm.department,
             category: courseForm.category,
           },
           course_offering: {
@@ -116,7 +116,10 @@ export default function NewCoursePage() {
             semester: courseForm.semester,
             day_of_week: courseForm.day_of_week || null,
             delivery_method: courseForm.delivery_method,
+            period: courseForm.period ? Number(courseForm.period) : null,
             target_grade: courseForm.target_grade,
+            faculty: requiresDepartment ? courseForm.faculty : null,
+            department: requiresDepartment ? courseForm.department : null,
             campus: courseForm.campus,
             classroom: courseForm.classroom,
           },
@@ -130,7 +133,8 @@ export default function NewCoursePage() {
       }
 
       if (!res.ok) {
-        throw new Error("授業の作成に失敗しました");
+        const data = await res.json().catch(() => null);
+        throw new Error(data?.error || data?.errors?.join?.(" / ") || "授業の作成に失敗しました");
       }
 
       const created = (await res.json()) as Course;
@@ -172,16 +176,19 @@ export default function NewCoursePage() {
 
           <div className="grid gap-4 md:grid-cols-2">
             <TextInput label="授業名" value={courseForm.name} onChange={(value) => setCourseForm((prev) => ({ ...prev, name: value }))} required />
-            <TextInput label="教授名" value={courseForm.teacher_name} onChange={(value) => setCourseForm((prev) => ({ ...prev, teacher_name: value }))} required />
-
-            <SelectInput label="学部" value={courseForm.faculty} onChange={handleFacultyChange} options={FACULTY_DEPARTMENT_OPTIONS.map((option) => option.faculty)} required />
-            <SelectInput label="学科" value={courseForm.department} onChange={(value) => setCourseForm((prev) => ({ ...prev, department: value }))} options={departmentOptions} required />
-
-            <TextInput label="受講年度" value={courseForm.academic_year} onChange={(value) => setCourseForm((prev) => ({ ...prev, academic_year: value }))} inputMode="numeric" />
             <SelectInput label="カテゴリ" value={courseForm.category} onChange={(value) => setCourseForm((prev) => ({ ...prev, category: value }))} options={[...COURSE_CATEGORY_OPTIONS]} required />
+            {requiresDepartment ? (
+              <>
+                <SelectInput label="学部" value={courseForm.faculty} onChange={handleFacultyChange} options={FACULTY_DEPARTMENT_OPTIONS.map((option) => option.faculty)} required />
+                <SelectInput label="学科" value={courseForm.department} onChange={(value) => setCourseForm((prev) => ({ ...prev, department: value }))} options={departmentOptions} required />
+              </>
+            ) : null}
+            <TextInput label="教授名" value={courseForm.teacher_name} onChange={(value) => setCourseForm((prev) => ({ ...prev, teacher_name: value }))} required />
+            <TextInput label="開講年度" value={courseForm.academic_year} onChange={(value) => setCourseForm((prev) => ({ ...prev, academic_year: value }))} inputMode="numeric" />
             <SelectInput label="学期" value={courseForm.semester} onChange={(value) => setCourseForm((prev) => ({ ...prev, semester: value }))} options={SEMESTER_OPTIONS.map((option) => option.value)} getLabel={(value) => SEMESTER_OPTIONS.find((option) => option.value === value)?.label ?? value} />
             <SelectInput label="曜日" value={courseForm.day_of_week} onChange={(value) => setCourseForm((prev) => ({ ...prev, day_of_week: value }))} options={DAY_OF_WEEK_OPTIONS.map((option) => option.value)} getLabel={(value) => DAY_OF_WEEK_OPTIONS.find((option) => option.value === value)?.label ?? value} />
             <SelectInput label="授業形態" value={courseForm.delivery_method} onChange={(value) => setCourseForm((prev) => ({ ...prev, delivery_method: value }))} options={DELIVERY_METHOD_OPTIONS.map((option) => option.value)} getLabel={(value) => DELIVERY_METHOD_OPTIONS.find((option) => option.value === value)?.label ?? value} required />
+            <TextInput label="時限" value={courseForm.period} onChange={(value) => setCourseForm((prev) => ({ ...prev, period: value }))} inputMode="numeric" />
             <SelectInput label="対象学年" value={courseForm.target_grade} onChange={(value) => setCourseForm((prev) => ({ ...prev, target_grade: value }))} options={TARGET_GRADE_OPTIONS.map((option) => option.value)} getLabel={(value) => TARGET_GRADE_OPTIONS.find((option) => option.value === value)?.label ?? value} required />
           </div>
 

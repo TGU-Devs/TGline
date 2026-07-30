@@ -1,94 +1,83 @@
 "use client";
 
-import { ArrowRight, Bell, Calendar, Heart, MessageCircle, Home, User, PenSquare, BookOpen, Users, Settings, Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import {
+  ArrowRight,
+  BookOpen,
+  Calendar,
+  MessageSquare,
+  Plus,
+  Star,
+  Users,
+} from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 import { notoSansJP } from "@/lib/fonts";
 
 export function HeroSection() {
   return (
     <section className="relative min-h-screen overflow-hidden">
-      {/* Background decorative elements */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute top-20 left-10 h-72 w-72 rounded-full bg-primary/20 blur-3xl animate-pulse" />
-        <div className="absolute bottom-20 right-10 h-96 w-96 rounded-full bg-accent/15 blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-64 w-64 rounded-full bg-primary/10 blur-2xl animate-pulse" style={{ animationDelay: "2s" }} />
+        <div className="absolute left-10 top-20 h-72 w-72 rounded-full bg-primary/20 blur-3xl motion-safe:animate-pulse" />
+        <div className="absolute bottom-20 right-10 h-96 w-96 rounded-full bg-accent/15 blur-3xl motion-safe:animate-pulse" />
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-24 sm:pt-15 pb-16">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Left Content */}
-          <div className="text-center lg:text-left animate-fade-in">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-1.5 text-sm font-medium text-accent-foreground mb-6">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-foreground opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-accent-foreground"></span>
-              </span>
-              誰でも自由に投稿できる
+      <div className="mx-auto max-w-7xl px-4 pb-16 pt-24 sm:px-6 lg:px-8">
+        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+          <div className="text-center motion-safe:animate-fade-in lg:text-left">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-accent px-4 py-1.5 text-sm font-medium text-accent-foreground">
+              <BookOpen className="size-4" />
+              履修前に、みんなの授業評価をチェック
             </div>
 
-            {/* Main heading */}
-            <h1 className={`${notoSansJP.className} text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground`}>
+            <h1 className={`${notoSansJP.className} text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl`}>
               <span className="inline-block whitespace-nowrap">東北学院大生のための</span>
               <br />
               <span className="text-primary">情報共有アプリ</span>
             </h1>
 
-            {/* Subtitle */}
-            <p className="mt-3 text-lg sm:text-xl text-muted-foreground max-w-xl mx-auto lg:ml-2 leading-relaxed">
-              授業情報・サークル活動・学内イベント
+            <p className="mx-auto mt-4 max-w-xl text-lg leading-relaxed text-muted-foreground sm:text-xl lg:ml-0">
+              授業の口コミを探したり、
               <br />
-              なんでも投稿OK。
+              学内情報をみんなで共有できます。
             </p>
-            <p className="mt-3 text-xs sm:text-sm text-muted-foreground/90 max-w-xl mx-auto lg:ml-2">
+            <p className="mx-auto mt-3 max-w-xl text-xs text-muted-foreground/90 sm:text-sm lg:ml-0">
               ※ 本サービスは東北学院大学の公式サービスではありません（学生有志による運営です）。
             </p>
 
-            {/* Feature Tags */}
-            <div className="mt-6 flex flex-wrap justify-center lg:justify-start gap-2">
+            <div className="mt-6 flex flex-wrap justify-center gap-2 lg:justify-start">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary">
-                <BookOpen className="h-4 w-4" />
-                授業情報
+                <BookOpen className="size-4" />
+                授業評価
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1.5 text-sm font-medium text-accent-foreground">
-                <Users className="h-4 w-4" />
+                <Users className="size-4" />
                 サークル
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary">
-                <Calendar className="h-4 w-4" />
+                <Calendar className="size-4" />
                 学内イベント
               </span>
             </div>
 
-            {/* CTA Buttons */}
-            <div className="mt-10 flex flex-col sm:flex-row items-stretch sm:items-start justify-center lg:justify-start gap-4 max-w-xs sm:max-w-none mx-auto lg:mx-0">
-              <Link href="/posts/new" className="w-full sm:w-auto">
-              <Button
-                size="lg"
-                className="w-full sm:w-auto bg-accent hover:bg-accent/90 text-accent-foreground px-8 py-6 text-base font-semibold shadow-lg shadow-accent/25 transition-all hover:shadow-xl hover:shadow-accent/30 hover:scale-105"
-              >
-                <PenSquare className="mr-2 h-5 w-5" />
-                投稿してみる
+            <div className="mx-auto mt-10 flex max-w-xs flex-col items-stretch justify-center gap-4 sm:max-w-none sm:flex-row sm:items-start lg:mx-0 lg:justify-start">
+              <Button asChild size="lg" className="h-12 w-full px-8 text-base font-semibold shadow-lg shadow-primary/20 sm:w-auto">
+                <Link href="/courses">
+                  <BookOpen className="mr-2 size-5" />
+                  授業評価を見る
+                </Link>
               </Button>
-              </Link>
-              <Link href="/posts" className="w-full sm:w-auto">
-              <Button
-                size="lg"
-                variant="outline"
-                className="w-full sm:w-auto border-primary/30 text-foreground px-8 py-6 text-base font-semibold bg-transparent transition-all hover:bg-primary"
-              >
-                投稿を見る
-                <ArrowRight className="ml-2 h-5 w-5" />
+              <Button asChild size="lg" variant="outline" className="h-12 w-full border-primary/30 bg-transparent px-8 text-base font-semibold sm:w-auto">
+                <Link href="/posts">
+                  投稿を見る
+                  <ArrowRight className="ml-2 size-5" />
+                </Link>
               </Button>
-              </Link>
             </div>
-
           </div>
 
-          {/* Right Content - Phone Mockup */}
-          <div className="relative flex justify-center lg:justify-end animate-slide-up">
-            <PhoneMockup />
+          <div className="relative flex justify-center motion-safe:animate-slide-up lg:justify-end">
+            <CourseReviewMockup />
           </div>
         </div>
       </div>
@@ -96,109 +85,91 @@ export function HeroSection() {
   );
 }
 
-function PhoneMockup() {
+function CourseReviewMockup() {
   return (
     <div className="relative">
-      {/* Floating elements around phone */}
-      <div className="absolute -top-4 -left-8 z-20 animate-float">
-        <div className="bg-card border border-border rounded-xl p-3 shadow-lg">
+      <div className="absolute -left-5 -top-4 z-20 motion-safe:animate-float sm:-left-8">
+        <div className="rounded-xl border border-border bg-card p-3 shadow-lg">
           <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-full bg-accent/20 flex items-center justify-center">
-              <PenSquare className="h-4 w-4 text-accent" />
+            <div className="flex size-8 items-center justify-center rounded-full bg-amber-100">
+              <Star className="size-4 fill-amber-400 text-amber-400" />
             </div>
             <div>
-              <div className="text-xs font-medium text-foreground">新規投稿</div>
-              <div className="text-xs text-muted-foreground">たった今</div>
+              <div className="text-xs font-medium text-foreground">評価 4.5</div>
+              <div className="text-xs text-muted-foreground">レビュー12件</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="absolute -bottom-4 -right-8 z-20 animate-float" style={{ animationDelay: "1s" }}>
-        <div className="bg-card border border-border rounded-xl p-3 shadow-lg">
+      <div className="absolute -bottom-4 -right-5 z-20 motion-safe:animate-float sm:-right-8">
+        <div className="rounded-xl border border-border bg-card p-3 shadow-lg">
           <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
-              <Users className="h-4 w-4 text-primary" />
+            <div className="flex size-8 items-center justify-center rounded-full bg-primary/15">
+              <MessageSquare className="size-4 text-primary" />
             </div>
             <div>
-              <div className="text-xs font-medium text-foreground">メンバー募集中</div>
-              <div className="text-xs text-muted-foreground">テニスサークル</div>
+              <div className="text-xs font-medium text-foreground">新しい口コミ</div>
+              <div className="text-xs text-muted-foreground">履修の参考に</div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Phone Frame */}
-      <div className="relative z-10 w-[280px] sm:w-[320px] h-[560px] sm:h-[640px] bg-foreground rounded-[3rem] p-2 shadow-2xl">
-        {/* Phone notch */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-7 bg-foreground rounded-b-2xl z-20" />
+      <div className="relative z-10 h-[560px] w-[280px] rounded-[3rem] bg-foreground p-2 shadow-2xl sm:h-[640px] sm:w-[320px]">
+        <div className="absolute left-1/2 top-0 z-20 h-7 w-32 -translate-x-1/2 rounded-b-2xl bg-foreground" />
 
-        {/* Phone screen */}
-        <div className="relative w-full h-full bg-background rounded-[2.5rem] overflow-hidden">
-          {/* Status bar */}
-          <div className="flex items-center justify-between px-6 pt-3 pb-2 text-xs text-muted-foreground">
+        <div className="relative h-full w-full overflow-hidden rounded-[2.5rem] bg-background">
+          <div className="flex items-center justify-between px-6 pb-2 pt-3 text-xs text-muted-foreground">
             <span>9:41</span>
-            <div className="flex items-center gap-1">
-              <div className="w-4 h-2 border border-muted-foreground rounded-sm">
-                <div className="w-3/4 h-full bg-muted-foreground rounded-sm" />
-              </div>
+            <div className="h-2 w-4 rounded-sm border border-muted-foreground">
+              <div className="h-full w-3/4 rounded-sm bg-muted-foreground" />
             </div>
           </div>
 
-          {/* App Content */}
           <div className="px-3 pb-20">
-            {/* Header - matches actual app */}
             <div className="flex items-center justify-between py-3">
-              <h2 className="text-sm font-bold text-foreground">投稿一覧</h2>
-              <div className="bg-primary text-primary-foreground text-[10px] font-medium px-2.5 py-1.5 rounded-xl flex items-center gap-1">
-                <Plus className="h-3 w-3" />
-                新規投稿
+              <h2 className="text-sm font-bold text-foreground">授業評価</h2>
+              <div className="flex items-center gap-1 rounded-xl bg-primary px-2.5 py-1.5 text-[10px] font-medium text-primary-foreground">
+                <Plus className="size-3" />
+                授業追加
               </div>
             </div>
 
-            {/* Post Cards - matches actual app layout */}
-            <div className="space-y-2.5 mt-1">
-              <MockPostCard
-                title="プログラミング勉強会メンバー募集"
-                user="たろう"
-                tags={[{ name: "サークル", type: "topic" }]}
-                time="30分前"
-                likes={42}
-                comments={8}
+            <div className="mt-1 space-y-2.5">
+              <MockCourseCard
+                name="英語1A"
+                teacher="佐藤先生"
+                category="教養科目"
+                rating="4.5"
+                reviews={12}
               />
-              <MockPostCard
-                title="月曜2限の経済学、教室変更"
-                user="はなこ"
-                tags={[{ name: "工学部", type: "faculty" }]}
-                time="2時間前"
-                likes={28}
-                comments={3}
+              <MockCourseCard
+                name="データベース論"
+                teacher="田中先生"
+                category="専門科目"
+                rating="4.2"
+                reviews={8}
               />
-              <MockPostCard
-                title="学園祭実行委員募集中"
-                user="じろう"
-                tags={[{ name: "イベント", type: "topic" }, { name: "文学部", type: "faculty" }]}
-                time="昨日"
-                likes={156}
-                comments={24}
+              <MockCourseCard
+                name="心理学"
+                teacher="鈴木先生"
+                category="教養科目"
+                rating="3.9"
+                reviews={15}
               />
             </div>
           </div>
 
-          {/* Bottom Navigation - matches actual app MobileNav */}
-          <div className="absolute bottom-0 left-0 right-0 bg-card border-t border-border px-4 py-2.5">
+          <div className="absolute inset-x-0 bottom-0 border-t border-border bg-card px-4 py-2.5">
             <div className="flex items-center justify-around">
-              <div className="flex flex-col items-center">
-                <Home className="h-5 w-5 text-primary" />
-                <span className="text-[8px] mt-0.5 font-medium text-primary">投稿一覧</span>
+              <div className="flex flex-col items-center text-muted-foreground">
+                <MessageSquare className="size-5" />
+                <span className="mt-0.5 text-[8px] font-medium">投稿</span>
               </div>
-              <div className="flex flex-col items-center">
-                <Bell className="h-5 w-5 text-muted-foreground" />
-                <span className="text-[8px] mt-0.5 font-medium text-muted-foreground">通知</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <Settings className="h-5 w-5 text-muted-foreground" />
-                <span className="text-[8px] mt-0.5 font-medium text-muted-foreground">設定</span>
+              <div className="flex flex-col items-center text-primary">
+                <BookOpen className="size-5" />
+                <span className="mt-0.5 text-[8px] font-medium">授業評価</span>
               </div>
             </div>
           </div>
@@ -208,54 +179,32 @@ function PhoneMockup() {
   );
 }
 
-function MockPostCard({
-  title,
-  user,
-  tags,
-  time,
-  likes,
-  comments,
+function MockCourseCard({
+  name,
+  teacher,
+  category,
+  rating,
+  reviews,
 }: {
-  title: string;
-  user: string;
-  tags: { name: string; type: "faculty" | "topic" }[];
-  time: string;
-  likes: number;
-  comments: number;
+  name: string;
+  teacher: string;
+  category: string;
+  rating: string;
+  reviews: number;
 }) {
   return (
-    <div className="bg-white border border-slate-100 rounded-2xl p-3 shadow-sm">
-      <h3 className="text-xs font-semibold text-foreground line-clamp-2 mb-1.5">{title}</h3>
-      <div className="flex flex-wrap gap-1 mb-1.5">
-        {tags.map((tag) => (
-          <span key={tag.name} className={`text-[8px] font-medium px-1.5 py-0.5 rounded-full border ${
-            tag.type === "faculty"
-              ? "bg-blue-50 text-blue-700 border-blue-200"
-              : "bg-orange-50 text-orange-700 border-orange-200"
-          }`}>
-            {tag.name}
-          </span>
-        ))}
-      </div>
-      <div className="flex items-center gap-2 mt-2 text-[10px] text-muted-foreground">
-        <div className="flex items-center gap-1">
-          <div className="w-3.5 h-3.5 bg-primary/15 rounded-full flex items-center justify-center">
-            <User className="h-2 w-2 text-primary" />
-          </div>
-          <span>{user}</span>
-        </div>
-        <div className="flex items-center gap-0.5">
-          <Calendar className="h-2.5 w-2.5" />
-          <span>{time}</span>
-        </div>
-        <div className="flex items-center gap-0.5">
-          <Heart className="h-2.5 w-2.5" />
-          <span>{likes}</span>
-        </div>
-        <div className="flex items-center gap-0.5">
-          <MessageCircle className="h-2.5 w-2.5" />
-          <span>{comments}</span>
-        </div>
+    <div className="rounded-2xl border border-slate-100 bg-white p-3 shadow-sm">
+      <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[8px] font-medium text-primary">
+        {category}
+      </span>
+      <h3 className="mt-2 text-xs font-semibold text-foreground">{name}</h3>
+      <p className="mt-1 text-[10px] text-muted-foreground">{teacher}</p>
+      <div className="mt-3 flex items-center justify-between text-[10px]">
+        <span className="flex items-center gap-1 font-semibold text-foreground">
+          <Star className="size-3 fill-amber-400 text-amber-400" />
+          {rating}
+        </span>
+        <span className="text-muted-foreground">レビュー {reviews}件</span>
       </div>
     </div>
   );

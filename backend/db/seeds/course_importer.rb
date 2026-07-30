@@ -29,13 +29,14 @@ class CourseImporter
     CSV.foreach(courses_path, headers: true).with_index(2) do |row, line_number|
       course = Course.find_or_initialize_by(
         name: required_value(row, "name"),
-        faculty: required_value(row, "faculty"),
-        department: required_value(row, "department")
+        category: required_value(row, "category")
       )
       stats[:created] += 1 if course.new_record?
 
       course.assign_attributes(
-        category: row["category"]
+        # ロールバック互換用。対象学部・学科の正本はCourseOffering。
+        faculty: course.category == "教養科目" ? nil : course.faculty.presence || required_value(row, "faculty"),
+        department: course.category == "教養科目" ? nil : course.department.presence || required_value(row, "department")
       )
       course.save!
       stats[:processed] += 1
@@ -55,8 +56,7 @@ class CourseImporter
     CSV.foreach(offerings_path, headers: true).with_index(2) do |row, line_number|
       course = Course.find_by!(
         name: required_value(row, "name"),
-        faculty: required_value(row, "faculty"),
-        department: required_value(row, "department")
+        category: required_value(row, "category")
       )
       offering = CourseOffering.find_or_initialize_by(
         course: course,
@@ -71,6 +71,8 @@ class CourseImporter
       offering.assign_attributes(
         delivery_method: row["delivery_method"].presence || "in_person",
         target_grade: row["target_grade"].presence || "all_grades",
+        faculty: course.category == "教養科目" ? nil : required_value(row, "faculty"),
+        department: course.category == "教養科目" ? nil : required_value(row, "department"),
         campus: row["campus"],
         classroom: row["classroom"]
       )

@@ -42,15 +42,13 @@ module Api
       end
 
       def course_params
-        params.require(:course).permit(:name, :faculty, :department, :category)
+        params.require(:course).permit(:name, :category)
       end
 
       def course_response(course)
         {
           id: course.id,
           name: course.name,
-          faculty: course.faculty,
-          department: course.department,
           category: course.category,
           created_at: course.created_at.iso8601,
           updated_at: course.updated_at.iso8601

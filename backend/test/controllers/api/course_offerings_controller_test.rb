@@ -18,7 +18,9 @@ class Api::CourseOfferingsControllerTest < ActionDispatch::IntegrationTest
       day_of_week: "monday",
       period: 2,
       campus: "五橋キャンパス",
-      classroom: "101"
+      classroom: "101",
+      faculty: "情報学部",
+      department: "データサイエンス学科"
     )
   end
 
@@ -71,7 +73,9 @@ class Api::CourseOfferingsControllerTest < ActionDispatch::IntegrationTest
       day_of_week: "tuesday",
       period: 3,
       campus: "五橋キャンパス",
-      classroom: "302"
+      classroom: "302",
+      faculty: "情報学部",
+      department: "データサイエンス学科"
     }
   end
 end

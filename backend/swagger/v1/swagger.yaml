@@ -29,6 +29,8 @@ tags:
     description: コメント機能
   - name: Tag
     description: タグ一覧
+  - name: Course
+    description: 授業・開講情報・授業レビュー
   - name: Admin
     description: 管理者専用エンドポイント
   - name: Misc
@@ -826,6 +828,307 @@ paths:
                   $ref: '#/components/schemas/Tag'
 
   # ============================================================
+  # Courses
+  # ============================================================
+  /api/courses:
+    get:
+      tags: [Course]
+      summary: 授業一覧を取得
+      operationId: listCourses
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: string
+          description: 授業名・教員名・対象学部・対象学科の部分一致
+        - name: faculty
+          in: query
+          schema:
+            type: string
+        - name: department
+          in: query
+          schema:
+            type: string
+        - name: target_grade
+          in: query
+          schema:
+            type: string
+            enum: [all_grades, first_year, second_year, third_year, fourth_year]
+          description: 指定学年に加えて全学年対象の授業も含める
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: academic_year
+          in: query
+          schema:
+            type: integer
+        - name: semester
+          in: query
+          schema:
+            type: string
+            enum: [first, second, full_year, intensive, other]
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  courses:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Course'
+                  has_next:
+                    type: boolean
+    post:
+      tags: [Course]
+      summary: 授業と最初の開講情報を作成
+      operationId: createCourse
+      security:
+        - cookieAuth: []
+      description: 同名・同カテゴリの授業が存在する場合はCourseを再利用し、開講情報だけを追加する
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [course, course_offering]
+              properties:
+                course:
+                  type: object
+                  required: [name, category]
+                  properties:
+                    name:
+                      type: string
+                    category:
+                      type: string
+                      enum: [教養科目, 専門科目, 外国語科目, 教職科目]
+                course_offering:
+                  $ref: '#/components/schemas/CourseOfferingInput'
+      responses:
+        '201':
+          description: 作成成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrors'
+
+  /api/courses/{id}:
+    get:
+      tags: [Course]
+      summary: 授業詳細を取得
+      operationId: getCourse
+      parameters:
+        - $ref: '#/components/parameters/CourseId'
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseDetail'
+        '404':
+          description: 授業が見つからない
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Errors'
+    patch:
+      tags: [Course]
+      summary: 授業と開講情報を更新
+      operationId: updateCourse
+      security:
+        - cookieAuth: []
+      description: 授業の登録者または管理者が更新可能
+      parameters:
+        - $ref: '#/components/parameters/CourseId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                course:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    category:
+                      type: string
+                      enum: [教養科目, 専門科目, 外国語科目, 教職科目]
+                course_offering:
+                  $ref: '#/components/schemas/CourseOfferingInput'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseDetail'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: 権限なし
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrors'
+
+  /api/courses/{course_id}/course_offerings:
+    post:
+      tags: [Course]
+      summary: 開講情報を追加
+      operationId: createCourseOffering
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CourseIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [course_offering]
+              properties:
+                course_offering:
+                  $ref: '#/components/schemas/CourseOfferingInput'
+      responses:
+        '201':
+          description: 作成成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseOffering'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrors'
+
+  /api/courses/{course_id}/reviews:
+    get:
+      tags: [Course]
+      summary: 授業レビュー一覧を取得
+      operationId: listCourseReviews
+      parameters:
+        - $ref: '#/components/parameters/CourseIdPath'
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  course_reviews:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CourseReview'
+    post:
+      tags: [Course]
+      summary: 開講情報へレビューを投稿
+      operationId: createCourseReview
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CourseIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [course_review]
+              properties:
+                course_review:
+                  $ref: '#/components/schemas/CourseReviewInput'
+      responses:
+        '201':
+          description: 投稿成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseReview'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrors'
+
+  /api/course_reviews/{id}:
+    patch:
+      tags: [Course]
+      summary: 自分の授業レビューを更新
+      operationId: updateCourseReview
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CourseReviewId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [course_review]
+              properties:
+                course_review:
+                  $ref: '#/components/schemas/CourseReviewInput'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseReview'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    delete:
+      tags: [Course]
+      summary: 授業レビューを論理削除
+      operationId: deleteCourseReview
+      security:
+        - cookieAuth: []
+      description: 投稿者本人または管理者が削除可能
+      parameters:
+        - $ref: '#/components/parameters/CourseReviewId'
+      responses:
+        '204':
+          description: 削除成功
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ============================================================
   # Admin
   # ============================================================
   /api/admin/stats:
@@ -851,6 +1154,197 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+
+  /api/admin/course_offerings:
+    get:
+      tags: [Admin, Course]
+      summary: 開講情報一覧を管理者として取得
+      operationId: listAdminCourseOfferings
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  course_offerings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AdminCourseOffering'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Admin, Course]
+      summary: 開講情報を管理者として作成
+      operationId: createAdminCourseOffering
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [course_offering]
+              properties:
+                course_offering:
+                  allOf:
+                    - $ref: '#/components/schemas/CourseOfferingInput'
+                    - type: object
+                      required: [course_id]
+                      properties:
+                        course_id:
+                          type: integer
+      responses:
+        '201':
+          description: 作成成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminCourseOffering'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrors'
+
+  /api/admin/courses:
+    get:
+      tags: [Admin, Course]
+      summary: 授業一覧を管理者として取得
+      operationId: listAdminCourses
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  courses:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Course'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Admin, Course]
+      summary: 授業本体を管理者として作成
+      operationId: createAdminCourse
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [course]
+              properties:
+                course:
+                  $ref: '#/components/schemas/AdminCourseInput'
+      responses:
+        '201':
+          description: 作成成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrors'
+
+  /api/admin/courses/{id}:
+    patch:
+      tags: [Admin, Course]
+      summary: 授業本体を管理者として更新
+      operationId: updateAdminCourse
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CourseId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [course]
+              properties:
+                course:
+                  $ref: '#/components/schemas/AdminCourseInput'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrors'
+
+  /api/admin/course_offerings/{id}:
+    patch:
+      tags: [Admin, Course]
+      summary: 開講情報を管理者として更新
+      operationId: updateAdminCourseOffering
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [course_offering]
+              properties:
+                course_offering:
+                  allOf:
+                    - $ref: '#/components/schemas/CourseOfferingInput'
+                    - type: object
+                      properties:
+                        course_id:
+                          type: integer
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminCourseOffering'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrors'
 
   # ============================================================
   # Misc
@@ -899,6 +1393,30 @@ components:
       schema:
         type: integer
       description: 投稿ID
+
+    CourseId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: 授業ID
+
+    CourseIdPath:
+      name: course_id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: 授業ID
+
+    CourseReviewId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: 授業レビューID
 
   responses:
     Unauthorized:
@@ -1068,6 +1586,232 @@ components:
         category:
           type: string
           enum: [faculty, topic]
+
+    # ----------------------------------------------------------
+    # Course
+    # ----------------------------------------------------------
+    CourseOffering:
+      type: object
+      properties:
+        id:
+          type: integer
+        academic_year:
+          type: integer
+          nullable: true
+        semester:
+          type: string
+          enum: [first, second, full_year, intensive, other]
+        teacher_name:
+          type: string
+        day_of_week:
+          type: string
+          nullable: true
+          enum: [monday, tuesday, wednesday, thursday, friday, saturday, sunday, other_day]
+        delivery_method:
+          type: string
+          enum: [in_person, remote]
+        target_grade:
+          type: string
+          enum: [all_grades, first_year, second_year, third_year, fourth_year]
+        faculty:
+          type: string
+          nullable: true
+          description: 教養科目ではnull
+        department:
+          type: string
+          nullable: true
+          description: 教養科目ではnull
+        period:
+          type: integer
+          nullable: true
+        campus:
+          type: string
+        classroom:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    AdminCourseOffering:
+      allOf:
+        - $ref: '#/components/schemas/CourseOffering'
+        - type: object
+          properties:
+            course:
+              type: object
+              properties:
+                id:
+                  type: integer
+                name:
+                  type: string
+
+    CourseOfferingInput:
+      type: object
+      required:
+        - teacher_name
+      properties:
+        academic_year:
+          type: integer
+          nullable: true
+        semester:
+          type: string
+          enum: [first, second, full_year, intensive, other]
+        teacher_name:
+          type: string
+        day_of_week:
+          type: string
+          nullable: true
+          enum: [monday, tuesday, wednesday, thursday, friday, saturday, sunday, other_day]
+        delivery_method:
+          type: string
+          enum: [in_person, remote]
+        target_grade:
+          type: string
+          enum: [all_grades, first_year, second_year, third_year, fourth_year]
+        faculty:
+          type: string
+          nullable: true
+          description: 教養科目では送信不要。それ以外は必須
+        department:
+          type: string
+          nullable: true
+          description: 教養科目では送信不要。それ以外は必須
+        period:
+          type: integer
+          nullable: true
+        campus:
+          type: string
+        classroom:
+          type: string
+          nullable: true
+
+    Course:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        category:
+          type: string
+        created_by_id:
+          type: integer
+          nullable: true
+        can_manage:
+          type: boolean
+        primary_course_offering:
+          allOf:
+            - $ref: '#/components/schemas/CourseOffering'
+          nullable: true
+        reviews_count:
+          type: integer
+        average_rating:
+          type: number
+          nullable: true
+        average_difficulty:
+          type: number
+          nullable: true
+        average_workload:
+          type: number
+          nullable: true
+        average_grading:
+          type: number
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    AdminCourseInput:
+      type: object
+      required: [name, category]
+      properties:
+        name:
+          type: string
+        category:
+          type: string
+          enum: [教養科目, 専門科目, 外国語科目, 教職科目]
+
+    CourseDetail:
+      allOf:
+        - $ref: '#/components/schemas/Course'
+        - type: object
+          properties:
+            course_offerings:
+              type: array
+              items:
+                $ref: '#/components/schemas/CourseOffering'
+
+    CourseReviewInput:
+      type: object
+      required:
+        - course_offering_id
+        - rating
+        - difficulty
+        - workload
+        - grading
+        - exam_presence
+        - attendance_check
+        - textbook_required
+      properties:
+        course_offering_id:
+          type: integer
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        difficulty:
+          type: integer
+          minimum: 1
+          maximum: 5
+        workload:
+          type: integer
+          minimum: 1
+          maximum: 5
+        grading:
+          type: integer
+          minimum: 1
+          maximum: 5
+        exam_presence:
+          type: string
+          enum: [none, sometimes, yes]
+        attendance_check:
+          type: string
+          enum: [none, sometimes, yes]
+        textbook_required:
+          type: boolean
+        comment:
+          type: string
+          nullable: true
+
+    CourseReview:
+      allOf:
+        - $ref: '#/components/schemas/CourseReviewInput'
+        - type: object
+          properties:
+            id:
+              type: integer
+            course_id:
+              type: integer
+            user:
+              type: object
+              properties:
+                id:
+                  type: integer
+                display_name:
+                  type: string
+            created_at:
+              type: string
+              format: date-time
+            updated_at:
+              type: string
+              format: date-time
 
     # ----------------------------------------------------------
     # Admin

@@ -17,7 +17,7 @@ class CourseReview < ApplicationRecord
   validates :exam_presence, :attendance_check, presence: true
   validates :textbook_required, inclusion: { in: [true, false] }
   validates :comment, length: { maximum: 5000 }, allow_blank: true
-  validates :user_id, uniqueness: { scope: :course_id, conditions: -> { where(deleted_at: nil) } }
+  validate :course_offering_required_for_new_reviews
   validate :course_offering_belongs_to_course
 
   scope :active, -> { where(deleted_at: nil) }
@@ -32,6 +32,13 @@ class CourseReview < ApplicationRecord
   end
 
   private
+
+  def course_offering_required_for_new_reviews
+    return if course_offering.present?
+    return if persisted? && course_offering_id_in_database.nil?
+
+    errors.add(:course_offering, "must exist")
+  end
 
   def course_offering_belongs_to_course
     return if course_offering.blank?
