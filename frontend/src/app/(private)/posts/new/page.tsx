@@ -79,7 +79,7 @@ export default function PostNewPage() {
         <div className="min-h-screen bg-background py-4 sm:py-8">
             <div className="max-w-4xl mx-auto px-4 sm:px-6">
                 {/* 戻るボタン */}
-                <TopButton searchParams={searchParams} message="一覧に戻る" />
+                <TopButton backUrl={`/posts?${searchParams.toString()}`} message="一覧に戻る" />
 
                 {/* 新規投稿フォーム */}
                 <Form

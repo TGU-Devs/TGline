@@ -57,7 +57,7 @@ if Rails.env.development?
 
   puts "Creating dummy posts..."
 
-  posts_data = [
+  base_posts_data = [
     {
       title: "投稿1",
       body: "これは投稿1の内容です",
@@ -78,6 +78,16 @@ if Rails.env.development?
       user: User.fourth,
     }
   ]
+
+  temporary_posts_data = 5.upto(30).map do |number|
+    {
+      title: "投稿#{number}",
+      body: "これは投稿#{number}の内容です",
+      user: User.all.to_a[(number - 1) % User.count]
+    }
+  end
+
+  posts_data = base_posts_data + temporary_posts_data
 
   posts_data.each do |post_data|
     post = Post.find_or_create_by!(title: post_data[:title]) do |p|

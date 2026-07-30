@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 
 import { useUser } from "@/contexts/UserContext";
 import { useStatusToast } from "@/hooks/useStatusToast";
@@ -9,6 +10,7 @@ import Loading from "@/components/ui/Loading";
 import ErrorUI from "@/components/ui/ErrorUI";
 import Toast from "@/components/ui/Toast";
 import Main from "@/components/ui/PageMain";
+import BackButton from "@/components/features/posts/components/shared/BackButton";
 import Header from "@/components/features/settings/Header";
 import ProfileSection from "@/components/features/settings/ProfileSection";
 import NotificationSection from "@/components/features/settings/NotificationSection";
@@ -39,6 +41,16 @@ const initFormValues = {
 
 const SettingsPage = () => {
     const { user, isLoading, error, refreshUser, setUser } = useUser();
+    const searchParams = useSearchParams();
+    const [fromProfile, setFromProfile] = useState(false);
+    const [profileUserId, setProfileUserId] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (searchParams.get("from") === "profile") {
+            setFromProfile(true);
+            setProfileUserId(searchParams.get("userId") || null);
+        }
+    }, [searchParams]);
 
     const [showSaveToast, setShowSaveToast] = useState(false);
     const [showErrorToast, setShowErrorToast] = useState(false);
@@ -185,6 +197,14 @@ const SettingsPage = () => {
                 message="パスワードを変更しました。"
                 bg="bg-emerald-500"
             />
+            {fromProfile && profileUserId && (
+                <div className="mb-6">
+                <BackButton
+                        fallbackUrl={`/users/${profileUserId}`}
+                        label="プロフィールに戻る"
+                    />
+                </div>
+            )}
 
             <form onSubmit={saveHandler} noValidate>
                 <Header icon={Save} saveHandler={saveHandler} />
