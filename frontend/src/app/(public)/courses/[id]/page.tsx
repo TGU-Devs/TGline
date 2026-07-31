@@ -175,26 +175,55 @@ export default function CourseDetailPage() {
                 <Link
                   key={offering.id}
                   href={`/courses/${course.id}/offerings/${offering.id}`}
-                  className="block rounded-md border border-border bg-background p-4 transition hover:border-primary/40 hover:shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                  className="group block overflow-hidden rounded-lg border border-border bg-background transition hover:border-primary/40 hover:shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-slate-900">
-                        {courseOfferingBadges(offering).map((label) => (
-                          <span key={label}>{label}</span>
-                        ))}
-                      </div>
-                      <div className="mt-2 grid gap-1 text-sm text-muted-foreground sm:grid-cols-2">
-                        <p>担当: {offering.teacher_name}</p>
-                        <p>キャンパス: {offering.campus || "-"}</p>
-                        {offering.classroom && <p>教室: {offering.classroom}</p>}
-                      </div>
+                  <div className="p-4">
+                    <div className="flex flex-wrap gap-2">
+                      {courseOfferingBadges(offering).map((label) => (
+                        <span
+                          key={label}
+                          className="rounded-md bg-secondary px-2.5 py-1 text-xs font-semibold text-secondary-foreground"
+                        >
+                          {label}
+                        </span>
+                      ))}
                     </div>
-                    <div className="flex shrink-0 items-center gap-3 text-sm text-muted-foreground">
-                      <span className="font-semibold text-slate-700">
-                        レビュー数 {reviewCountsByOffering[offering.id] ?? 0}件
+
+                    <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-3">
+                      <div className="min-w-0">
+                        <dt className="text-xs font-medium text-muted-foreground">担当教員</dt>
+                        <dd className="mt-1 break-words font-semibold text-slate-800">
+                          {offering.teacher_name}
+                        </dd>
+                      </div>
+                      <div className="min-w-0">
+                        <dt className="text-xs font-medium text-muted-foreground">キャンパス</dt>
+                        <dd className="mt-1 break-words font-semibold text-slate-800">
+                          {offering.campus || "未登録"}
+                        </dd>
+                      </div>
+                      {offering.classroom && (
+                        <div className="min-w-0">
+                          <dt className="text-xs font-medium text-muted-foreground">教室</dt>
+                          <dd className="mt-1 break-words font-semibold text-slate-800">
+                            {offering.classroom}
+                          </dd>
+                        </div>
+                      )}
+                    </dl>
+                  </div>
+
+                  <div className="flex min-h-12 items-center justify-between gap-3 border-t border-border bg-muted/30 px-4 py-3">
+                    <div className="flex min-w-0 items-center gap-2 text-sm text-slate-700">
+                      <MessageSquare className="size-4 shrink-0 text-primary" />
+                      <span>レビュー</span>
+                      <span className="font-bold tabular-nums">
+                        {reviewCountsByOffering[offering.id] ?? 0}件
                       </span>
-                      <ChevronRight className="size-5" />
+                    </div>
+                    <div className="flex shrink-0 items-center gap-1 text-sm font-semibold text-primary">
+                      <span>口コミを見る</span>
+                      <ChevronRight className="size-5 transition-transform group-hover:translate-x-0.5" />
                     </div>
                   </div>
                 </Link>
