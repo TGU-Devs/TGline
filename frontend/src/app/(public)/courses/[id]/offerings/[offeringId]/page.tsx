@@ -11,7 +11,13 @@ import {
   formatCourseOfferingOption,
   reviewStats,
 } from "@/components/features/courses/display";
-import { formatAverage, formatPresence, ratingLabels } from "@/components/features/courses/labels";
+import {
+  formatAverage,
+  formatPresence,
+  formatRatingScore,
+  ratingLabels,
+  type RatingScoreField,
+} from "@/components/features/courses/labels";
 import type { Course, CourseReview, CourseReviewsResponse } from "@/components/features/courses/types";
 import ErrorUI from "@/components/ui/ErrorUI";
 import Loading from "@/components/ui/Loading";
@@ -129,10 +135,10 @@ export default function CourseOfferingDetailPage() {
             </div>
           </div>
 
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <ScoreSummary label={ratingLabels.difficulty} value={stats.average_difficulty} />
-            <ScoreSummary label={ratingLabels.workload} value={stats.average_workload} />
-            <ScoreSummary label={ratingLabels.grading} value={stats.average_grading} />
+          <div className="mt-5 grid gap-3 sm:grid-cols-3">
+            <ScoreSummary field="difficulty" value={stats.average_difficulty} />
+            <ScoreSummary field="workload" value={stats.average_workload} />
+            <ScoreSummary field="grading" value={stats.average_grading} />
           </div>
         </section>
 
@@ -162,10 +168,10 @@ export default function CourseOfferingDetailPage() {
                       {review.rating}
                     </div>
                   </div>
-                  <div className="mt-3 grid gap-2 text-sm sm:grid-cols-4">
-                    <ReviewScore label="難易度" value={review.difficulty} />
-                    <ReviewScore label="課題量" value={review.workload} />
-                    <ReviewScore label="単位" value={review.grading} />
+                  <div className="mt-3 grid gap-2 text-sm sm:grid-cols-3">
+                    <ReviewScore field="difficulty" value={review.difficulty} />
+                    <ReviewScore field="workload" value={review.workload} />
+                    <ReviewScore field="grading" value={review.grading} />
                   </div>
                   <div className="mt-3 grid gap-2 text-sm sm:grid-cols-4">
                     <ReviewMeta label="テスト" value={formatPresence(review.exam_presence)} />
@@ -196,20 +202,20 @@ function Metric({ label, value, icon }: { label: string; value: string; icon: Re
   );
 }
 
-function ScoreSummary({ label, value }: { label: string; value: number | null | undefined }) {
+function ScoreSummary({ field, value }: { field: RatingScoreField; value: number | null | undefined }) {
   return (
     <div className="rounded-md bg-background p-3">
-      <p className="text-xs font-semibold text-muted-foreground">{label}</p>
-      <p className="mt-1 text-lg font-bold text-slate-900">{formatAverage(value)}</p>
+      <p className="text-xs font-semibold text-muted-foreground">{ratingLabels[field]}</p>
+      <p className="mt-1 text-lg font-bold text-slate-900">{formatRatingScore(field, value)}</p>
     </div>
   );
 }
 
-function ReviewScore({ label, value }: { label: string; value: number }) {
+function ReviewScore({ field, value }: { field: RatingScoreField; value: number }) {
   return (
     <div className="rounded-md bg-secondary px-3 py-2">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="font-bold text-slate-900">{value}</p>
+      <p className="text-xs text-muted-foreground">{ratingLabels[field]}</p>
+      <p className="font-bold text-slate-900">{formatRatingScore(field, value)}</p>
     </div>
   );
 }

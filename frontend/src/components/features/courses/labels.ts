@@ -43,12 +43,31 @@ export const ratingLabels = {
   grading: "単位の取りやすさ",
 } as const;
 
-export const ratingScaleHints = {
-  rating: { min: "低い", max: "高い" },
-  difficulty: { min: "易しい", max: "難しい" },
-  workload: { min: "少ない", max: "多い" },
-  grading: { min: "厳しい", max: "取りやすい" },
+export type RatingScoreField = keyof typeof ratingLabels;
+
+export const ratingScaleLabels: Record<RatingScoreField, readonly string[]> = {
+  rating: ["不満", "やや不満", "普通", "満足", "とても満足"],
+  difficulty: ["難しい", "やや難しい", "普通", "やや易しい", "易しい"],
+  workload: ["多い", "やや多い", "普通", "やや少ない", "少ない"],
+  grading: ["取りにくい", "やや取りにくい", "普通", "やや取りやすい", "取りやすい"],
 } as const;
+
+export const ratingScaleHints: Record<RatingScoreField, { min: string; max: string }> = {
+  rating: { min: "低い", max: "高い" },
+  difficulty: { min: "難しい", max: "易しい" },
+  workload: { min: "多い", max: "少ない" },
+  grading: { min: "取りにくい", max: "取りやすい" },
+};
+
+export function formatRatingScore(
+  field: RatingScoreField,
+  value: number | null | undefined,
+) {
+  if (typeof value !== "number") return "評価なし";
+
+  const score = Math.min(5, Math.max(1, Math.round(value)));
+  return ratingScaleLabels[field][score - 1];
+}
 
 export function formatSemester(value: string | null | undefined) {
   if (!value) return "-";

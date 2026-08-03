@@ -287,6 +287,8 @@ function ScoreInput({
           value={value}
           onChange={(event) => onChange(Number(event.target.value))}
           className="h-2 w-full cursor-pointer appearance-none rounded-full bg-muted accent-primary outline-none"
+          aria-label={label}
+          aria-valuetext={`${value}、${value === 1 ? minLabel : value === 5 ? maxLabel : "中間"}`}
         />
         <div className="mt-2 grid grid-cols-5 text-center text-xs font-medium text-muted-foreground">
           {[1, 2, 3, 4, 5].map((score) => (

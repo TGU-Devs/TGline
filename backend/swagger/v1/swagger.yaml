@@ -1712,15 +1712,19 @@ components:
         average_rating:
           type: number
           nullable: true
+          description: 総合評価の平均。1が不満、5がとても満足
         average_difficulty:
           type: number
           nullable: true
+          description: 授業難易度の平均。1が難しい、5が易しい
         average_workload:
           type: number
           nullable: true
+          description: 課題量の平均。1が多い、5が少ない
         average_grading:
           type: number
           nullable: true
+          description: 単位の取りやすさの平均。1が取りにくい、5が取りやすい
         created_at:
           type: string
           format: date-time
@@ -1766,18 +1770,22 @@ components:
           type: integer
           minimum: 1
           maximum: 5
+          description: 総合評価。1が不満、5がとても満足
         difficulty:
           type: integer
           minimum: 1
           maximum: 5
+          description: 授業の難易度。1が難しい、5が易しい
         workload:
           type: integer
           minimum: 1
           maximum: 5
+          description: 課題量。1が多い、5が少ない
         grading:
           type: integer
           minimum: 1
           maximum: 5
+          description: 単位の取りやすさ。1が取りにくい、5が取りやすい
         exam_presence:
           type: string
           enum: [none, sometimes, yes]
