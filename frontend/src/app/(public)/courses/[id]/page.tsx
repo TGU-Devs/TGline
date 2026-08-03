@@ -19,7 +19,9 @@ import LoginPromptModal from "@/components/features/auth/LoginPromptModal";
 import { courseOfferingBadges } from "@/components/features/courses/display";
 import {
   formatAverage,
+  formatRatingScore,
   ratingLabels,
+  type RatingScoreField,
 } from "@/components/features/courses/labels";
 import type { Course, CourseReview, CourseReviewsResponse } from "@/components/features/courses/types";
 import ErrorUI from "@/components/ui/ErrorUI";
@@ -139,10 +141,10 @@ export default function CourseDetailPage() {
             </div>
           </div>
 
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <ScoreSummary label={ratingLabels.difficulty} value={course.average_difficulty} />
-            <ScoreSummary label={ratingLabels.workload} value={course.average_workload} />
-            <ScoreSummary label={ratingLabels.grading} value={course.average_grading} />
+          <div className="mt-5 grid gap-3 sm:grid-cols-3">
+            <ScoreSummary field="difficulty" value={course.average_difficulty} />
+            <ScoreSummary field="workload" value={course.average_workload} />
+            <ScoreSummary field="grading" value={course.average_grading} />
           </div>
         </section>
 
@@ -249,11 +251,11 @@ function Metric({ label, value, icon }: { label: string; value: string; icon: Re
   );
 }
 
-function ScoreSummary({ label, value }: { label: string; value: number | null | undefined }) {
+function ScoreSummary({ field, value }: { field: RatingScoreField; value: number | null | undefined }) {
   return (
     <div className="rounded-md bg-background p-3">
-      <p className="text-xs font-semibold text-muted-foreground">{label}</p>
-      <p className="mt-1 text-lg font-bold text-slate-900">{formatAverage(value)}</p>
+      <p className="text-xs font-semibold text-muted-foreground">{ratingLabels[field]}</p>
+      <p className="mt-1 text-lg font-bold text-slate-900">{formatRatingScore(field, value)}</p>
     </div>
   );
 }
