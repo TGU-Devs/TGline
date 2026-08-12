@@ -6,7 +6,7 @@ module Api
 
     # GET /api/posts/:post_id/comments
     def index
-      comments = @post.comments.active.includes(:user).order(created_at: :asc)
+      comments = @post.comments.active.includes(user: { avatar_attachment: :blob }).order(created_at: :asc)
 
       render json: comments.map { |comment| comment_response(comment) }, status: :ok
     end
@@ -52,9 +52,24 @@ module Api
         body: comment.body,
         user: comment.user ? {
           id: comment.user.id,
-          display_name: comment.user.display_name
+          display_name: comment.user.display_name,
+          avatar: avatar_response(comment.user)
         } : nil,
         created_at: comment.created_at.iso8601
+      }
+    end
+
+    def public_backend_url
+      ENV.fetch('BACKEND_PUBLIC_URL', request.base_url).delete_suffix('/')
+    end
+
+    def avatar_response(user)
+      return nil unless user.avatar.attached?
+
+      {
+        url: "#{public_backend_url}#{rails_blob_path(user.avatar, only_path: true)}",
+        content_type: user.avatar.content_type,
+        byte_size: user.avatar.byte_size
       }
     end
   end
