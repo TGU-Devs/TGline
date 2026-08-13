@@ -10,6 +10,20 @@ class ApplicationController < ActionController::API
 
   private
 
+  def public_backend_url
+    ENV.fetch('BACKEND_PUBLIC_URL', request.base_url).delete_suffix('/')
+  end
+
+  def avatar_response(user)
+    return nil unless user&.avatar&.attached?
+
+    {
+      url: "#{public_backend_url}#{rails_blob_path(user.avatar, only_path: true)}",
+      content_type: user.avatar.content_type,
+      byte_size: user.avatar.byte_size
+    }
+  end
+
   def university_email?(email)
     email.to_s.strip.downcase.end_with?("@g.tohoku-gakuin.ac.jp")
   end

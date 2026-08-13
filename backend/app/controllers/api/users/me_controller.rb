@@ -50,10 +50,6 @@ module Api
 
       private
 
-      def public_backend_url
-        ENV.fetch('BACKEND_PUBLIC_URL', request.base_url).delete_suffix('/')
-      end
-
       def user_params
         params.require(:user).permit(:display_name, :description, :email, :avatar, :remove_avatar)
       end
@@ -68,16 +64,6 @@ module Api
           provider: user.provider,
           created_at: user.created_at.iso8601,
           avatar: avatar_response(user)
-        }
-      end
-
-      def avatar_response(user)
-        return nil unless user.avatar.attached?
-
-        {
-          url: "#{public_backend_url}#{rails_blob_path(user.avatar, only_path: true)}",
-          content_type: user.avatar.content_type,
-          byte_size: user.avatar.byte_size
         }
       end
     end
