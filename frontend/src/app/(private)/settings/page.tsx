@@ -45,6 +45,9 @@ const SettingsPage = () => {
     const [fromProfile, setFromProfile] = useState(false);
     const [profileUserId, setProfileUserId] = useState<string | null>(null);
 
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [isAvatarDeleted, setIsAvatarDeleted] = useState(false);
+
     useEffect(() => {
         if (searchParams.get("from") === "profile") {
             setFromProfile(true);
@@ -108,26 +111,33 @@ const SettingsPage = () => {
         setFormErrors({});
 
         try {
-            const payload = {
-                user: {
-                    display_name: formValues.display_name,
-                    description: formValues.description,
-                },
-            };
+            const formData = new FormData();
+                formData.append("user[display_name]", formValues.display_name);
+                formData.append("user[description]", formValues.description || "");
 
-            const res = await fetch("/api/users/me", {
+                if (selectedFile) {
+                formData.append("user[avatar]", selectedFile);
+                } else if (isAvatarDeleted) {
+                formData.append("user[remove_avatar]", "true");
+                }
+
+                const res = await fetch("/api/users/me", {
                 method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                },
                 credentials: "include",
-                body: JSON.stringify(payload),
+                body: formData,
             });
-            if (res.ok) {
-                setShowSaveToast(true);
-                const updated = await res.json();
 
-                setUser(updated);
+            if (res.ok) {
+                if (res.ok) {
+            setShowSaveToast(true);
+
+            await refreshUser();
+
+            setSelectedFile(null);
+            setIsAvatarDeleted(false);
+
+            setTimeout(() => setShowSaveToast(false), 3000);
+            }
 
                 setTimeout(() => setShowSaveToast(false), 3000);
             } else {
@@ -214,6 +224,11 @@ const SettingsPage = () => {
                     formErrors={formErrors}
                     icon={UserIcon}
                     onchangeHandler={onchangeHandler}
+                    selectedFile={selectedFile}
+                    setSelectedFile={setSelectedFile}
+                    isAvatarDeleted={isAvatarDeleted}
+                    setIsAvatarDeleted={setIsAvatarDeleted}
+                    currentAvatarUrl={typeof user?.avatar === "string" ? user.avatar : user?.avatar?.url}
                 />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <NotificationSection

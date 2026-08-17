@@ -5,7 +5,7 @@ import Logo from "./Logo";
 import LogoutButton from "./LogoutButton";
 
 import { Menu, X } from "lucide-react";
-import Avatar from "boring-avatars";
+import UserAvatar from "@/components/UserAvatar";
 
 import { User } from "@/types/user";
 import type { MenuItem } from "./types";
@@ -105,9 +105,8 @@ const MobileNav = ({
                     <Link href="/settings" onClick={toggleMenu} className="flex items-center space-x-3 mb-4 rounded-xl p-2 -m-2 hover:bg-sidebar-accent/10 transition-colors">
                         <div className="w-10 h-10 shrink-0 bg-primary rounded-full flex items-center justify-center text-lg text-primary-foreground font-bold shadow-sm">
                             {currentUser ? (
-                                <Avatar
+                                <UserAvatar
                                     name={currentUser?.display_name || ""}
-                                    variant="beam"
                                     size={60}
                                 />
                             ) : (

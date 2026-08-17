@@ -1,4 +1,4 @@
-import Avatar from "boring-avatars";
+import UserAvatar from "@/components/UserAvatar";
 import { Calendar } from "lucide-react";
 import type { Post, Comment } from "@/components/features/posts/types";
 import type { UserProfile } from "@/components/features/users/types";
@@ -22,9 +22,9 @@ const UserProfileSection = ({
                 <div className="flex flex-col gap-4 flex-1">
                     <div className="flex items-start gap-6">
                         <div className="shrink-0 flex items-center justify-center rounded-full bg-blue-50/50 p-2">
-                            <Avatar
+                            <UserAvatar
+                                avatar={user.avatar}
                                 name={user.display_name}
-                                variant="beam"
                                 size={80}
                             />
                         </div>
