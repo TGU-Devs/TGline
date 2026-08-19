@@ -72,14 +72,15 @@ class User < ApplicationRecord
   end
 
   def acceptable_avatar
+    return unless attachment_changes["avatar"]
     return unless avatar.attached?
 
     unless ACCEPTABLE_AVATAR_TYPES.include?(avatar.content_type)
-      errors.add(:avatar, "はJPEG、PNG、WebP、GIF形式のみアップロードできます")
+      errors.add(:avatar, "アイコン画像はJPEG、PNG、WebP、GIF形式のみアップロードできます")
     end
 
     if avatar.blob.byte_size > MAX_AVATAR_SIZE
-      errors.add(:avatar, "は#{MAX_AVATAR_SIZE / 1.megabyte}MB以下にしてください")
+      errors.add(:avatar, "アイコン画像は#{MAX_AVATAR_SIZE / 1.megabyte}MB以下にしてください")
     end
   end
 end

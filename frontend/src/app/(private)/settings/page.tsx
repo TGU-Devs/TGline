@@ -40,7 +40,7 @@ const initFormValues = {
 };
 
 const SettingsPage = () => {
-    const { user, isLoading, error, refreshUser, setUser } = useUser();
+    const { user, isLoading, error, refreshUser } = useUser();
     const searchParams = useSearchParams();
     const [fromProfile, setFromProfile] = useState(false);
     const [profileUserId, setProfileUserId] = useState<string | null>(null);
@@ -57,6 +57,9 @@ const SettingsPage = () => {
 
     const [showSaveToast, setShowSaveToast] = useState(false);
     const [showErrorToast, setShowErrorToast] = useState(false);
+    const [errorMessage, setErrorMessage] = useState(
+        "ネットワークエラーが発生しました。",
+    );
     const [isDark, setIsDark] = useState(false);
     const [formValues, setFormValues] = useState<FormValues>(initFormValues);
     const [formErrors, setFormErrors] = useState<Errors>({});
@@ -112,41 +115,43 @@ const SettingsPage = () => {
 
         try {
             const formData = new FormData();
-                formData.append("user[display_name]", formValues.display_name);
-                formData.append("user[description]", formValues.description || "");
+            formData.append("user[display_name]", formValues.display_name);
+            formData.append("user[description]", formValues.description || "");
 
-                if (selectedFile) {
+            if (selectedFile) {
                 formData.append("user[avatar]", selectedFile);
-                } else if (isAvatarDeleted) {
+            } else if (isAvatarDeleted) {
                 formData.append("user[remove_avatar]", "true");
-                }
+            }
 
-                const res = await fetch("/api/users/me", {
+            const res = await fetch("/api/users/me", {
                 method: "PATCH",
                 credentials: "include",
                 body: formData,
             });
 
             if (res.ok) {
-                if (res.ok) {
-            setShowSaveToast(true);
-
-            await refreshUser();
-
-            setSelectedFile(null);
-            setIsAvatarDeleted(false);
-
-            setTimeout(() => setShowSaveToast(false), 3000);
-            }
-
+                setShowSaveToast(true);
+                await refreshUser();
+                setSelectedFile(null);
+                setIsAvatarDeleted(false);
                 setTimeout(() => setShowSaveToast(false), 3000);
             } else {
                 console.error("ユーザーデータの更新に失敗:", res.status);
+
+                const errorData = await res.json().catch(() => null);
+                setErrorMessage(
+                    errorData?.errors
+                        ? Object.values(errorData.errors).flat().join(", ")
+                        : "ユーザーデータの更新に失敗しました。",
+                );
+
                 setShowErrorToast(true);
                 setTimeout(() => setShowErrorToast(false), 4000);
             }
         } catch (error) {
             console.error("ユーザーデータの更新中にエラーが発生:", error);
+            setErrorMessage("ネットワークエラーが発生しました。");
             setShowErrorToast(true);
             setTimeout(() => setShowErrorToast(false), 4000);
         }
@@ -198,7 +203,7 @@ const SettingsPage = () => {
             <Toast
                 showToast={showErrorToast}
                 icon={AlertTriangle}
-                message="ネットワークエラーが発生しました。"
+                message={errorMessage}
                 bg="bg-red-500"
             />
             <Toast
@@ -228,7 +233,7 @@ const SettingsPage = () => {
                     setSelectedFile={setSelectedFile}
                     isAvatarDeleted={isAvatarDeleted}
                     setIsAvatarDeleted={setIsAvatarDeleted}
-                    currentAvatarUrl={typeof user?.avatar === "string" ? user.avatar : user?.avatar?.url}
+                    currentAvatarUrl={user?.avatar?.url}
                 />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <NotificationSection
