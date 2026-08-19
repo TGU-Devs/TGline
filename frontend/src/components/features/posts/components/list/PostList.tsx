@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { User, Calendar, Heart, MessageCircle } from "lucide-react";
+import { Calendar, Heart, MessageCircle } from "lucide-react";
+import UserAvatar from "@/components/UserAvatar";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -97,9 +98,11 @@ const PostList = ({
                                 }}
                                 className="flex items-center gap-1.5 hover:text-primary transition-colors cursor-pointer"
                             >
-                                <div className="w-5 h-5 bg-primary/15 rounded-full flex items-center justify-center">
-                                    <User className="h-3 w-3 text-primary" />
-                                </div>
+                                <UserAvatar
+                                    avatar={post.user?.avatar}
+                                    name={post.user?.display_name || "匿名"}
+                                    size={20}
+                                />
                                 <span>{post.user?.display_name || "匿名"}</span>
                             </button>
                             <div className="flex items-center gap-1">

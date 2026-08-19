@@ -18,7 +18,8 @@ const UserProfile = ({ currentUser, isLoading }: UserProfileProps) => {
                     <div className="w-10 h-10 shrink-0 bg-primary rounded-full flex items-center justify-center text-lg text-primary-foreground font-bold shadow-sm">
                         {currentUser ? (
                             <UserAvatar
-                                name={currentUser?.display_name || ""}
+                                avatar={currentUser.avatar}
+                                name={currentUser.display_name || ""}
                                 size={60}
                             />
                         ) : (
