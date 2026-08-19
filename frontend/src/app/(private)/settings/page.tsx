@@ -184,7 +184,7 @@ const SettingsPage = () => {
         setFormValues((prevFormValues) => ({ ...prevFormValues, [id]: value }));
     };
 
-    if (isLoading) {
+    if (isLoading && !user) {
         return <Loading />;
     }
 

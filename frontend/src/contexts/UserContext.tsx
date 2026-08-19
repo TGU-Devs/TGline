@@ -6,6 +6,7 @@ import {
     useState,
     useEffect,
     useCallback,
+    useRef,
 } from "react";
 import type { User } from "@/types/user";
 
@@ -23,10 +24,13 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const hasLoadedRef = useRef(false);
 
     const fetchUser = useCallback(async () => {
         try {
-            setIsLoading(true);
+            if (!hasLoadedRef.current) {
+                setIsLoading(true);
+            }
             const res = await fetch("/api/users/me", {
                 credentials: "include",
                 cache: "no-store",
@@ -43,6 +47,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
             console.error("UseContext:取得エラー", err);
             setError("ユーザー情報の取得に失敗しました");
         } finally {
+            hasLoadedRef.current = true;
             setIsLoading(false);
         }
     }, []);
