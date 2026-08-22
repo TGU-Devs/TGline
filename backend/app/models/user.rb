@@ -8,6 +8,7 @@ class User < ApplicationRecord
   has_many :comments, dependent: :destroy
   has_many :course_reviews, dependent: :destroy
   has_many :created_courses, class_name: "Course", foreign_key: :created_by_id, dependent: :nullify
+  has_many :notifications, foreign_key: :recipient_id, dependent: :destroy
 
   def password_required?
     provider.blank? && super
