@@ -20,7 +20,7 @@ const UserProfile = ({ currentUser, isLoading }: UserProfileProps) => {
                             <UserAvatar
                                 avatar={currentUser.avatar}
                                 name={currentUser.display_name || ""}
-                                size={60}
+                                size={40}
                             />
                         ) : (
                             <div className="animate-pulse w-10 h-10 bg-primary/50 rounded-full" />
