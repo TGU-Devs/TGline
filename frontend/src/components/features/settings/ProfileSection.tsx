@@ -66,15 +66,13 @@ const ProfileSection = ({
 
 return (
   <SettingSection title="プロフィール設定" icon={Icon}>
-    <div className="flex flex-col md:flex-row gap-8 items-start">
-      <div className="flex flex-col items-center gap-3">
-        <div className="mb-4">
-          <UserAvatar
-            avatar={displayAvatarUrl ? { url: displayAvatarUrl } : null}
-            name={formValues.display_name || "User"}
-            size={80}
-          />
-        </div>
+    <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-center md:items-start">
+      <div className="flex flex-col items-center gap-3 w-full md:w-auto">
+        <UserAvatar
+          avatar={displayAvatarUrl ? { url: displayAvatarUrl } : null}
+          name={formValues.display_name || "User"}
+          size={80}
+        />
 
         <input
           type="file"
@@ -85,10 +83,10 @@ return (
           id="avatar-upload"
         />
 
-        <div className="flex flex-col gap-1.5 w-full">
+        <div className="flex flex-row md:flex-col gap-2 justify-center w-full max-w-xs md:max-w-none">
           <label
             htmlFor="avatar-upload"
-            className="text-xs text-center font-bold text-sky-600 bg-sky-50 hover:bg-sky-100 px-3 py-1.5 rounded-lg cursor-pointer transition-colors"
+            className="flex-1 md:flex-none text-xs text-center font-bold text-sky-600 bg-sky-50 hover:bg-sky-100 px-3 py-1.5 rounded-lg cursor-pointer transition-colors"
           >
             画像を選択
           </label>
@@ -97,7 +95,7 @@ return (
             <button
               type="button"
               onClick={handleRemoveAvatar}
-              className="text-xs font-bold text-red-500 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors"
+              className="flex-1 md:flex-none text-xs font-bold text-red-500 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors"
             >
               画像を削除
             </button>
