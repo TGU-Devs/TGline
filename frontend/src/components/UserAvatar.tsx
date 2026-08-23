@@ -32,7 +32,7 @@ export default function UserAvatar({
     <div className={className} style={{ width: size, height: size }}>
       <Avatar
         size={size}
-        name="default-fixed-avatar"
+        name={name}
         variant="beam"
         colors={["#92A1C6", "#146A7C", "#F0AB3D", "#C271B4", "#C20D90"]}
       />
