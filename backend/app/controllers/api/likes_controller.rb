@@ -8,11 +8,13 @@ module Api
     def create
       like = current_user.likes.build(post: @post)
 
-      if like.save
-        head :created
-      else
-        head :unprocessable_entity
+      Like.transaction do
+        like.save!
+        Notification.create_for_like!(like)
       end
+      head :created
+    rescue ActiveRecord::RecordInvalid
+      head :unprocessable_entity
     end
 
     # DELETE /api/posts/:post_id/likes
@@ -20,7 +22,10 @@ module Api
       like = current_user.likes.find_by(post: @post)
       return head :not_found unless like
 
-      like.destroy
+      Like.transaction do
+        Notification.destroy_for_like_or_comment!(like)
+        like.destroy!
+      end
       head :no_content
     end
 

@@ -25,4 +25,31 @@ class Notification < ApplicationRecord
     def mark_as_read! 
       update!(read_at: Time.current) if read_at.nil?
     end
+
+    def self.create_for_like!(like)
+      return if like.user_id == like.post.user_id #自分がいいねした場合は通知を作成しない
+
+      create!(
+        recipient: like.post.user, #通知を受け取るユーザー
+        actor: like.user, #通知を送信したユーザー
+        notifiable: like, #通知対象のモデル
+        kind: :like #通知の種類
+      )
+    end
+
+    def self.create_for_comment!(comment)
+      return if comment.user_id == comment.post.user_id #自分がコメントした場合は通知を作成しない
+
+      create!(
+        recipient: comment.post.user, #通知を受け取るユーザー
+        actor: comment.user, #通知を送信したユーザー
+        notifiable: comment, #通知対象のモデル
+        kind: :comment #通知の種類
+      )
+    end
+
+    #いいね,コメントを削除した場合の通知の削除
+    def self.destroy_for_like_or_comment!(record)
+      where(notifiable: record).destroy_all
+    end
   end
