@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-import { User, Calendar, Heart, Trash2, Edit } from "lucide-react";
+import { Calendar,Heart, Trash2, Edit } from "lucide-react";
 
 import { useCurrentUser } from "@/components/features/posts/hooks/useCurrentUser";
 import  formatDate  from "@/utils/formatDate";
@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { getPostImageUrl } from "@/components/features/posts/utils/imageUrl";
 
 import type { Post } from "@/components/features/posts/types";
+import UserAvatar from "@/components/UserAvatar";
 
 import { CATEGORY_CONFIG } from "../../constants";
 
@@ -151,7 +152,11 @@ const PostDetailCard = ({ post, setPost }: PostDetailCardProps) => {
                             }}
                             className="flex items-center gap-1 hover:text-primary transition-colors cursor-pointer"
                         >
-                            <User className="h-3 w-3 sm:h-4 sm:w-4" />
+                            <UserAvatar
+                                 avatar={post.user?.avatar}
+                                 name={post.user?.display_name || "匿名"}
+                                 size={24}
+                            />
                             <span>{post.user?.display_name || "匿名"}</span>
                         </button>
                         <div className="flex items-center gap-1">

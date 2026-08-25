@@ -67,21 +67,16 @@ ActiveRecord::Schema[7.2].define(version: 2026_08_04_000001) do
     t.datetime "updated_at", null: false
     t.integer "delivery_method", default: 0, null: false
     t.integer "target_grade", default: 0, null: false
-    t.string "target_scope", default: "unknown", null: false
     t.string "faculty"
     t.string "department"
-    t.integer "target_grades", array: true
     t.index ["academic_year"], name: "index_course_offerings_on_academic_year"
-    t.index ["course_id", "academic_year", "semester", "teacher_name", "day_of_week", "delivery_method", "period"], name: "index_course_offerings_on_unique_schedule", unique: true
+    t.index ["course_id", "academic_year", "semester", "teacher_name", "day_of_week", "delivery_method", "target_grade", "period"], name: "index_course_offerings_on_unique_schedule", unique: true
     t.index ["course_id"], name: "index_course_offerings_on_course_id"
     t.index ["delivery_method"], name: "index_course_offerings_on_delivery_method"
     t.index ["department"], name: "index_course_offerings_on_department"
     t.index ["faculty"], name: "index_course_offerings_on_faculty"
     t.index ["semester"], name: "index_course_offerings_on_semester"
     t.index ["target_grade"], name: "index_course_offerings_on_target_grade"
-    t.index ["target_scope"], name: "index_course_offerings_on_target_scope"
-    t.check_constraint "target_grades IS NULL OR target_grades <@ ARRAY[1, 2, 3, 4]", name: "course_offerings_target_grades_values"
-    t.check_constraint "target_scope::text = ANY (ARRAY['all_university'::character varying, 'faculty'::character varying, 'department'::character varying, 'unknown'::character varying]::text[])", name: "course_offerings_target_scope_values"
   end
 
   create_table "course_reviews", force: :cascade do |t|
@@ -92,13 +87,13 @@ ActiveRecord::Schema[7.2].define(version: 2026_08_04_000001) do
     t.integer "difficulty", null: false
     t.integer "workload", null: false
     t.integer "grading", null: false
+    t.integer "exam_presence", default: 0, null: false
+    t.integer "attendance_check", default: 0, null: false
+    t.boolean "textbook_required", default: false, null: false
     t.text "comment"
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "exam_presence", default: 0, null: false
-    t.integer "attendance_check", default: 0, null: false
-    t.boolean "textbook_required", default: false, null: false
     t.index ["attendance_check"], name: "index_course_reviews_on_attendance_check"
     t.index ["course_id"], name: "index_course_reviews_on_course_id"
     t.index ["course_offering_id"], name: "index_course_reviews_on_course_offering_id"

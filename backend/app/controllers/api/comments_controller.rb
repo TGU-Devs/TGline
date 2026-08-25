@@ -6,7 +6,7 @@ module Api
 
     # GET /api/posts/:post_id/comments
     def index
-      comments = @post.comments.active.includes(:user).order(created_at: :asc)
+      comments = @post.comments.active.includes(user: { avatar_attachment: :blob }).order(created_at: :asc)
 
       render json: comments.map { |comment| comment_response(comment) }, status: :ok
     end
@@ -52,10 +52,12 @@ module Api
         body: comment.body,
         user: comment.user ? {
           id: comment.user.id,
-          display_name: comment.user.display_name
+          display_name: comment.user.display_name,
+          avatar: avatar_response(comment.user)
         } : nil,
         created_at: comment.created_at.iso8601
       }
     end
+
   end
 end

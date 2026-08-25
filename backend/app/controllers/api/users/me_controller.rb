@@ -35,8 +35,16 @@ module Api
           return render json: { error: "OAuthユーザーはメールアドレスを変更できません" }, status: :forbidden
         end
 
-        if current_user.update(user_params)
-          render json: user_response(current_user), status: :ok
+        attrs = user_params.except(:avatar, :remove_avatar)
+
+        if user_params[:avatar].present?
+          attrs = attrs.merge(avatar: user_params[:avatar])
+        elsif ActiveModel::Type::Boolean.new.cast(user_params[:remove_avatar])
+          attrs = attrs.merge(avatar: nil)
+        end
+
+        if current_user.update(attrs)
+          render json: user_response(current_user.reload), status: :ok
         else
           render json: { errors: current_user.errors }, status: :unprocessable_entity
         end
@@ -45,7 +53,7 @@ module Api
       private
 
       def user_params
-        params.require(:user).permit(:display_name, :description, :email)
+        params.require(:user).permit(:display_name, :description, :email, :avatar, :remove_avatar)
       end
 
       def user_response(user)
@@ -56,7 +64,8 @@ module Api
           description: user.description,
           role: user.role,
           provider: user.provider,
-          created_at: user.created_at.iso8601
+          created_at: user.created_at.iso8601,
+          avatar: avatar_response(user)
         }
       end
     end

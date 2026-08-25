@@ -26,7 +26,7 @@ export default function PrivateLayout({
     }, [isLoading, router, user]);
 
     // ローディング中
-    if (isLoading) {
+    if (isLoading && !user) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">

@@ -77,16 +77,20 @@ export async function DELETE(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const cookie = request.headers.get("cookie") || "";
-    const body = await request.json();
+    const contentType = request.headers.get("content-type") || "";
+    const isMultipart = contentType.includes("multipart/form-data");
+    const body = isMultipart
+      ? await request.formData()
+      : JSON.stringify(await request.json());
 
-    // バックエンドにリクエスト
+    // バックエンドにリクエスト（画像アップロード時は multipart をそのまま転送）
     const backendRes = await fetch(`${BACKEND_URL}/api/users/me`, {
       method: "PATCH",
       headers: {
-        "Content-Type": "application/json",
+        ...(isMultipart ? {} : { "Content-Type": "application/json" }),
         Cookie: cookie,
       },
-      body: JSON.stringify(body),
+      body,
     });
 
     const data = await backendRes.json();

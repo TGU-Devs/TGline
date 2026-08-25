@@ -1,3 +1,5 @@
+import type { UserAvatar } from "@/types/user";
+
 export type Errors = {
     title?: string;
     body?: string;
@@ -9,14 +11,17 @@ export type Tag = {
     category: "faculty" | "topic";
 };
 
+export type PostUser = {
+    id: number;
+    display_name: string;
+    avatar: UserAvatar | null;
+};
+
 export type Post = {
     id: number;
     title: string;
     body: string;
-    user: {
-        id: number;
-        display_name: string;
-    } | null;
+    user: PostUser | null;
     tags: Tag[];
     likes_count: number;
     current_user_liked: boolean;
@@ -37,10 +42,7 @@ export type PostImage = {
 export type Comment = {
     id: number;
     body: string;
-    user: {
-        id: number;
-        display_name: string;
-    } | null;
+    user: PostUser | null;
     created_at: string;
 }
 

@@ -245,9 +245,16 @@ Authorization: Bearer <token>
   "display_name": "太郎",
   "description": "経済学部3年です。就活中です。",
   "role": "user",
-  "created_at": "2026-01-01T12:00:00Z"
+  "created_at": "2026-01-01T12:00:00Z",
+  "avatar": {
+    "url": "http://localhost:3001/rails/active_storage/blobs/.../icon.png",
+    "content_type": "image/png",
+    "byte_size": 12345
+  }
 }
 ```
+
+※ `avatar` 未設定時は `null`
 
 エラー時（401 Unauthorized）：
 
@@ -263,7 +270,8 @@ Authorization: Bearer <token>
 
 #### 概要
 
-現在ログインしているユーザーのプロフィールを更新する。
+現在ログインしているユーザーのプロフィールを更新する。  
+テキスト更新は JSON、アバター画像のアップロードは `multipart/form-data` で送る。
 
 #### リクエストヘッダー
 
@@ -273,17 +281,28 @@ Authorization: Bearer <token>
 
 #### リクエストボディ
 
+テキスト更新（JSON）：
+
 ```json
 {
-  "display_name": "新しい名前",
-  "description": "自己紹介文"
+  "user": {
+    "display_name": "新しい名前",
+    "description": "自己紹介文"
+  }
 }
 ```
+
+アバター更新（multipart/form-data）：
+
+* `user[avatar]`：画像ファイル（アップロード / 差し替え）
+* `user[remove_avatar]`：`true` でアバター削除
+* `user[display_name]` / `user[description]`：同時更新可
 
 #### バリデーション
 
 * display_name：任意（更新する場合のみ）
 * description：任意（最大200文字）
+* avatar：JPEG / PNG / WebP / GIF、2MB以下
 
 #### レスポンス
 
@@ -296,9 +315,16 @@ Authorization: Bearer <token>
   "display_name": "新しい名前",
   "description": "自己紹介文",
   "role": "user",
-  "created_at": "2026-01-01T12:00:00Z"
+  "created_at": "2026-01-01T12:00:00Z",
+  "avatar": {
+    "url": "http://localhost:3001/rails/active_storage/blobs/.../icon.png",
+    "content_type": "image/png",
+    "byte_size": 12345
+  }
 }
 ```
+
+※ `avatar` 未設定時は `null`
 
 エラー時：
 
@@ -333,11 +359,17 @@ Authorization: Bearer <token>
   "id": 2,
   "display_name": "花子",
   "description": "法学部2年です。",
-  "created_at": "2026-01-01T12:00:00Z"
+  "created_at": "2026-01-01T12:00:00Z",
+  "avatar": {
+    "url": "http://localhost:3001/rails/active_storage/blobs/.../icon.png",
+    "content_type": "image/png",
+    "byte_size": 12345
+  }
 }
 ```
 
-※ emailは公開情報に含めない
+※ emailは公開情報に含めない  
+※ `avatar` 未設定時は `null`
 
 エラー時（401 Unauthorized）：
 
@@ -380,27 +412,42 @@ Authorization: Bearer <token>
 #### レスポンス例
 
 ```json
-[
-  {
-    "id": 1,
-    "title": "経済学のレポートについて",
-    "body": "〇〇先生の授業について質問です",
-    "anonymous": true,
-    "tags": [
-      { 
-        "id": 3, 
-        "name": "ミクロ経済学",
-        "category": "class"
-      }
-    ],
-    "likes_count": 5,
-    "user": null,
-    "created_at": "2026-01-01T12:00:00Z"
-  }
-]
+{
+  "posts": [
+    {
+      "id": 1,
+      "title": "経済学のレポートについて",
+      "body": "〇〇先生の授業について質問です",
+      "tags": [
+        {
+          "id": 3,
+          "name": "ミクロ経済学",
+          "category": "class"
+        }
+      ],
+      "likes_count": 5,
+      "current_user_liked": false,
+      "comments_count": 2,
+      "images": [],
+      "user": {
+        "id": 2,
+        "display_name": "太郎",
+        "avatar": {
+          "url": "http://localhost:3001/rails/active_storage/blobs/.../icon.png",
+          "content_type": "image/png",
+          "byte_size": 12345
+        }
+      },
+      "created_at": "2026-01-01T12:00:00Z",
+      "updated_at": "2026-01-01T12:00:00Z"
+    }
+  ],
+  "has_next": false
+}
 ```
 
-※ anonymous=true の場合、user は必ず null。
+※ `user.avatar` 未設定時は `null`  
+※ 投稿者が削除済みの場合、`user` は `null`
 
 ---
 
@@ -653,14 +700,20 @@ Authorization: Bearer <token>
 {
   "id": 1,
   "body": "自分も同じ疑問あった",
-  "anonymous": false,
   "user": {
     "id": 2,
-    "display_name": "太郎"
+    "display_name": "太郎",
+    "avatar": {
+      "url": "http://localhost:3001/rails/active_storage/blobs/.../icon.png",
+      "content_type": "image/png",
+      "byte_size": 12345
+    }
   },
   "created_at": "2026-01-01T12:10:00Z"
 }
 ```
+
+※ `user.avatar` 未設定時は `null`
 
 #### エラーレスポンス
 
@@ -693,24 +746,32 @@ Authorization: Bearer <token>
   {
     "id": 1,
     "body": "わかる",
-    "anonymous": false,
     "user": {
       "id": 2,
-      "display_name": "太郎"
+      "display_name": "太郎",
+      "avatar": {
+        "url": "http://localhost:3001/rails/active_storage/blobs/.../icon.png",
+        "content_type": "image/png",
+        "byte_size": 12345
+      }
     },
     "created_at": "2026-01-01T12:10:00Z"
   },
   {
     "id": 2,
     "body": "私も同じです",
-    "anonymous": true,
-    "user": null,
+    "user": {
+      "id": 3,
+      "display_name": "花子",
+      "avatar": null
+    },
     "created_at": "2026-01-01T12:15:00Z"
   }
 ]
 ```
 
-※ anonymous=true の場合、user は必ず null。
+※ `user.avatar` 未設定時は `null`  
+※ コメント投稿者が削除済みの場合、`user` は `null`
 
 ---
 

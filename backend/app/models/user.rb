@@ -1,8 +1,12 @@
 # frozen_string_literal: true
 
 class User < ApplicationRecord
+  MAX_AVATAR_SIZE = 2.megabytes
+  ACCEPTABLE_AVATAR_TYPES = %w[image/jpeg image/png image/webp image/gif].freeze
+  
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
+  has_one_attached :avatar
   has_many :posts, dependent: :destroy
   has_many :likes, dependent: :destroy
   has_many :comments, dependent: :destroy
@@ -19,6 +23,7 @@ class User < ApplicationRecord
   validates :role, presence: true, inclusion: { in: %w[user admin] }
   validates :description, length: { maximum: 200 }, allow_nil: true
   validate :oauth_user_cannot_change_email, on: :update
+  validate :acceptable_avatar
 
   scope :active, -> { where(deleted_at: nil) }
   scope :deleted, -> { where.not(deleted_at: nil) }
@@ -64,5 +69,18 @@ class User < ApplicationRecord
     return unless will_save_change_to_email?
 
     errors.add(:email, "OAuthユーザーは変更できません")
+  end
+
+  def acceptable_avatar
+    return unless attachment_changes["avatar"]
+    return unless avatar.attached?
+
+    unless ACCEPTABLE_AVATAR_TYPES.include?(avatar.content_type)
+      errors.add(:avatar, "アイコン画像はJPEG、PNG、WebP、GIF形式のみアップロードできます")
+    end
+
+    if avatar.blob.byte_size > MAX_AVATAR_SIZE
+      errors.add(:avatar, "アイコン画像は#{MAX_AVATAR_SIZE / 1.megabyte}MB以下にしてください")
+    end
   end
 end
