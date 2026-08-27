@@ -55,5 +55,16 @@ Rails.application.routes.draw do
       resource :likes, only: [:create, :destroy]
       resources :comments, only: [:index, :create, :destroy]
     end
+
+    # 通知関連
+    resources :notifications, only: [:index] do
+      collection do
+        get :unread_count
+        post :read_all
+      end
+      member do
+        post :read
+      end
+    end
   end
 end
