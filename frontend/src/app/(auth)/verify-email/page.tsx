@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle2, Loader2, AlertCircle, LogIn } from "lucide-react";
+import { apiFetch } from "@/lib/api";
 
 const VerifyEmailBody = () => {
   const router = useRouter();
@@ -23,7 +24,7 @@ const VerifyEmailBody = () => {
       }
 
       try {
-        const res = await fetch("/api/users/email_verification", {
+        const res = await apiFetch("/api/users/email_verification", {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

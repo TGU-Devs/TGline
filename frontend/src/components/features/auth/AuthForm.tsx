@@ -7,6 +7,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import FormItem from "./FormItem";
 import { Button } from "@/components/ui/button";
+import { apiFetch } from "@/lib/api";
 
 import { User, Mail, KeyRound, RotateCcwKey, Eye, EyeOff } from "lucide-react";
 
@@ -132,7 +133,7 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
 
         setIsResendingVerification(true);
         try {
-            const response = await fetch("/api/users/email_verification", {
+            const response = await apiFetch("/api/users/email_verification", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email_verification: { email } }),
@@ -159,7 +160,7 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
 
     // サインアップ処理
     const handleSignUp = async () => {
-        const response = await fetch("/api/users/sign_up", {
+        const response = await apiFetch("/api/users/sign_up", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
@@ -187,7 +188,7 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
 
     // サインイン処理
     const handleSignIn = async () => {
-        const response = await fetch("/api/users/sign_in", {
+        const response = await apiFetch("/api/users/sign_in", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
@@ -220,7 +221,7 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
         setFormErrors({});
 
         try {
-            const response = await fetch("/api/users/google_sign_in", {
+            const response = await apiFetch("/api/users/google_sign_in", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",

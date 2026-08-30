@@ -23,6 +23,7 @@ import ErrorUI from "@/components/ui/ErrorUI";
 import Loading from "@/components/ui/Loading";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/contexts/UserContext";
+import { apiFetch } from "@/lib/api";
 
 export default function CourseOfferingDetailPage() {
   const params = useParams<{ id: string; offeringId: string }>();
@@ -42,8 +43,8 @@ export default function CourseOfferingDetailPage() {
       setIsLoading(true);
 
       const [courseRes, reviewsRes] = await Promise.all([
-        fetch(`/api/courses/${courseId}`, { credentials: "include" }),
-        fetch(`/api/courses/${courseId}/reviews`, { credentials: "include" }),
+        apiFetch(`/api/courses/${courseId}`),
+        apiFetch(`/api/courses/${courseId}/reviews`),
       ]);
 
       if (!courseRes.ok) {

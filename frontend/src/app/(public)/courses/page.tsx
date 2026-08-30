@@ -26,6 +26,7 @@ import {
 } from "@/components/features/courses/options";
 
 import type { Course, CourseOffering, CoursesResponse } from "@/components/features/courses/types";
+import { apiFetch } from "@/lib/api";
 
 export default function CoursesPage() {
   const router = useRouter();
@@ -70,7 +71,7 @@ export default function CoursesPage() {
         if (currentTargetGrade) params.set("target_grade", currentTargetGrade);
         params.set("page", String(targetPage));
 
-        const res = await fetch(`/api/courses?${params.toString()}`, {
+        const res = await apiFetch(`/api/courses?${params.toString()}`, {
           credentials: "include",
         });
 

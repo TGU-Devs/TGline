@@ -11,6 +11,7 @@ import { linkify } from "@/utils/linkify";
 import Modal from "@/components/ui/Modal";
 import { Button } from "@/components/ui/button";
 import { getPostImageUrl } from "@/components/features/posts/utils/imageUrl";
+import { apiFetch } from "@/lib/api";
 
 import type { Post } from "@/components/features/posts/types";
 import UserAvatar from "@/components/UserAvatar";
@@ -36,7 +37,7 @@ const PostDetailCard = ({ post, setPost }: PostDetailCardProps) => {
     const handleDelete = async () => {
         try {
             setIsDeleting(true);
-            const res = await fetch(`/api/posts/${post.id}`, {
+            const res = await apiFetch(`/api/posts/${post.id}`, {
                 method: "DELETE",
                 credentials: "include",
             });
@@ -68,7 +69,7 @@ const PostDetailCard = ({ post, setPost }: PostDetailCardProps) => {
         });
 
         try {
-            const res = await fetch(`/api/posts/${post.id}/likes`, {
+            const res = await apiFetch(`/api/posts/${post.id}/likes`, {
                 method: currentLiked ? "DELETE" : "POST",
                 credentials: "include",
             });

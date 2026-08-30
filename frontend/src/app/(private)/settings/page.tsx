@@ -32,6 +32,7 @@ import {
     AlertTriangle,
 } from "lucide-react";
 import { FormValues, Errors } from "@/components/features/settings/types";
+import { apiFetch } from "@/lib/api";
 
 const initFormValues = {
     display_name: "",
@@ -124,7 +125,7 @@ const SettingsPage = () => {
                 formData.append("user[remove_avatar]", "true");
             }
 
-            const res = await fetch("/api/users/me", {
+            const res = await apiFetch("/api/users/me", {
                 method: "PATCH",
                 credentials: "include",
                 body: formData,

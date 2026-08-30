@@ -11,6 +11,7 @@ import TopButton from "@/components/features/posts/components/shared/TopButton";
 import Form from "@/components/features/posts/components/form/Form";
 
 import type { Post, Tag } from "@/components/features/posts/types";
+import { apiFetch } from "@/lib/api";
 
 export default function PostEditPage() {
     const params = useParams();
@@ -39,7 +40,7 @@ export default function PostEditPage() {
     const fetchPost = async (id: string) => {
         try {
             setIsLoading(true);
-            const res = await fetch(`/api/posts/${id}`, {
+            const res = await apiFetch(`/api/posts/${id}`, {
                 credentials: "include",
             });
 
@@ -93,7 +94,7 @@ export default function PostEditPage() {
                 formData.append("post[remove_image_ids][]", String(imageId));
             });
 
-            const res = await fetch(`/api/posts/${params.id}`, {
+            const res = await apiFetch(`/api/posts/${params.id}`, {
                 method: "PATCH",
                 credentials: "include",
                 body: formData,

@@ -21,11 +21,7 @@ module Api
           return
         end
 
-        cookies.delete(:jwt_token, {
-          httponly: true,
-          secure: Rails.env.production?,
-          same_site: :lax
-        })
+        clear_auth_cookie
 
         head :no_content
       end

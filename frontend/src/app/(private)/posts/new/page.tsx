@@ -7,6 +7,7 @@ import { useFormValidate } from "@/components/features/posts/hooks/useFormValida
 
 import TopButton from "@/components/features/posts/components/shared/TopButton";
 import Form from "@/components/features/posts/components/form/Form";
+import { apiFetch } from "@/lib/api";
 
 export default function PostNewPage() {
     const router = useRouter();
@@ -47,7 +48,7 @@ export default function PostNewPage() {
                 formData.append("post[images][]", image);
             });
 
-            const res = await fetch("/api/posts", {
+            const res = await apiFetch("/api/posts", {
                 method: "POST",
                 credentials: "include",
                 body: formData,

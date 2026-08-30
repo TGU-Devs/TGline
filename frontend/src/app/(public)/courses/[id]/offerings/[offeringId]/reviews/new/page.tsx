@@ -17,6 +17,7 @@ import type { Course } from "@/components/features/courses/types";
 import ErrorUI from "@/components/ui/ErrorUI";
 import Loading from "@/components/ui/Loading";
 import { Button } from "@/components/ui/button";
+import { apiFetch } from "@/lib/api";
 
 const scoreFields = ["rating", "difficulty", "workload", "grading"] as const;
 
@@ -61,8 +62,8 @@ export default function NewOfferingReviewPage() {
       setIsLoading(true);
 
       const [courseRes, meRes] = await Promise.all([
-        fetch(`/api/courses/${courseId}`, { credentials: "include" }),
-        fetch("/api/users/me", { credentials: "include" }),
+        apiFetch(`/api/courses/${courseId}`),
+        apiFetch("/api/users/me"),
       ]);
 
       if (!courseRes.ok) {
@@ -117,7 +118,7 @@ export default function NewOfferingReviewPage() {
       setFormError(null);
       setIsSubmitting(true);
 
-      const res = await fetch(`/api/courses/${courseId}/reviews`, {
+      const res = await apiFetch(`/api/courses/${courseId}/reviews`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

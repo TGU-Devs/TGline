@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Mail } from "lucide-react";
+import { apiFetch } from "@/lib/api";
 
 const ForgotPasswordPage = () => {
   const [email, setEmail] = useState("");
@@ -29,7 +30,7 @@ const ForgotPasswordPage = () => {
     setIsSubmitting(true);
 
     try {
-      const res = await fetch("/api/users/password_reset", {
+      const res = await apiFetch("/api/users/password_reset", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password_reset: { email } }),

@@ -44,6 +44,7 @@ module Api
         )
 
         token = JwtService.encode(user.id)
+        set_auth_cookie(token)
 
         render json: {
           message: "メール認証が完了しました",
