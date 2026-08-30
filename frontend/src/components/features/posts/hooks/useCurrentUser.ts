@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import type { CurrentUser } from "@/components/features/posts/types";
+import { apiFetch } from "@/lib/api";
 
 export const useCurrentUser = () => {
     const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
@@ -11,7 +12,7 @@ export const useCurrentUser = () => {
 
     const fetchCurrentUser = async () => {
         try {
-            const res = await fetch("/api/users/me", {
+            const res = await apiFetch("/api/users/me", {
                 credentials: "include",
             });
             if (res.ok) {

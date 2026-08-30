@@ -10,7 +10,7 @@ TGline プロジェクト専用の PR レビューエージェント。
 以下の観点で脆弱性がないかチェックする：
 
 - **JWT トークン**: httpOnly cookie 以外にトークンが露出していないか
-- **BFF バイパス**: フロントエンドからバックエンド（port 3001）に直接アクセスしていないか。すべてのリクエストは Next.js Route Handlers（`frontend/src/app/api/`）を経由する必要がある
+- **API URL**: フロントエンドのAPI通信が `@/lib/api` を経由し、RailsのURLを重複定義していないか
 - **認証・認可の漏れ**: Rails コントローラで `authenticate_user!` の skip が適切か、`authorize_owner!` / `authorize_owner_or_admin!` が必要なアクションに付いているか
 - **SQL インジェクション**: Strong Parameters を経由しない `params` の直接利用がないか
 - **XSS**: ユーザー入力の出力時にエスケープされているか
@@ -19,19 +19,19 @@ TGline プロジェクト専用の PR レビューエージェント。
 
 ### 2. アーキテクチャ
 
-TGline の BFF パターンとコード規約に沿っているかチェックする：
+TGline のRails API直接通信パターンとコード規約に沿っているかチェックする：
 
-- **BFF パターン準拠**: ブラウザ → Next.js Route Handlers → Rails API の流れが守られているか
+- **API通信パターン準拠**: ブラウザ → Rails API の流れになっており、`apiFetch`でCookie送信が統一されているか
 - **Rails 側の規約**:
   - コントローラは `Api::` namespace 配下か
   - 論理削除パターン（`deleted_at`, `scope :active`, `soft_delete`）が守られているか（物理削除 `destroy` を使っていないか）
   - レスポンス形式は `xxx_response` プライベートメソッドで統一されているか
   - 日時は `.iso8601` で返しているか
-- **BFF 側の規約**:
-  - `BACKEND_URL` は `process.env.BACKEND_URL || "http://backend:3000"` か
-  - Cookie 転送が `request.headers.get("cookie") || ""` で行われているか
-  - Next.js 15 の `params` が `Promise` として `await` されているか
-  - DELETE の 204 レスポンスが適切にハンドリングされているか
+- **フロントエンド側の規約**:
+  - API通信に `frontend/src/lib/api.ts` の `apiFetch` を使用しているか
+  - `NEXT_PUBLIC_API_URL` 以外にRailsのベースURLをハードコードしていないか
+  - multipart送信時に `Content-Type` を手動設定していないか
+  - DELETE の204レスポンスでJSONを読み取っていないか
 - **ファイル配置**: 新規ファイルが既存のディレクトリ構造に合っているか
 - **型定義**: `frontend/src/types/` の TypeScript 型が Rails のレスポンスと一致しているか
 
@@ -91,4 +91,4 @@ TGline の BFF パターンとコード規約に沿っているかチェック�
 - `backend/app/controllers/concerns/authenticable.rb` — 認証パターン
 - `backend/app/controllers/concerns/authorizable.rb` — 認可パターン
 - `frontend/src/middleware.ts` — フロントエンド認証ミドルウェア
-- `frontend/src/app/api/` — BFF ルートの既存パターン
+- `frontend/src/lib/api.ts` — Rails API直接通信用クライアント

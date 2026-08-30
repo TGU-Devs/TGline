@@ -11,6 +11,7 @@ import Button from "@/components/features/settings/security/Button";
 import { Lock } from "lucide-react";
 
 import { validatePassword } from "@/lib/validators";
+import { apiFetch } from "@/lib/api";
 
 import {
     ChangePasswordFormValues,
@@ -67,7 +68,7 @@ const ChangePasswordPage = () => {
         if (Object.keys(errors).length === 0) {
             setIsSubmitting(true);
             try {
-                const res = await fetch("/api/users/password", {
+                const res = await apiFetch("/api/users/password", {
                     method: "PATCH",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({

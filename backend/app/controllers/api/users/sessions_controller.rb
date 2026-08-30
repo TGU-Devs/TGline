@@ -21,14 +21,7 @@ module Api
           end
 
           token = JwtService.encode(user.id)
-
-          cookies[:jwt_token] = {
-            value: token,
-            httponly: true,
-            secure: Rails.env.production?,
-            same_site: :lax,
-            expires: 7.days.from_now
-          }
+          set_auth_cookie(token)
 
           render json: {
             user: user_response(user),
@@ -41,11 +34,7 @@ module Api
       end
 
       def destroy
-        cookies.delete(:jwt_token, {
-          httponly: true,
-          secure: Rails.env.production?,
-          same_site: :lax
-        })
+        clear_auth_cookie
 
         head :no_content
       end

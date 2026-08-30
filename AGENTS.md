@@ -28,17 +28,17 @@ docker compose down -v        # DBボリュームも削除
 
 ## アーキテクチャ
 
-### BFF（Backend-for-Frontend）パターン
-ブラウザは**直接Railsにアクセスしない**。すべてのAPI呼び出しは Next.js Route Handlers（`frontend/src/app/api/`）を経由してRails（port 3001）にプロキシされる。JWTトークンはNext.js API層が管理するhttpOnly cookieに保存。
+### Rails API直接通信
+ブラウザは `NEXT_PUBLIC_API_URL` で指定したRails APIを直接呼び出す。API通信には `frontend/src/lib/api.ts` の `apiFetch` を使用し、JWTはRailsが発行するHttpOnly Cookieで管理する。
 
 ```
-ブラウザ → Next.js Route Handlers (port 3000) → Rails API (port 3001) → PostgreSQL
+ブラウザ → Rails API (開発: port 3001 / 本番: api.tgline.dev) → PostgreSQL
 ```
 
 ### バックエンド: Rails API-only（`/backend`）
 - **ルーティング**: すべて `/api` 名前空間配下 — `config/routes.rb` 参照
 - **認証**: Devise + JWT（有効期限7日、v0ではリフレッシュトークンなし）
-- **Google OAuth**: クライアントサイドSSO → Next.jsルート → RailsがIDトークンを検証
+- **Google OAuth**: クライアントサイドSSO → RailsがIDトークンを検証
 - **論理削除**: Posts, Comments, Users は `deleted_at` カラムで論理削除（物理削除しない）
 - **モデル**: User, Post, Comment, Like, Tag, PostTag
 - **タグカテゴリ**: enum（faculty, class, topic）— 学部タグは投稿あたり最大1つ
@@ -51,7 +51,7 @@ docker compose down -v        # DBボリュームも削除
 - **出力**: 本番用standaloneモード
 
 ### 主要ディレクトリ
-- `frontend/src/app/api/` — BFFプロキシルート（Rails APIの構造をミラー）
+- `frontend/src/lib/api.ts` — Rails API直接通信用クライアント
 - `frontend/src/components/features/` — 機能別コンポーネント（auth, posts等）
 - `frontend/src/components/ui/` — shadcn/ui プリミティブ
 - `backend/app/controllers/api/` — Rails APIコントローラ
@@ -65,7 +65,7 @@ docker compose down -v        # DBボリュームも削除
 - `.env` — 本番用（gitignore対象）
 - `.env.template` — 本番用テンプレート
 
-主要変数: `DATABASE_HOST`, `DATABASE_PASSWORD`, `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_GOOGLE_CLIENT_ID`
+主要変数: `DATABASE_HOST`, `DATABASE_PASSWORD`, `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_GOOGLE_CLIENT_ID`, `COOKIE_DOMAIN`
 
 ## Prompts
 

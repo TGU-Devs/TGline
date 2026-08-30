@@ -3,6 +3,7 @@
 import { DoorOpen } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { apiFetch } from "@/lib/api";
 
 type LogoutButtonProps = {
     isDesktop?: boolean;
@@ -15,7 +16,7 @@ const LogoutButton = ({ isDesktop }: LogoutButtonProps) => {
     const handleLogout = async () => {
         setIsLoading(true);
         try {
-            const response = await fetch("/api/users/sign_out", {
+            const response = await apiFetch("/api/users/sign_out", {
                 method: "DELETE",
                 credentials: "include",
             });

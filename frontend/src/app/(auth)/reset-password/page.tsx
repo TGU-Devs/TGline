@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { KeyRound, Eye, EyeOff } from "lucide-react";
 import { validatePassword, validatePasswordConfirmation } from "@/lib/validators";
+import { apiFetch } from "@/lib/api";
 
 type FormErrors = {
   password?: string;
@@ -78,7 +79,7 @@ const ResetPasswordForm = () => {
     setIsSubmitting(true);
 
     try {
-      const res = await fetch("/api/users/password_reset", {
+      const res = await apiFetch("/api/users/password_reset", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

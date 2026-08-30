@@ -20,6 +20,7 @@ import {
 import { Button } from "@/components/ui/button";
 
 import type { Course } from "@/components/features/courses/types";
+import { apiFetch } from "@/lib/api";
 
 type CourseForm = {
   name: string;
@@ -65,7 +66,7 @@ export default function NewCoursePage() {
   const requiresDepartment = courseForm.category !== "教養科目";
 
   useEffect(() => {
-    fetch("/api/users/me", { credentials: "include" })
+    apiFetch("/api/users/me")
       .then((res) => {
         setIsAuthenticated(res.ok);
         if (!res.ok) setShowLoginModal(true);
@@ -99,7 +100,7 @@ export default function NewCoursePage() {
       setError(null);
       setIsCreating(true);
 
-      const res = await fetch("/api/courses", {
+      const res = await apiFetch("/api/courses", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

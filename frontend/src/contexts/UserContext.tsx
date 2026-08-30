@@ -9,6 +9,7 @@ import {
     useRef,
 } from "react";
 import type { User } from "@/types/user";
+import { apiFetch } from "@/lib/api";
 
 type UserContextType = {
     user: User| null;
@@ -31,7 +32,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
             if (!hasLoadedRef.current) {
                 setIsLoading(true);
             }
-            const res = await fetch("/api/users/me", {
+            const res = await apiFetch("/api/users/me", {
                 credentials: "include",
                 cache: "no-store",
             });

@@ -36,14 +36,7 @@ module Api
 
         if user.errors.empty?
           token = JwtService.encode(user.id)
-
-          cookies[:jwt_token] = {
-            value: token,
-            httponly: true,
-            secure: Rails.env.production?,
-            same_site: :lax,
-            expires: 7.days.from_now
-          }
+          set_auth_cookie(token)
 
           render json: {
             user: {

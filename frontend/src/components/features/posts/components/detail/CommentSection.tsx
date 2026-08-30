@@ -9,6 +9,7 @@ import { useCurrentUser } from "@/components/features/posts/hooks/useCurrentUser
 import { linkify } from "@/utils/linkify";
 import Modal from "@/components/ui/Modal";
 import { Button } from "@/components/ui/button";
+import { apiFetch } from "@/lib/api";
 
 import UserAvatar from "@/components/UserAvatar";
 import type { Comment } from "@/components/features/posts/types";
@@ -40,7 +41,7 @@ const CommentSection = ({
 
     const fetchComments = async (id: number) => {
         try {
-            const res = await fetch(`/api/posts/${id}/comments`, {
+            const res = await apiFetch(`/api/posts/${id}/comments`, {
                 credentials: "include",
             });
             if (res.ok) {
@@ -57,7 +58,7 @@ const CommentSection = ({
 
         try {
             setIsSubmittingComment(true);
-            const res = await fetch(`/api/posts/${postId}/comments`, {
+            const res = await apiFetch(`/api/posts/${postId}/comments`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
@@ -81,7 +82,7 @@ const CommentSection = ({
         if (!deletingCommentId || !postId) return;
 
         try {
-            const res = await fetch(
+            const res = await apiFetch(
                 `/api/posts/${postId}/comments/${deletingCommentId}`,
                 {
                     method: "DELETE",
