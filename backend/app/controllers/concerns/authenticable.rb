@@ -39,7 +39,27 @@ module Authenticable
     render json: { error: 'unauthorized' }, status: :unauthorized
   end
 
+  def set_auth_cookie(token)
+    cookies[:jwt_token] = auth_cookie_options.merge(
+      value: token,
+      expires: 7.days.from_now
+    )
+  end
+
+  def clear_auth_cookie
+    cookies.delete(:jwt_token, auth_cookie_options)
+  end
+
   private
+
+  def auth_cookie_options
+    {
+      httponly: true,
+      secure: Rails.env.production?,
+      same_site: :lax,
+      domain: ENV['COOKIE_DOMAIN'].presence
+    }.compact
+  end
 
   def extract_token
     cookies[:jwt_token] if cookies[:jwt_token].present?

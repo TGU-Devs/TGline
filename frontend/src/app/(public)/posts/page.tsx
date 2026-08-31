@@ -24,6 +24,7 @@ import PostList from "@/components/features/posts/components/list/PostList";
 import LoginPromptModal from "@/components/features/auth/LoginPromptModal";
 
 import type { Post } from "@/components/features/posts/types";
+import { apiFetch } from "@/lib/api";
 
 export default function PostsPage() {
     const router = useRouter();
@@ -109,7 +110,7 @@ export default function PostsPage() {
                 }
                 params.set("page", String(targetPage));
 
-                const res = await fetch(`/api/posts?${params.toString()}`, {
+                const res = await apiFetch(`/api/posts?${params.toString()}`, {
                     credentials: "include",
                 });
 
@@ -353,7 +354,7 @@ export default function PostsPage() {
             );
 
             try {
-                const res = await fetch(`/api/posts/${postId}/likes`, {
+                const res = await apiFetch(`/api/posts/${postId}/likes`, {
                     method: currentLiked ? "DELETE" : "POST",
                     credentials: "include",
                 });

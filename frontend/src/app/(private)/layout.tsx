@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useUser } from "@/contexts/UserContext";
 
 import Sidebar from "@/components/layout/sidebar";
+import { apiFetch } from "@/lib/api";
 
 export default function PrivateLayout({
     children,
@@ -16,7 +17,7 @@ export default function PrivateLayout({
 
     useEffect(() => {
         if (!isLoading && !user) {
-            fetch("/api/users/sign_out", {
+            apiFetch("/api/users/sign_out", {
                 method: "DELETE",
                 credentials: "include",
             }).finally(() => {
@@ -26,7 +27,7 @@ export default function PrivateLayout({
     }, [isLoading, router, user]);
 
     // ローディング中
-    if (isLoading) {
+    if (isLoading && !user) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">

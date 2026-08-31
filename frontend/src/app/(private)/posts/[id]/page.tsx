@@ -17,6 +17,7 @@ import PostDetailCard from "@/components/features/posts/components/detail/PostDe
 import CommentSection from "@/components/features/posts/components/detail/CommentSection";
 
 import { Post } from "@/components/features/posts/types";
+import { apiFetch } from "@/lib/api";
 
 export default function PostDetailPage() {
     const params = useParams();
@@ -41,7 +42,7 @@ export default function PostDetailPage() {
     const fetchPost = async (id: string) => {
         try {
             setIsLoading(true);
-            const res = await fetch(`/api/posts/${id}`, {
+            const res = await apiFetch(`/api/posts/${id}`, {
                 credentials: "include",
             });
 

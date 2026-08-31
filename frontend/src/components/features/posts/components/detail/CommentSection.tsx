@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
-import { MessageCircle, Send, Trash2, User } from "lucide-react";
+import { MessageCircle, Send, Trash2 } from "lucide-react";
 
 import formatDate from "@/utils/formatDate";
 
@@ -9,7 +9,9 @@ import { useCurrentUser } from "@/components/features/posts/hooks/useCurrentUser
 import { linkify } from "@/utils/linkify";
 import Modal from "@/components/ui/Modal";
 import { Button } from "@/components/ui/button";
+import { apiFetch } from "@/lib/api";
 
+import UserAvatar from "@/components/UserAvatar";
 import type { Comment } from "@/components/features/posts/types";
 
 type CommentSectionProps = {
@@ -39,7 +41,7 @@ const CommentSection = ({
 
     const fetchComments = async (id: number) => {
         try {
-            const res = await fetch(`/api/posts/${id}/comments`, {
+            const res = await apiFetch(`/api/posts/${id}/comments`, {
                 credentials: "include",
             });
             if (res.ok) {
@@ -56,7 +58,7 @@ const CommentSection = ({
 
         try {
             setIsSubmittingComment(true);
-            const res = await fetch(`/api/posts/${postId}/comments`, {
+            const res = await apiFetch(`/api/posts/${postId}/comments`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
@@ -80,7 +82,7 @@ const CommentSection = ({
         if (!deletingCommentId || !postId) return;
 
         try {
-            const res = await fetch(
+            const res = await apiFetch(
                 `/api/posts/${postId}/comments/${deletingCommentId}`,
                 {
                     method: "DELETE",
@@ -172,18 +174,22 @@ const CommentSection = ({
                                             href={`/users/${comment.user.id}?from=post&postId=${postId}`}
                                             className="flex items-center gap-2 hover:opacity-70 transition-opacity"
                                         >
-                                            <div className="w-5 h-5 bg-primary/15 rounded-full flex items-center justify-center shrink-0">
-                                                <User className="h-3 w-3 text-primary" />
-                                            </div>
+                                            <UserAvatar
+                                                avatar={comment.user.avatar}
+                                                name={comment.user.display_name}
+                                                size={20}
+                                            />
                                             <span className="font-medium text-foreground hover:text-primary transition-colors">
                                                 {comment.user.display_name}
                                             </span>
                                         </Link>
                                     ) : (
                                         <div className="flex items-center gap-2">
-                                            <div className="w-5 h-5 bg-primary/15 rounded-full flex items-center justify-center shrink-0">
-                                                <User className="h-3 w-3 text-primary" />
-                                            </div>
+                                            <UserAvatar
+                                                avatar={null}
+                                                name="匿名"
+                                                size={20}
+                                            />
                                             <span className="font-medium text-foreground">匿名</span>
                                         </div>
                                     )}

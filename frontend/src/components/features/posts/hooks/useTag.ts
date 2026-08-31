@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import type { Tag } from "@/components/features/posts/types";
+import { apiFetch } from "@/lib/api";
 
 export const useTags = () => {
     const [tags, setTags] = useState<Tag[]>([]);
@@ -10,7 +11,7 @@ export const useTags = () => {
 
     const fetchTags = async () => {
         try {
-            const res = await fetch("/api/tags", { credentials: "include" });
+            const res = await apiFetch("/api/tags");
             if (res.ok) {
                 const data = await res.json();
                 setTags(data);

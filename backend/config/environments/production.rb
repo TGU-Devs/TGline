@@ -89,6 +89,7 @@ Rails.application.configure do
   config.hosts = [
     "tglinebackend-production.up.railway.app",
     "tglinebackend.railway.internal",
+    "api.tgline.dev",
     "localhost"
   ]
   # Skip DNS rebinding protection for the default health check endpoint.

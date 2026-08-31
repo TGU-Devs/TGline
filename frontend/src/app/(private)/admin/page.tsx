@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useUser } from "@/contexts/UserContext";
 import { Button } from "@/components/ui/button";
 import { Users, FileText, MessageCircle } from "lucide-react";
+import { apiFetch } from "@/lib/api";
 
 interface AdminStats {
   counts: {
@@ -66,7 +67,7 @@ export default function AdminPage() {
     try {
       setIsLoading(true);
       setError(null);
-      const res = await fetch("/api/admin/stats", { credentials: "include" });
+      const res = await apiFetch("/api/admin/stats");
 
       if (!res.ok) {
         throw new Error("統計データの取得に失敗しました");

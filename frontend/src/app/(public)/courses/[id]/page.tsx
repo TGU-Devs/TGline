@@ -28,6 +28,7 @@ import ErrorUI from "@/components/ui/ErrorUI";
 import Loading from "@/components/ui/Loading";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/contexts/UserContext";
+import { apiFetch } from "@/lib/api";
 
 const COURSE_REQUEST_FORM_URL = "https://forms.gle/9UmZSNiZZWhZxE4JA";
 
@@ -48,8 +49,8 @@ export default function CourseDetailPage() {
       setIsLoading(true);
 
       const [courseRes, reviewsRes] = await Promise.all([
-        fetch(`/api/courses/${courseId}`, { credentials: "include" }),
-        fetch(`/api/courses/${courseId}/reviews`, { credentials: "include" }),
+        apiFetch(`/api/courses/${courseId}`),
+        apiFetch(`/api/courses/${courseId}/reviews`),
       ]);
 
       if (!courseRes.ok) {

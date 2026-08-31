@@ -20,6 +20,7 @@ import type { Course } from "@/components/features/courses/types";
 import ErrorUI from "@/components/ui/ErrorUI";
 import Loading from "@/components/ui/Loading";
 import { Button } from "@/components/ui/button";
+import { apiFetch } from "@/lib/api";
 
 type OfferingForm = {
   teacher_name: string;
@@ -69,8 +70,8 @@ export default function NewCourseOfferingPage() {
       setIsLoading(true);
 
       const [courseRes, meRes] = await Promise.all([
-        fetch(`/api/courses/${courseId}`, { credentials: "include" }),
-        fetch("/api/users/me", { credentials: "include" }),
+        apiFetch(`/api/courses/${courseId}`),
+        apiFetch("/api/users/me"),
       ]);
 
       if (!courseRes.ok) {
@@ -122,7 +123,7 @@ export default function NewCourseOfferingPage() {
       setIsSubmitting(true);
       const requiresDepartment = course.category !== "教養科目";
 
-      const res = await fetch(`/api/courses/${courseId}/course_offerings`, {
+      const res = await apiFetch(`/api/courses/${courseId}/course_offerings`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

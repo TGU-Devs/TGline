@@ -33,6 +33,17 @@
 | インフラ | Docker / Docker Compose（開発）, Railway（本番） |
 | CI | GitHub Actions（フロントエンドビルド検証） |
 
+### API通信
+
+ブラウザは `NEXT_PUBLIC_API_URL` で指定した Rails API を直接呼び出す。
+
+```text
+ブラウザ → Rails API → PostgreSQL
+```
+
+開発環境では `http://localhost:3001`、本番環境では `https://api.tgline.dev` を使用する。
+JWT は Rails が発行する HttpOnly Cookie で管理する。
+
 ## 主要機能
 
 - **投稿・コメント** — タイトル+本文形式の投稿、コメント機能、いいね機能
@@ -51,7 +62,6 @@ TGU/
 │   │   ├── app/
 │   │   │   ├── (public)/    # 認証不要ページ（LP, ログイン, 登録）
 │   │   │   ├── (private)/   # 認証必須ページ（投稿一覧, 設定等）
-│   │   │   └── api/         # BFF プロキシルート
 │   │   ├── components/
 │   │   │   ├── features/    # 機能別コンポーネント
 │   │   │   └── ui/          # shadcn/ui プリミティブ

@@ -13,7 +13,7 @@ module Api
       page = (params[:page] || 1).to_i
       liked_only = ActiveModel::Type::Boolean.new.cast(params[:liked])
 
-      posts = Post.active.with_attached_images.includes(:user, :tags, :likes, :comments).order(created_at: :desc)
+      posts = Post.active.with_attached_images.includes(:tags, :likes, :comments, user: {avatar_attachment: :blob}).order(created_at: :desc)
 
 
       if liked_only
@@ -133,7 +133,8 @@ module Api
         body: post.body,
         user: post.user ? {
           id: post.user.id,
-          display_name: post.user.display_name
+          display_name: post.user.display_name,
+          avatar: avatar_response(post.user)
         } : nil,
         tags: post.tags.map { |tag|
           {
@@ -163,8 +164,5 @@ module Api
       end
     end
 
-    def public_backend_url
-      ENV.fetch('BACKEND_PUBLIC_URL', request.base_url).delete_suffix('/')
-    end
   end
 end

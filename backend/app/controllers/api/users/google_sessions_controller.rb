@@ -18,16 +18,9 @@ module Api
 
         if user.persisted?
           token = JwtService.encode(user.id)
+          set_auth_cookie(token)
 
           Rails.logger.info("[GoogleOAuth] Login success - user_id: #{user.id}, email: #{user.email}, display_name: #{user.display_name}")
-
-          cookies[:jwt_token] = {
-            value: token,
-            httponly: true,
-            secure: Rails.env.production?,
-            same_site: :lax,
-            expires: 7.days.from_now
-          }
 
           render json: {
             user: user_response(user),

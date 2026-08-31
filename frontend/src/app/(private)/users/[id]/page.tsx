@@ -12,6 +12,7 @@ import PostListSection from "@/components/features/users/PostListSection";
 import { useUser } from "@/contexts/UserContext";
 
 import type { UserProfile } from "@/components/features/users/types";
+import { apiFetch } from "@/lib/api";
 
 const UserProfilePage = ({ params }: { params: Promise<{ id: string }> }) => {
     const resolvedParams = use(params);
@@ -29,7 +30,7 @@ const UserProfilePage = ({ params }: { params: Promise<{ id: string }> }) => {
         const fetchUserProfile = async () => {
             try {
                 setIsLoading(true);
-                const response = await fetch(`/api/users/${resolvedParams.id}`);
+                const response = await apiFetch(`/api/users/${resolvedParams.id}`);
 
                 if (!response.ok) {
                     throw new Error("ユーザー情報の取得に失敗しました");

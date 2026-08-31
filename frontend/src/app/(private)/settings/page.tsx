@@ -32,6 +32,7 @@ import {
     AlertTriangle,
 } from "lucide-react";
 import { FormValues, Errors } from "@/components/features/settings/types";
+import { apiFetch } from "@/lib/api";
 
 const initFormValues = {
     display_name: "",
@@ -40,10 +41,13 @@ const initFormValues = {
 };
 
 const SettingsPage = () => {
-    const { user, isLoading, error, refreshUser, setUser } = useUser();
+    const { user, isLoading, error, refreshUser } = useUser();
     const searchParams = useSearchParams();
     const [fromProfile, setFromProfile] = useState(false);
     const [profileUserId, setProfileUserId] = useState<string | null>(null);
+
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [isAvatarDeleted, setIsAvatarDeleted] = useState(false);
 
     useEffect(() => {
         if (searchParams.get("from") === "profile") {
@@ -54,6 +58,9 @@ const SettingsPage = () => {
 
     const [showSaveToast, setShowSaveToast] = useState(false);
     const [showErrorToast, setShowErrorToast] = useState(false);
+    const [errorMessage, setErrorMessage] = useState(
+        "ネットワークエラーが発生しました。",
+    );
     const [isDark, setIsDark] = useState(false);
     const [formValues, setFormValues] = useState<FormValues>(initFormValues);
     const [formErrors, setFormErrors] = useState<Errors>({});
@@ -108,35 +115,44 @@ const SettingsPage = () => {
         setFormErrors({});
 
         try {
-            const payload = {
-                user: {
-                    display_name: formValues.display_name,
-                    description: formValues.description,
-                },
-            };
+            const formData = new FormData();
+            formData.append("user[display_name]", formValues.display_name);
+            formData.append("user[description]", formValues.description || "");
 
-            const res = await fetch("/api/users/me", {
+            if (selectedFile) {
+                formData.append("user[avatar]", selectedFile);
+            } else if (isAvatarDeleted) {
+                formData.append("user[remove_avatar]", "true");
+            }
+
+            const res = await apiFetch("/api/users/me", {
                 method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                },
                 credentials: "include",
-                body: JSON.stringify(payload),
+                body: formData,
             });
+
             if (res.ok) {
                 setShowSaveToast(true);
-                const updated = await res.json();
-
-                setUser(updated);
-
+                await refreshUser();
+                setSelectedFile(null);
+                setIsAvatarDeleted(false);
                 setTimeout(() => setShowSaveToast(false), 3000);
             } else {
                 console.error("ユーザーデータの更新に失敗:", res.status);
+
+                const errorData = await res.json().catch(() => null);
+                setErrorMessage(
+                    errorData?.errors
+                        ? Object.values(errorData.errors).flat().join(", ")
+                        : "ユーザーデータの更新に失敗しました。",
+                );
+
                 setShowErrorToast(true);
                 setTimeout(() => setShowErrorToast(false), 4000);
             }
         } catch (error) {
             console.error("ユーザーデータの更新中にエラーが発生:", error);
+            setErrorMessage("ネットワークエラーが発生しました。");
             setShowErrorToast(true);
             setTimeout(() => setShowErrorToast(false), 4000);
         }
@@ -169,7 +185,7 @@ const SettingsPage = () => {
         setFormValues((prevFormValues) => ({ ...prevFormValues, [id]: value }));
     };
 
-    if (isLoading) {
+    if (isLoading && !user) {
         return <Loading />;
     }
 
@@ -188,7 +204,7 @@ const SettingsPage = () => {
             <Toast
                 showToast={showErrorToast}
                 icon={AlertTriangle}
-                message="ネットワークエラーが発生しました。"
+                message={errorMessage}
                 bg="bg-red-500"
             />
             <Toast
@@ -214,6 +230,11 @@ const SettingsPage = () => {
                     formErrors={formErrors}
                     icon={UserIcon}
                     onchangeHandler={onchangeHandler}
+                    selectedFile={selectedFile}
+                    setSelectedFile={setSelectedFile}
+                    isAvatarDeleted={isAvatarDeleted}
+                    setIsAvatarDeleted={setIsAvatarDeleted}
+                    currentAvatarUrl={user?.avatar?.url}
                 />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <NotificationSection

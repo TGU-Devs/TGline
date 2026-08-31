@@ -11,6 +11,7 @@ import SecurityFormItem from "@/components/features/settings/security/SecurityFo
 import Button from "@/components/features/settings/security/Button";
 
 import Toast from "@/components/ui/Toast";
+import { apiFetch } from "@/lib/api";
 
 import { Check, Trash2, TriangleAlert, X } from "lucide-react";
 
@@ -79,7 +80,7 @@ const DeleteAccountPage = () => {
                 });
             }
 
-            const res = await fetch("/api/users/me", options);
+            const res = await apiFetch("/api/users/me", options);
 
             if (res.status === 204) {
                 setIsModalOpen(false);
