@@ -10,6 +10,8 @@ class Notification < ApplicationRecord
   
     validates :notifiable_type, inclusion: { in: NOTIFIABLE_TYPES }
     validates :notifiable_id, uniqueness: { scope: [:notifiable_type, :recipient_id] }
+
+    after_create_commit :deliver_notification_email
   
     #未読通知の取得
     scope :unread, -> { where(read_at: nil) } 
@@ -51,5 +53,13 @@ class Notification < ApplicationRecord
     #いいね,コメントを削除した場合の通知の削除
     def self.destroy_for_like_or_comment!(record)
       where(notifiable: record).destroy_all
+    end
+
+    private
+
+    def deliver_notification_email
+      NotificationMailer.notify(self).deliver_now
+    rescue StandardError => e
+      Rails.logger.error("Notification email failed: #{e.message}")
     end
   end
