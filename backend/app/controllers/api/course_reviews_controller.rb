@@ -26,7 +26,7 @@ module Api
     end
 
     def update
-      authorize_owner!(@course_review)
+      return unless authorize_owner!(@course_review)
 
       if @course_review.update(course_review_params)
         render json: course_review_response(@course_review.reload), status: :ok
@@ -36,8 +36,7 @@ module Api
     end
 
     def destroy
-      authorize_owner_or_admin!(@course_review)
-      return if performed?
+      return unless authorize_owner_or_admin!(@course_review)
 
       @course_review.soft_delete
       head :no_content
