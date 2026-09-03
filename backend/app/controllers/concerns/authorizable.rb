@@ -11,30 +11,34 @@ module Authorizable
 
 
   def authorize_admin!
-    return if current_user&.admin?
+    return true if current_user&.admin?
 
     forbidden_error('管理者のみアクセス可能です')
+    false
   end
 
 
   def authorize_owner_or_admin!(resource, owner_attribute: :user_id)
-    return if current_user&.admin?
-    return if resource.send(owner_attribute) == current_user&.id
+    return true if current_user&.admin?
+    return true if resource.send(owner_attribute) == current_user&.id
 
     forbidden_error('このリソースへのアクセス権限がありません')
+    false
   end
 
   def authorize_owner!(resource, owner_attribute: :user_id)
-    return if resource.send(owner_attribute) == current_user&.id
+    return true if resource.send(owner_attribute) == current_user&.id
 
     forbidden_error('このリソースの所有者のみアクセス可能です')
+    false
   end
 
 
   def authorize_roles!(*roles)
-    return if roles.include?(current_user&.role)
+    return true if roles.include?(current_user&.role)
 
     forbidden_error("許可されたロール: #{roles.join(', ')}")
+    false
   end
 
   # 現在のユーザーが管理者かどうか

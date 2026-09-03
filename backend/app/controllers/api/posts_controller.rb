@@ -68,7 +68,7 @@ module Api
     # PATCH /posts/:id
     # 投稿を更新（認証必須、所有者のみ）
     def update
-      authorize_owner!(@post)
+      return unless authorize_owner!(@post)
 
       @post.tag_ids = normalized_tag_ids if post_params.key?(:tag_ids)
       @post.assign_attributes(post_params.except(:tag_ids, :images, :remove_image_ids))
@@ -90,7 +90,7 @@ module Api
 
 
     def destroy
-      authorize_owner_or_admin!(@post)
+      return unless authorize_owner_or_admin!(@post)
 
       @post.soft_delete
       head :no_content
