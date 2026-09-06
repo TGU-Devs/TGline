@@ -1,5 +1,5 @@
 import { BellOff } from "lucide-react";
-import type { FilterTab } from "@/app/(private)/notifications/page";
+import type { FilterTab } from "@/components/features/notifications/types";
 
 type NoNotificationsProps = {
     activeTab: FilterTab;

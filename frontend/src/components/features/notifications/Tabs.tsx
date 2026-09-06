@@ -1,6 +1,12 @@
-import type { FilterTab, Tab } from "@/app/(private)/notifications/page";
+import type { FilterTab, Tab } from "@/components/features/notifications/types";
 
-const Tabs = ({ tabs, activeTab, setActiveTab }: { tabs: Tab[]; activeTab: FilterTab; setActiveTab: (id: FilterTab) => void }) => {
+type TabsProps = {
+    tabs: Tab[];
+    activeTab: FilterTab;
+    setActiveTab: (tabId: FilterTab) => void;
+};
+
+const Tabs = ({ tabs, activeTab, setActiveTab }: TabsProps) => {
     return (
         <div className="mb-6 inline-flex items-center gap-1 p-1 rounded-2xl bg-slate-100">
             {tabs.map((tab) => (

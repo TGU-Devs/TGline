@@ -1,9 +1,8 @@
 import { Heart, MessageCircle, ChevronRight } from "lucide-react";
-import type { FilterTab } from "@/app/(private)/notifications/page";
-import type { Notification  } from "@/app/(private)/notifications/page";
 import NextPageButton from "@/components/features/notifications/NextPageButton";
 import UserAvatar from "@/components/UserAvatar";
 import formatDate from "@/utils/formatDate";
+import type { Notification, FilterTab } from "@/components/features/notifications/types";
 
 type ListProps = {
     visibleNotifications: Notification[];
