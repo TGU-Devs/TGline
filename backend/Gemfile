@@ -11,6 +11,9 @@ gem 'dotenv-rails', groups: [:development, :test]
 
 gem 'rack-cors'
 
+# GraphQL API（学習用）
+gem 'graphql', '~> 2.6'
+
 # Authentication
 gem 'devise'
 gem 'jwt'
@@ -64,3 +67,7 @@ group :development, :test do
   gem "bullet"
 end
 
+group :development do
+  # 学習用GraphQL APIをブラウザから試すためのIDE
+  gem 'graphiql-rails'
+end

@@ -2,6 +2,17 @@ Rails.application.routes.draw do
   mount Rswag::Ui::Engine => '/api-docs'
   mount Rswag::Api::Engine => '/api-docs'
 
+  # GraphQLの学習用エンドポイント。本番環境にはルート自体を作らない。
+  if Rails.env.development?
+    namespace :study_api do
+      post "graphql", to: "graphql#execute"
+    end
+
+    mount GraphiQL::Rails::Engine,
+          at: "/study_api/graphiql",
+          graphql_path: "/study_api/graphql"
+  end
+
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
