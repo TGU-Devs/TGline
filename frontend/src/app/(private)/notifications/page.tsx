@@ -11,11 +11,13 @@ import Tabs from "@/components/features/notifications/Tabs";
 import NoNotifications from "@/components/features/notifications/NoNotifications";
 import List from "@/components/features/notifications/List";
 import { apiFetch } from "@/lib/api";
+import { useUnreadCount } from "@/components/features/notifications/UnreadCountContext";
 
 import type { Notification, FilterTab, Tab } from "@/components/features/notifications/types";
 
 const NotificationsPage = () => {
     const router = useRouter();
+    const { unreadCount: sidebarUnreadCount, setUnreadCount } = useUnreadCount();
 
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [activeTab, setActiveTab] = useState<FilterTab>("all");
@@ -95,6 +97,7 @@ const NotificationsPage = () => {
                     : notification,
             ),
         );
+        setUnreadCount((count) => Math.max(0, count - 1));
 
         try {
             const res = await apiFetch(`/api/notifications/${id}/read`, {
@@ -111,6 +114,7 @@ const NotificationsPage = () => {
                         : notification,
                 ),
             );
+            setUnreadCount((count) => count + 1);
         }
     };
 
@@ -119,9 +123,11 @@ const NotificationsPage = () => {
         if (unreadCount === 0) return;
 
         const previous = notifications;
+        const previousSidebarCount = sidebarUnreadCount;
         setNotifications((prev) =>
             prev.map((notification) => ({ ...notification, read: true })),
         );
+        setUnreadCount(0);
 
         try {
             const res = await apiFetch("/api/notifications/read_all", {
@@ -132,6 +138,7 @@ const NotificationsPage = () => {
             }
         } catch {
             setNotifications(previous);
+            setUnreadCount(previousSidebarCount);
         }
     };
 
