@@ -57,7 +57,10 @@ class Notification < ApplicationRecord
 
     private
 
+    #通知メールの送信
     def deliver_notification_email
+      return unless recipient.wants_email_for?(kind)
+
       NotificationMailer.notify(self).deliver_now
     rescue StandardError => e
       Rails.logger.error("Notification email failed: #{e.message}")

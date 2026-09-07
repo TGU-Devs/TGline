@@ -49,7 +49,16 @@ module Api
       private
 
       def user_params
-        params.require(:user).permit(:display_name, :description, :email, :avatar, :remove_avatar)
+        params.require(:user).permit(
+          :display_name,
+          :description,
+          :email,
+          :avatar,
+          :remove_avatar,
+          :notify_email,
+          :notify_email_like,
+          :notify_email_comment
+        )
       end
 
       def user_response(user)
@@ -61,7 +70,10 @@ module Api
           role: user.role,
           provider: user.provider,
           created_at: user.created_at.iso8601,
-          avatar: avatar_response(user)
+          avatar: avatar_response(user),
+          notify_email: user.notify_email,
+          notify_email_like: user.notify_email_like,
+          notify_email_comment: user.notify_email_comment
         }
       end
     end

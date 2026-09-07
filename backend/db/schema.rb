@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_08_20_012911) do
+ActiveRecord::Schema[7.2].define(version: 2026_09_07_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -185,6 +185,9 @@ ActiveRecord::Schema[7.2].define(version: 2026_08_20_012911) do
     t.string "email_verification_token"
     t.datetime "email_verification_sent_at"
     t.datetime "email_verified_at"
+    t.boolean "notify_email", default: true, null: false
+    t.boolean "notify_email_like", default: true, null: false
+    t.boolean "notify_email_comment", default: true, null: false
     t.index ["deleted_at"], name: "index_users_on_deleted_at"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["email_verification_token"], name: "index_users_on_email_verification_token", unique: true
