@@ -4,8 +4,18 @@
 # model remove the "{}" from the fixture names and add the columns immediately
 # below each fixture, per the syntax in the comments below
 #
-one: {}
+one:
+  recipient: one
+  actor: two
+  notifiable_type: Like
+  notifiable_id: 1
+  kind: 0
 # column: value
 #
-two: {}
+two:
+  recipient: two
+  actor: one
+  notifiable_type: Comment
+  notifiable_id: 1
+  kind: 1
 # column: value
