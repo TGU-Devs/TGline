@@ -72,13 +72,20 @@ export default function PostDetailPage() {
     const userId = searchParams.get("userId");
     const returnPostId = searchParams.get("returnPostId");
     const isFromProfile = from === "profile" && userId;
+    const isFromNotifications = from === "notifications";
 
     const backUrl = isFromProfile
         ? returnPostId
             ? `/users/${userId}?from=post&postId=${returnPostId}`
             : `/users/${userId}?from=posts`
-        : `/posts?${searchParams.toString()}`;
-    const backLabel = isFromProfile ? "プロフィールに戻る" : "一覧に戻る";
+        : isFromNotifications
+            ? "/notifications"
+            : `/posts?${searchParams.toString()}`;
+    const backLabel = isFromProfile
+        ? "プロフィールに戻る"
+        : isFromNotifications
+            ? "通知一覧に戻る"
+            : "一覧に戻る";
 
     if (isLoading) {
         return (   

@@ -147,7 +147,7 @@ const NotificationsPage = () => {
         await markAsRead(notification.id);
 
         if (notification.post_id) {
-            router.push(`/posts/${notification.post_id}`);
+            router.push(`/posts/${notification.post_id}?from=notifications`);
         }
     };
 
