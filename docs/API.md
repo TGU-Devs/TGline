@@ -250,11 +250,15 @@ Authorization: Bearer <token>
     "url": "http://localhost:3001/rails/active_storage/blobs/.../icon.png",
     "content_type": "image/png",
     "byte_size": 12345
-  }
+  },
+  "notify_email": true,
+  "notify_email_like": true,
+  "notify_email_comment": true
 }
 ```
 
-※ `avatar` 未設定時は `null`
+※ `avatar` 未設定時は `null`  
+※ `notify_email` / `notify_email_like` / `notify_email_comment` はメール通知設定（DB デフォルトはいずれも `true`）
 
 エラー時（401 Unauthorized）：
 
@@ -287,7 +291,10 @@ Authorization: Bearer <token>
 {
   "user": {
     "display_name": "新しい名前",
-    "description": "自己紹介文"
+    "description": "自己紹介文",
+    "notify_email": true,
+    "notify_email_like": true,
+    "notify_email_comment": false
   }
 }
 ```
@@ -297,12 +304,16 @@ Authorization: Bearer <token>
 * `user[avatar]`：画像ファイル（アップロード / 差し替え）
 * `user[remove_avatar]`：`true` でアバター削除
 * `user[display_name]` / `user[description]`：同時更新可
+* `user[notify_email]` / `user[notify_email_like]` / `user[notify_email_comment]`：メール通知設定（boolean）
 
 #### バリデーション
 
 * display_name：任意（更新する場合のみ）
 * description：任意（最大200文字）
 * avatar：JPEG / PNG / WebP / GIF、2MB以下
+* notify_email：任意（boolean）。`false` のときいいね／コメントのメールは送らない
+* notify_email_like：任意（boolean）。いいねのメールを送るか
+* notify_email_comment：任意（boolean）。コメントのメールを送るか
 
 #### レスポンス
 
@@ -320,11 +331,15 @@ Authorization: Bearer <token>
     "url": "http://localhost:3001/rails/active_storage/blobs/.../icon.png",
     "content_type": "image/png",
     "byte_size": 12345
-  }
+  },
+  "notify_email": true,
+  "notify_email_like": true,
+  "notify_email_comment": false
 }
 ```
 
-※ `avatar` 未設定時は `null`
+※ `avatar` 未設定時は `null`  
+※ `notify_email` が `false` のときは、`notify_email_like` / `notify_email_comment` が `true` でもメールは送らない
 
 エラー時：
 
@@ -559,7 +574,8 @@ Authorization: Bearer <token>
 
 #### 概要
 
-投稿にいいねを付与する。
+投稿にいいねを付与する。  
+投稿者以外のいいねでは、投稿者向けのアプリ内通知を作成する（自分の投稿へのいいねでは作成しない）。通知作成後、投稿者のメール設定に応じてメールを送信する。
 
 #### リクエストヘッダー
 
@@ -596,7 +612,7 @@ Authorization: Bearer <token>
 
 #### 概要
 
-いいねを解除する。
+いいねを解除する。関連する通知も削除する。
 
 #### リクエストヘッダー
 
@@ -672,7 +688,8 @@ Authorization: Bearer <token>
 
 #### 概要
 
-コメントを作成する。
+コメントを作成する。  
+投稿者以外のコメントでは、投稿者向けのアプリ内通知を作成する（自分の投稿へのコメントでは作成しない）。通知作成後、投稿者のメール設定に応じてメールを送信する。
 
 #### リクエストヘッダー
 
@@ -772,6 +789,143 @@ Authorization: Bearer <token>
 
 ※ `user.avatar` 未設定時は `null`  
 ※ コメント投稿者が削除済みの場合、`user` は `null`
+
+---
+
+## 通知（Notifications）
+
+いいね・コメントにより投稿者へアプリ内通知を作成する。メール送信は受信者の設定（`notify_email` / `notify_email_like` / `notify_email_comment`）に従う。メール送信に失敗してもアプリ内通知は残る。いいね取り消し・コメント削除時は対応する通知も削除する。
+
+※ お知らせ通知・リアルタイム配信・デスクトップ通知は対象外
+
+### GET /notifications
+
+#### 概要
+
+自分宛の通知を新しい順に取得する。1ページあたり20件。
+
+#### リクエストヘッダー
+
+```
+Authorization: Bearer <token>
+```
+
+#### クエリ（任意）
+
+* page: ページ番号（省略時は 1）
+
+#### レスポンス
+
+成功時（200 OK）：
+
+```json
+{
+  "notifications": [
+    {
+      "id": 1,
+      "kind": "like",
+      "read": false,
+      "message": "太郎があなたの投稿「ミクロ経済学の課題」にいいねしました",
+      "actor": {
+        "id": 2,
+        "display_name": "太郎",
+        "avatar": {
+          "url": "http://localhost:3001/rails/active_storage/blobs/.../icon.png",
+          "content_type": "image/png",
+          "byte_size": 12345
+        }
+      },
+      "post_id": 10,
+      "created_at": "2026-01-01T12:10:00Z"
+    },
+    {
+      "id": 2,
+      "kind": "comment",
+      "read": true,
+      "message": "花子があなたの投稿「ミクロ経済学の課題」にコメントしました",
+      "actor": {
+        "id": 3,
+        "display_name": "花子",
+        "avatar": null
+      },
+      "post_id": 10,
+      "created_at": "2026-01-01T12:05:00Z"
+    }
+  ],
+  "has_next_page": false
+}
+```
+
+※ `kind` は `like` または `comment`  
+※ `actor.avatar` 未設定時は `null`
+
+---
+
+### GET /notifications/unread_count
+
+#### 概要
+
+自分宛の未読通知の総数を取得する。
+
+#### リクエストヘッダー
+
+```
+Authorization: Bearer <token>
+```
+
+#### レスポンス
+
+成功時（200 OK）：
+
+```json
+{
+  "count": 3
+}
+```
+
+---
+
+### POST /notifications/:id/read
+
+#### 概要
+
+指定した通知を既読にする。自分宛の通知のみ対象。
+
+#### リクエストヘッダー
+
+```
+Authorization: Bearer <token>
+```
+
+#### レスポンス
+
+成功時（200 OK）：該当通知オブジェクト（`read` が `true`）
+
+通知が見つからない場合（404 Not Found）：
+
+```json
+{
+  "error": "Notification not found"
+}
+```
+
+---
+
+### POST /notifications/read_all
+
+#### 概要
+
+自分宛の未読通知をすべて既読にする。
+
+#### リクエストヘッダー
+
+```
+Authorization: Bearer <token>
+```
+
+#### レスポンス
+
+成功時：204 No Content
 
 ---
 

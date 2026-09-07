@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_08_04_000001) do
+ActiveRecord::Schema[7.2].define(version: 2026_09_07_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -127,6 +127,20 @@ ActiveRecord::Schema[7.2].define(version: 2026_08_04_000001) do
     t.index ["user_id"], name: "index_likes_on_user_id"
   end
 
+  create_table "notifications", force: :cascade do |t|
+    t.bigint "recipient_id", null: false
+    t.bigint "actor_id", null: false
+    t.string "notifiable_type", null: false
+    t.bigint "notifiable_id", null: false
+    t.integer "kind", null: false
+    t.datetime "read_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_id"], name: "index_notifications_on_actor_id"
+    t.index ["notifiable_type", "notifiable_id", "recipient_id"], name: "index_notifications_on_notifiable_and_recipient", unique: true
+    t.index ["recipient_id", "created_at"], name: "index_notifications_on_recipient_id_and_created_at", order: { created_at: :desc }
+  end
+
   create_table "post_tags", force: :cascade do |t|
     t.bigint "post_id", null: false
     t.bigint "tag_id", null: false
@@ -171,6 +185,9 @@ ActiveRecord::Schema[7.2].define(version: 2026_08_04_000001) do
     t.string "email_verification_token"
     t.datetime "email_verification_sent_at"
     t.datetime "email_verified_at"
+    t.boolean "notify_email", default: true, null: false
+    t.boolean "notify_email_like", default: true, null: false
+    t.boolean "notify_email_comment", default: true, null: false
     t.index ["deleted_at"], name: "index_users_on_deleted_at"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["email_verification_token"], name: "index_users_on_email_verification_token", unique: true
@@ -190,6 +207,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_08_04_000001) do
   add_foreign_key "courses", "users", column: "created_by_id"
   add_foreign_key "likes", "posts"
   add_foreign_key "likes", "users"
+  add_foreign_key "notifications", "users", column: "actor_id"
+  add_foreign_key "notifications", "users", column: "recipient_id"
   add_foreign_key "post_tags", "posts"
   add_foreign_key "post_tags", "tags"
   add_foreign_key "posts", "users"

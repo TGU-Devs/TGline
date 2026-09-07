@@ -12,6 +12,7 @@ class User < ApplicationRecord
   has_many :comments, dependent: :destroy
   has_many :course_reviews, dependent: :destroy
   has_many :created_courses, class_name: "Course", foreign_key: :created_by_id, dependent: :nullify
+  has_many :notifications, foreign_key: :recipient_id, dependent: :destroy
 
   def password_required?
     provider.blank? && super
@@ -42,6 +43,16 @@ class User < ApplicationRecord
 
   def email_verified?
     email_verified_at.present?
+  end
+
+  def wants_email_for?(kind)
+    return false unless notify_email
+
+    case kind.to_s
+    when "like" then notify_email_like
+    when "comment" then notify_email_comment
+    else false
+    end
   end
 
   def generate_email_verification_token!
