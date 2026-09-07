@@ -9,7 +9,7 @@ module Api
 
             notifications = Notification
              .for_recipient(current_user)
-             .includes(:actor, :notifiable)
+             .includes(:notifiable, actor: { avatar_attachment: :blob })
              .limit(per_page + 1)
              .offset((page - 1) * per_page)
              .order(created_at: :desc)
@@ -58,6 +58,7 @@ module Api
                 actor: notification.actor && {
                     id: notification.actor.id,
                     display_name: notification.actor.display_name,
+                    avatar: avatar_response(notification.actor),
                 },
                 post_id: notification.notifiable&.post_id,
                 created_at: notification.created_at.iso8601

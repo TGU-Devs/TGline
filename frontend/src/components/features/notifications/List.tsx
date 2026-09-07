@@ -81,6 +81,7 @@ const List = ({ visibleNotifications, activeTab, isLoadingMore, hasNextPage, pag
                                 <div className="flex items-start gap-3 sm:gap-4 pl-1">
                                     <div className="relative shrink-0">
                                         <UserAvatar
+                                            avatar={notification.actor?.avatar}
                                             name={actorName || "匿名"}
                                             size={44}
                                             className="rounded-full ring-2 ring-white shadow-sm"
