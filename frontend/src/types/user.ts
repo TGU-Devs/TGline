@@ -12,4 +12,7 @@ export type User = {
     provider: string | null;
     role: string;
     avatar: UserAvatar | null;
+    notify_email?: boolean;
+    notify_email_like?: boolean;
+    notify_email_comment?: boolean;
 }

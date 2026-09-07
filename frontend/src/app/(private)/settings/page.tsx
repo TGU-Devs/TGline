@@ -40,6 +40,12 @@ const initFormValues = {
     description: "",
 };
 
+const initNotifyPrefs = {
+    email: true,
+    email_like: true,
+    email_comment: true,
+};
+
 const SettingsPage = () => {
     const { user, isLoading, error, refreshUser } = useUser();
     const searchParams = useSearchParams();
@@ -64,6 +70,7 @@ const SettingsPage = () => {
     const [isDark, setIsDark] = useState(false);
     const [formValues, setFormValues] = useState<FormValues>(initFormValues);
     const [formErrors, setFormErrors] = useState<Errors>({});
+    const [notifyPrefs, setNotifyPrefs] = useState(initNotifyPrefs);
 
     useEffect(() => {
         if (user) {
@@ -71,6 +78,11 @@ const SettingsPage = () => {
                 display_name: user.display_name || "",
                 email: user.email || "",
                 description: user.description || "",
+            });
+            setNotifyPrefs({
+                email: user.notify_email ?? true,
+                email_like: user.notify_email_like ?? true,
+                email_comment: user.notify_email_comment ?? true,
             });
         }
     }, [user]);
@@ -118,6 +130,9 @@ const SettingsPage = () => {
             const formData = new FormData();
             formData.append("user[display_name]", formValues.display_name);
             formData.append("user[description]", formValues.description || "");
+            formData.append("user[notify_email]", String(notifyPrefs.email));
+            formData.append("user[notify_email_like]", String(notifyPrefs.email_like));
+            formData.append("user[notify_email_comment]", String(notifyPrefs.email_comment));
 
             if (selectedFile) {
                 formData.append("user[avatar]", selectedFile);
@@ -185,6 +200,13 @@ const SettingsPage = () => {
         setFormValues((prevFormValues) => ({ ...prevFormValues, [id]: value }));
     };
 
+    const onNotifyToggle = (id: string) => {
+        if (id === "announcement") return;
+        if (id !== "email" && id !== "email_like" && id !== "email_comment") return;
+
+        setNotifyPrefs((prev) => ({ ...prev, [id]: !prev[id] }));
+    };
+
     if (isLoading && !user) {
         return <Loading />;
     }
@@ -240,6 +262,11 @@ const SettingsPage = () => {
                     <NotificationSection
                         notifications={NOTIFICATION_OPTIONS}
                         icon={Bell}
+                        checkedMap={{
+                            ...notifyPrefs,
+                            announcement: false,
+                        }}
+                        onToggle={onNotifyToggle}
                     />
                     <ThemeSection
                         themeOptions={themeOptions}

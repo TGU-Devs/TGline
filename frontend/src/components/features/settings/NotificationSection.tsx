@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import SettingSection from "./SettingSection";
 import type { Notification } from "./types";
 import type { LucideIcon } from "lucide-react";
@@ -8,18 +7,8 @@ import type { LucideIcon } from "lucide-react";
 type NotificationSectionProps = {
     notifications: Notification[];
     icon: LucideIcon;
-};
-
-const collectChecked = (items: Notification[]) => {
-    const map: Record<string, boolean> = {};
-    const walk = (list: Notification[]) => {
-        list.forEach((item) => {
-            map[item.id] = item.checked;
-            if (item.children) walk(item.children);
-        });
-    };
-    walk(items);
-    return map;
+    checkedMap: Record<string, boolean>;
+    onToggle: (id: string) => void;
 };
 
 type NotificationRowProps = {
@@ -87,13 +76,9 @@ const NotificationRow = ({
 const NotificationSection = ({
     notifications,
     icon: Icon,
+    checkedMap,
+    onToggle,
 }: NotificationSectionProps) => {
-    const [checkedMap, setCheckedMap] = useState(() => collectChecked(notifications));
-
-    const onToggle = (id: string) => {
-        setCheckedMap((prev) => ({ ...prev, [id]: !prev[id] }));
-    };
-
     return (
         <div className="relative">
             <SettingSection title="通知設定" icon={Icon}>
