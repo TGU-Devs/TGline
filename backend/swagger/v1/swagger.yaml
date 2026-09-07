@@ -27,6 +27,8 @@ tags:
     description: いいね機能
   - name: Comment
     description: コメント機能
+  - name: Notification
+    description: いいね・コメントのアプリ内通知
   - name: Tag
     description: タグ一覧
   - name: Course
@@ -237,6 +239,15 @@ paths:
                     email:
                       type: string
                       format: email
+                    notify_email:
+                      type: boolean
+                      description: メール通知のマスタースイッチ。false のときはいいね・コメントのメールを送らない
+                    notify_email_like:
+                      type: boolean
+                      description: いいねのメール通知
+                    notify_email_comment:
+                      type: boolean
+                      description: コメントのメール通知
       responses:
         '200':
           description: 更新成功
@@ -660,6 +671,7 @@ paths:
       operationId: createLike
       security:
         - cookieAuth: []
+      description: 投稿者以外のいいねでは投稿者向けのアプリ内通知を作成し、設定に応じてメールを送信する。自分の投稿へのいいねでは通知しない。
       parameters:
         - $ref: '#/components/parameters/PostIdPath'
       responses:
@@ -682,6 +694,7 @@ paths:
       operationId: deleteLike
       security:
         - cookieAuth: []
+      description: 関連する通知も削除する
       parameters:
         - $ref: '#/components/parameters/PostIdPath'
       responses:
@@ -728,6 +741,7 @@ paths:
       operationId: createComment
       security:
         - cookieAuth: []
+      description: 投稿者以外のコメントでは投稿者向けのアプリ内通知を作成し、設定に応じてメールを送信する。自分の投稿へのコメントでは通知しない。
       parameters:
         - $ref: '#/components/parameters/PostIdPath'
       requestBody:
@@ -775,7 +789,7 @@ paths:
       operationId: deleteComment
       security:
         - cookieAuth: []
-      description: コメント投稿者本人または管理者が削除可能
+      description: コメント投稿者本人または管理者が削除可能。関連する通知も削除する。
       parameters:
         - $ref: '#/components/parameters/PostIdPath'
         - name: id
@@ -801,6 +815,90 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Errors'
+
+  # ============================================================
+  # Notifications
+  # ============================================================
+  /api/notifications:
+    get:
+      tags: [Notification]
+      summary: 通知一覧を取得
+      operationId: listNotifications
+      security:
+        - cookieAuth: []
+      description: 自分宛の通知を新しい順に20件ずつ返す。
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+          description: ページ番号
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/notifications/unread_count:
+    get:
+      tags: [Notification]
+      summary: 未読通知数を取得
+      operationId: getUnreadNotificationCount
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnreadNotificationCount'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/notifications/read_all:
+    post:
+      tags: [Notification]
+      summary: 未読通知をすべて既読にする
+      operationId: readAllNotifications
+      security:
+        - cookieAuth: []
+      responses:
+        '204':
+          description: 成功
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/notifications/{id}/read:
+    post:
+      tags: [Notification]
+      summary: 通知を既読にする
+      operationId: readNotification
+      security:
+        - cookieAuth: []
+      description: 自分宛の通知のみ既読にできる。
+      parameters:
+        - $ref: '#/components/parameters/NotificationId'
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: 通知が見つからない
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   # ============================================================
   # Tags
@@ -1418,6 +1516,14 @@ components:
         type: integer
       description: 授業レビューID
 
+    NotificationId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: 通知ID
+
   responses:
     Unauthorized:
       description: 未認証（トークンなしまたは期限切れ）
@@ -1482,6 +1588,15 @@ components:
         created_at:
           type: string
           format: date-time
+        notify_email:
+          type: boolean
+          description: メール通知のマスタースイッチ。false のときはいいね・コメントのメールを送らない
+        notify_email_like:
+          type: boolean
+          description: いいねのメール通知
+        notify_email_comment:
+          type: boolean
+          description: コメントのメール通知
 
     UserSummary:
       type: object
@@ -1571,6 +1686,66 @@ components:
         created_at:
           type: string
           format: date-time
+
+    # ----------------------------------------------------------
+    # Notification
+    # ----------------------------------------------------------
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+        kind:
+          type: string
+          enum: [like, comment]
+        read:
+          type: boolean
+        message:
+          type: string
+          example: 太郎があなたの投稿「ミクロ経済学の課題」にいいねしました
+        actor:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: integer
+            display_name:
+              type: string
+            avatar:
+              type: object
+              nullable: true
+              description: 未設定時はnull
+              properties:
+                url:
+                  type: string
+                content_type:
+                  type: string
+                byte_size:
+                  type: integer
+        post_id:
+          type: integer
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    NotificationList:
+      type: object
+      properties:
+        notifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notification'
+        has_next_page:
+          type: boolean
+          description: 次のページが存在するか
+
+    UnreadNotificationCount:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: 未読通知の総数
 
     # ----------------------------------------------------------
     # Tag
