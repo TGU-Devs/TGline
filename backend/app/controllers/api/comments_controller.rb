@@ -29,7 +29,7 @@ module Api
       comment = @post.comments.active.find_by(id: params[:id])
       return render json: { errors: ['Comment not found'] }, status: :not_found unless comment
 
-      authorize_owner_or_admin!(comment)
+      return unless authorize_owner_or_admin!(comment)
 
       Comment.transaction do
         Notification.destroy_for_like_or_comment!(comment)
