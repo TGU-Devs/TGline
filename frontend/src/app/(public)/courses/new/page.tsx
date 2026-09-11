@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -22,7 +22,8 @@ import SelectField from "@/components/ui/form/SelectField";
 import TextField from "@/components/ui/form/TextField";
 
 import type { Course } from "@/components/features/courses/types";
-import { ApiError, apiFetch, apiJson } from "@/lib/api";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
+import { ApiError, apiJson } from "@/lib/api";
 
 type CourseForm = {
   name: string;
@@ -59,25 +60,18 @@ const initialCourseForm: CourseForm = {
 export default function NewCoursePage() {
   const router = useRouter();
 
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const [showLoginModal, setShowLoginModal] = useState(false);
+  const {
+    isAuthenticated,
+    showLoginModal,
+    openLoginModal,
+    closeLoginModal,
+    requireAuth,
+  } = useAuthGuard();
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [courseForm, setCourseForm] = useState<CourseForm>(initialCourseForm);
   const departmentOptions = departmentsForFaculty(courseForm.faculty);
   const requiresDepartment = courseForm.category !== "教養科目";
-
-  useEffect(() => {
-    apiFetch("/api/users/me")
-      .then((res) => {
-        setIsAuthenticated(res.ok);
-        if (!res.ok) setShowLoginModal(true);
-      })
-      .catch(() => {
-        setIsAuthenticated(false);
-        setShowLoginModal(true);
-      });
-  }, []);
 
   const handleFacultyChange = (faculty: string) => {
     const departments = departmentsForFaculty(faculty);
@@ -91,12 +85,7 @@ export default function NewCoursePage() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (isAuthenticated === false) {
-      setShowLoginModal(true);
-      return;
-    }
-
-    if (isAuthenticated === null) return;
+    if (!requireAuth()) return;
 
     try {
       setError(null);
@@ -135,8 +124,7 @@ export default function NewCoursePage() {
       router.push(`/courses/${created.id}`);
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
-        setIsAuthenticated(false);
-        setShowLoginModal(true);
+        openLoginModal();
         return;
       }
       setError(err instanceof Error ? err.message : "エラーが発生しました");
@@ -214,7 +202,7 @@ export default function NewCoursePage() {
         </form>
       </div>
 
-      <LoginPromptModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
+      <LoginPromptModal isOpen={showLoginModal} onClose={closeLoginModal} />
     </main>
   );
 }

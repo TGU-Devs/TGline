@@ -22,6 +22,7 @@ import Loading from "@/components/ui/Loading";
 import { Button } from "@/components/ui/button";
 import SelectField from "@/components/ui/form/SelectField";
 import TextField from "@/components/ui/form/TextField";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { ApiError, apiFetch, apiJson } from "@/lib/api";
 
 type OfferingForm = {
@@ -58,10 +59,15 @@ export default function NewCourseOfferingPage() {
   const courseId = params.id;
 
   const [course, setCourse] = useState<Course | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const {
+    isAuthenticated,
+    showLoginModal,
+    openLoginModal,
+    closeLoginModal,
+    requireAuth,
+  } = useAuthGuard();
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [form, setForm] = useState<OfferingForm>(initialOfferingForm);
@@ -71,10 +77,7 @@ export default function NewCourseOfferingPage() {
       setError(null);
       setIsLoading(true);
 
-      const [courseRes, meRes] = await Promise.all([
-        apiFetch(`/api/courses/${courseId}`),
-        apiFetch("/api/users/me"),
-      ]);
+      const courseRes = await apiFetch(`/api/courses/${courseId}`);
 
       if (!courseRes.ok) {
         throw new Error("授業情報の取得に失敗しました");
@@ -82,7 +85,6 @@ export default function NewCourseOfferingPage() {
 
       const courseData = (await courseRes.json()) as Course;
       setCourse(courseData);
-      setIsAuthenticated(meRes.ok);
     } catch (err) {
       setError(err instanceof Error ? err.message : "エラーが発生しました");
     } finally {
@@ -93,12 +95,6 @@ export default function NewCourseOfferingPage() {
   useEffect(() => {
     fetchPageData();
   }, [fetchPageData]);
-
-  useEffect(() => {
-    if (isAuthenticated === false) {
-      setShowLoginModal(true);
-    }
-  }, [isAuthenticated]);
 
   const handleFacultyChange = (faculty: string) => {
     const departments = departmentsForFaculty(faculty);
@@ -112,12 +108,7 @@ export default function NewCourseOfferingPage() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (isAuthenticated === false) {
-      setShowLoginModal(true);
-      return;
-    }
-
-    if (isAuthenticated === null) return;
+    if (!requireAuth()) return;
     if (!course) return;
 
     try {
@@ -154,8 +145,7 @@ export default function NewCourseOfferingPage() {
       router.push(`/courses/${courseId}`);
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
-        setIsAuthenticated(false);
-        setShowLoginModal(true);
+        openLoginModal();
         return;
       }
       setFormError(err instanceof Error ? err.message : "エラーが発生しました");
@@ -294,7 +284,7 @@ export default function NewCourseOfferingPage() {
           <Button
             type={isAuthenticated === false ? "button" : "submit"}
             disabled={isSubmitting || isAuthenticated === null}
-            onClick={isAuthenticated === false ? () => setShowLoginModal(true) : undefined}
+            onClick={isAuthenticated === false ? openLoginModal : undefined}
             className="h-11 w-full rounded-md"
           >
             <Plus className="size-4" />
@@ -303,7 +293,7 @@ export default function NewCourseOfferingPage() {
         </form>
       </div>
 
-      <LoginPromptModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
+      <LoginPromptModal isOpen={showLoginModal} onClose={closeLoginModal} />
     </main>
   );
 }

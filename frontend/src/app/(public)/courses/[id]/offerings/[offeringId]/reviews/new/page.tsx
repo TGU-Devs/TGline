@@ -18,6 +18,7 @@ import ErrorUI from "@/components/ui/ErrorUI";
 import Loading from "@/components/ui/Loading";
 import { Button } from "@/components/ui/button";
 import FieldLabel from "@/components/ui/form/FieldLabel";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { ApiError, apiFetch, apiJson } from "@/lib/api";
 
 const scoreFields = ["rating", "difficulty", "workload", "grading"] as const;
@@ -49,10 +50,15 @@ export default function NewOfferingReviewPage() {
   const offeringId = Number(params.offeringId);
 
   const [course, setCourse] = useState<Course | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const {
+    isAuthenticated,
+    showLoginModal,
+    openLoginModal,
+    closeLoginModal,
+    requireAuth,
+  } = useAuthGuard();
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [form, setForm] = useState<ReviewForm>(initialForm);
@@ -62,10 +68,7 @@ export default function NewOfferingReviewPage() {
       setError(null);
       setIsLoading(true);
 
-      const [courseRes, meRes] = await Promise.all([
-        apiFetch(`/api/courses/${courseId}`),
-        apiFetch("/api/users/me"),
-      ]);
+      const courseRes = await apiFetch(`/api/courses/${courseId}`);
 
       if (!courseRes.ok) {
         throw new Error("授業情報の取得に失敗しました");
@@ -73,13 +76,6 @@ export default function NewOfferingReviewPage() {
 
       const courseData = (await courseRes.json()) as Course;
       setCourse(courseData);
-
-      if (!meRes.ok) {
-        setIsAuthenticated(false);
-        return;
-      }
-
-      setIsAuthenticated(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "エラーが発生しました");
     } finally {
@@ -90,12 +86,6 @@ export default function NewOfferingReviewPage() {
   useEffect(() => {
     fetchPageData();
   }, [fetchPageData]);
-
-  useEffect(() => {
-    if (isAuthenticated === false) {
-      setShowLoginModal(true);
-    }
-  }, [isAuthenticated]);
 
   const offering = useMemo(() => {
     return course?.course_offerings?.find((item) => item.id === offeringId);
@@ -108,12 +98,7 @@ export default function NewOfferingReviewPage() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (isAuthenticated === false) {
-      setShowLoginModal(true);
-      return;
-    }
-
-    if (isAuthenticated === null) return;
+    if (!requireAuth()) return;
 
     try {
       setFormError(null);
@@ -146,8 +131,7 @@ export default function NewOfferingReviewPage() {
       router.push(`/courses/${courseId}/offerings/${offeringId}`);
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
-        setIsAuthenticated(false);
-        setShowLoginModal(true);
+        openLoginModal();
         return;
       }
       setFormError(err instanceof Error ? err.message : "エラーが発生しました");
@@ -233,7 +217,7 @@ export default function NewOfferingReviewPage() {
           <Button
             type={isAuthenticated === false ? "button" : "submit"}
             disabled={isSubmitting || isAuthenticated === null}
-            onClick={isAuthenticated === false ? () => setShowLoginModal(true) : undefined}
+            onClick={isAuthenticated === false ? openLoginModal : undefined}
             className="h-11 w-full rounded-md"
           >
             <Star className="size-4" />
@@ -242,7 +226,7 @@ export default function NewOfferingReviewPage() {
         </form>
       </div>
 
-      <LoginPromptModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
+      <LoginPromptModal isOpen={showLoginModal} onClose={closeLoginModal} />
     </main>
   );
 }
