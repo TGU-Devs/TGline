@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import type { ReactNode } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import {
@@ -17,12 +16,9 @@ import {
 
 import LoginPromptModal from "@/components/features/auth/LoginPromptModal";
 import { courseOfferingBadges } from "@/components/features/courses/display";
-import {
-  formatAverage,
-  formatRatingScore,
-  ratingLabels,
-  type RatingScoreField,
-} from "@/components/features/courses/labels";
+import Metric from "@/components/features/courses/components/Metric";
+import ScoreSummary from "@/components/features/courses/components/ScoreSummary";
+import { formatAverage } from "@/components/features/courses/labels";
 import type { Course, CourseReview, CourseReviewsResponse } from "@/components/features/courses/types";
 import ErrorUI from "@/components/ui/ErrorUI";
 import Loading from "@/components/ui/Loading";
@@ -237,26 +233,5 @@ export default function CourseDetailPage() {
       </div>
       <LoginPromptModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
     </main>
-  );
-}
-
-function Metric({ label, value, icon }: { label: string; value: string; icon: ReactNode }) {
-  return (
-    <div className="rounded-md border border-border bg-background p-3 text-center">
-      <div className="flex items-center justify-center gap-1 text-xl font-bold text-slate-900">
-        {icon}
-        {value}
-      </div>
-      <p className="mt-1 text-xs font-medium text-muted-foreground">{label}</p>
-    </div>
-  );
-}
-
-function ScoreSummary({ field, value }: { field: RatingScoreField; value: number | null | undefined }) {
-  return (
-    <div className="rounded-md bg-background p-3">
-      <p className="text-xs font-semibold text-muted-foreground">{ratingLabels[field]}</p>
-      <p className="mt-1 text-lg font-bold text-slate-900">{formatRatingScore(field, value)}</p>
-    </div>
   );
 }
