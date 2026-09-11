@@ -20,6 +20,8 @@ import type { Course } from "@/components/features/courses/types";
 import ErrorUI from "@/components/ui/ErrorUI";
 import Loading from "@/components/ui/Loading";
 import { Button } from "@/components/ui/button";
+import SelectField from "@/components/ui/form/SelectField";
+import TextField from "@/components/ui/form/TextField";
 import { apiFetch } from "@/lib/api";
 
 type OfferingForm = {
@@ -198,84 +200,95 @@ export default function NewCourseOfferingPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-border bg-card p-5 shadow-sm">
           <div className="grid gap-3 sm:grid-cols-2">
-            <OfferingInput
+            <TextField
               label="教授名"
               value={form.teacher_name}
               onChange={(value) => setForm((prev) => ({ ...prev, teacher_name: value }))}
               required
+              surface="card"
             />
-            <OfferingInput
+            <TextField
               label="開講年度"
               value={form.academic_year}
               onChange={(value) => setForm((prev) => ({ ...prev, academic_year: value }))}
               inputMode="numeric"
+              surface="card"
             />
-            <OfferingSelect
+            <SelectField
               label="学期"
               value={form.semester}
               onChange={(value) => setForm((prev) => ({ ...prev, semester: value }))}
               options={SEMESTER_OPTIONS.map((option) => option.value)}
               getLabel={(value) => SEMESTER_OPTIONS.find((option) => option.value === value)?.label ?? value}
               required
+              surface="card"
             />
-            <OfferingSelect
+            <SelectField
               label="曜日"
               value={form.day_of_week}
               onChange={(value) => setForm((prev) => ({ ...prev, day_of_week: value }))}
               options={DAY_OF_WEEK_OPTIONS.map((option) => option.value)}
               getLabel={(value) => DAY_OF_WEEK_OPTIONS.find((option) => option.value === value)?.label ?? value}
+              surface="card"
             />
-            <OfferingSelect
+            <SelectField
               label="授業形態"
               value={form.delivery_method}
               onChange={(value) => setForm((prev) => ({ ...prev, delivery_method: value }))}
               options={DELIVERY_METHOD_OPTIONS.map((option) => option.value)}
               getLabel={(value) => DELIVERY_METHOD_OPTIONS.find((option) => option.value === value)?.label ?? value}
               required
+              surface="card"
             />
-            <OfferingInput
+            <TextField
               label="時限"
               value={form.period}
               onChange={(value) => setForm((prev) => ({ ...prev, period: value }))}
               inputMode="numeric"
+              surface="card"
             />
             {requiresDepartment ? (
               <>
-                <OfferingSelect
+                <SelectField
                   label="学部"
                   value={form.faculty}
                   onChange={handleFacultyChange}
                   options={FACULTY_DEPARTMENT_OPTIONS.map((option) => option.faculty)}
                   required
+                  surface="card"
                 />
-                <OfferingSelect
+                <SelectField
                   label="学科"
                   value={form.department}
                   onChange={(value) => setForm((prev) => ({ ...prev, department: value }))}
                   options={departmentOptions}
                   required
+                  surface="card"
                 />
               </>
             ) : null}
-            <OfferingSelect
+            <SelectField
               label="対象学年"
               value={form.target_grade}
               onChange={(value) => setForm((prev) => ({ ...prev, target_grade: value }))}
               options={TARGET_GRADE_OPTIONS.map((option) => option.value)}
               getLabel={(value) => TARGET_GRADE_OPTIONS.find((option) => option.value === value)?.label ?? value}
               required
+              surface="card"
             />
-            <OfferingSelect
+            <SelectField
               label="キャンパス"
               value={form.campus}
               onChange={(value) => setForm((prev) => ({ ...prev, campus: value }))}
               options={[...CAMPUS_OPTIONS]}
               required
+              surface="card"
             />
-            <OfferingInput
+            <TextField
               label="教室"
               value={form.classroom}
               onChange={(value) => setForm((prev) => ({ ...prev, classroom: value }))}
+              surface="card"
             />
           </div>
 
@@ -295,77 +308,5 @@ export default function NewCourseOfferingPage() {
 
       <LoginPromptModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
     </main>
-  );
-}
-
-function FieldLabel({ label, required }: { label: string; required: boolean }) {
-  return (
-    <span className="mb-1 flex items-center gap-2 text-sm font-semibold text-slate-700">
-      {label}
-      <span className={`rounded-sm px-1.5 py-0.5 text-[10px] font-bold ${required ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
-        {required ? "必須" : "任意"}
-      </span>
-    </span>
-  );
-}
-
-function OfferingInput({
-  label,
-  value,
-  onChange,
-  required = false,
-  inputMode,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  required?: boolean;
-  inputMode?: "numeric";
-}) {
-  return (
-    <label className="block">
-      <FieldLabel label={label} required={required} />
-      <input
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        required={required}
-        inputMode={inputMode}
-        className="h-11 w-full rounded-md border border-input bg-card px-3 text-base outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-      />
-    </label>
-  );
-}
-
-function OfferingSelect({
-  label,
-  value,
-  onChange,
-  options,
-  required = false,
-  getLabel,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  options: readonly string[];
-  required?: boolean;
-  getLabel?: (value: string) => string;
-}) {
-  return (
-    <label className="block">
-      <FieldLabel label={label} required={required} />
-      <select
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        required={required}
-        className="h-11 w-full rounded-md border border-input bg-card px-3 text-base outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-      >
-        {options.map((option) => (
-          <option key={option} value={option}>
-            {getLabel ? getLabel(option) : option}
-          </option>
-        ))}
-      </select>
-    </label>
   );
 }

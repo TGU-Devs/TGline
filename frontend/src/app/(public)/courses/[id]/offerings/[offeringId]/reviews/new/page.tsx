@@ -17,6 +17,7 @@ import type { Course } from "@/components/features/courses/types";
 import ErrorUI from "@/components/ui/ErrorUI";
 import Loading from "@/components/ui/Loading";
 import { Button } from "@/components/ui/button";
+import FieldLabel from "@/components/ui/form/FieldLabel";
 import { apiFetch } from "@/lib/api";
 
 const scoreFields = ["rating", "difficulty", "workload", "grading"] as const;
@@ -246,17 +247,6 @@ export default function NewOfferingReviewPage() {
 
       <LoginPromptModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
     </main>
-  );
-}
-
-function FieldLabel({ label, required }: { label: string; required: boolean }) {
-  return (
-    <span className="mb-1 flex items-center gap-2 text-sm font-semibold text-slate-700">
-      {label}
-      <span className={`rounded-sm px-1.5 py-0.5 text-[10px] font-bold ${required ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
-        {required ? "必須" : "任意"}
-      </span>
-    </span>
   );
 }
 

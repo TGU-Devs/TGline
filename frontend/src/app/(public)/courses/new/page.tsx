@@ -18,6 +18,8 @@ import {
   departmentsForFaculty,
 } from "@/components/features/courses/options";
 import { Button } from "@/components/ui/button";
+import SelectField from "@/components/ui/form/SelectField";
+import TextField from "@/components/ui/form/TextField";
 
 import type { Course } from "@/components/features/courses/types";
 import { apiFetch } from "@/lib/api";
@@ -176,21 +178,21 @@ export default function NewCoursePage() {
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <TextInput label="授業名" value={courseForm.name} onChange={(value) => setCourseForm((prev) => ({ ...prev, name: value }))} required />
-            <SelectInput label="カテゴリ" value={courseForm.category} onChange={(value) => setCourseForm((prev) => ({ ...prev, category: value }))} options={[...COURSE_CATEGORY_OPTIONS]} required />
+            <TextField label="授業名" value={courseForm.name} onChange={(value) => setCourseForm((prev) => ({ ...prev, name: value }))} required />
+            <SelectField label="カテゴリ" value={courseForm.category} onChange={(value) => setCourseForm((prev) => ({ ...prev, category: value }))} options={[...COURSE_CATEGORY_OPTIONS]} required />
             {requiresDepartment ? (
               <>
-                <SelectInput label="学部" value={courseForm.faculty} onChange={handleFacultyChange} options={FACULTY_DEPARTMENT_OPTIONS.map((option) => option.faculty)} required />
-                <SelectInput label="学科" value={courseForm.department} onChange={(value) => setCourseForm((prev) => ({ ...prev, department: value }))} options={departmentOptions} required />
+                <SelectField label="学部" value={courseForm.faculty} onChange={handleFacultyChange} options={FACULTY_DEPARTMENT_OPTIONS.map((option) => option.faculty)} required />
+                <SelectField label="学科" value={courseForm.department} onChange={(value) => setCourseForm((prev) => ({ ...prev, department: value }))} options={departmentOptions} required />
               </>
             ) : null}
-            <TextInput label="教授名" value={courseForm.teacher_name} onChange={(value) => setCourseForm((prev) => ({ ...prev, teacher_name: value }))} required />
-            <TextInput label="開講年度" value={courseForm.academic_year} onChange={(value) => setCourseForm((prev) => ({ ...prev, academic_year: value }))} inputMode="numeric" />
-            <SelectInput label="学期" value={courseForm.semester} onChange={(value) => setCourseForm((prev) => ({ ...prev, semester: value }))} options={SEMESTER_OPTIONS.map((option) => option.value)} getLabel={(value) => SEMESTER_OPTIONS.find((option) => option.value === value)?.label ?? value} />
-            <SelectInput label="曜日" value={courseForm.day_of_week} onChange={(value) => setCourseForm((prev) => ({ ...prev, day_of_week: value }))} options={DAY_OF_WEEK_OPTIONS.map((option) => option.value)} getLabel={(value) => DAY_OF_WEEK_OPTIONS.find((option) => option.value === value)?.label ?? value} />
-            <SelectInput label="授業形態" value={courseForm.delivery_method} onChange={(value) => setCourseForm((prev) => ({ ...prev, delivery_method: value }))} options={DELIVERY_METHOD_OPTIONS.map((option) => option.value)} getLabel={(value) => DELIVERY_METHOD_OPTIONS.find((option) => option.value === value)?.label ?? value} required />
-            <TextInput label="時限" value={courseForm.period} onChange={(value) => setCourseForm((prev) => ({ ...prev, period: value }))} inputMode="numeric" />
-            <SelectInput label="対象学年" value={courseForm.target_grade} onChange={(value) => setCourseForm((prev) => ({ ...prev, target_grade: value }))} options={TARGET_GRADE_OPTIONS.map((option) => option.value)} getLabel={(value) => TARGET_GRADE_OPTIONS.find((option) => option.value === value)?.label ?? value} required />
+            <TextField label="教授名" value={courseForm.teacher_name} onChange={(value) => setCourseForm((prev) => ({ ...prev, teacher_name: value }))} required />
+            <TextField label="開講年度" value={courseForm.academic_year} onChange={(value) => setCourseForm((prev) => ({ ...prev, academic_year: value }))} inputMode="numeric" />
+            <SelectField label="学期" value={courseForm.semester} onChange={(value) => setCourseForm((prev) => ({ ...prev, semester: value }))} options={SEMESTER_OPTIONS.map((option) => option.value)} getLabel={(value) => SEMESTER_OPTIONS.find((option) => option.value === value)?.label ?? value} />
+            <SelectField label="曜日" value={courseForm.day_of_week} onChange={(value) => setCourseForm((prev) => ({ ...prev, day_of_week: value }))} options={DAY_OF_WEEK_OPTIONS.map((option) => option.value)} getLabel={(value) => DAY_OF_WEEK_OPTIONS.find((option) => option.value === value)?.label ?? value} />
+            <SelectField label="授業形態" value={courseForm.delivery_method} onChange={(value) => setCourseForm((prev) => ({ ...prev, delivery_method: value }))} options={DELIVERY_METHOD_OPTIONS.map((option) => option.value)} getLabel={(value) => DELIVERY_METHOD_OPTIONS.find((option) => option.value === value)?.label ?? value} required />
+            <TextField label="時限" value={courseForm.period} onChange={(value) => setCourseForm((prev) => ({ ...prev, period: value }))} inputMode="numeric" />
+            <SelectField label="対象学年" value={courseForm.target_grade} onChange={(value) => setCourseForm((prev) => ({ ...prev, target_grade: value }))} options={TARGET_GRADE_OPTIONS.map((option) => option.value)} getLabel={(value) => TARGET_GRADE_OPTIONS.find((option) => option.value === value)?.label ?? value} required />
           </div>
 
           <div className="my-6 h-px bg-border" />
@@ -201,8 +203,8 @@ export default function NewCoursePage() {
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <SelectInput label="キャンパス" value={courseForm.campus} onChange={(value) => setCourseForm((prev) => ({ ...prev, campus: value }))} options={[...CAMPUS_OPTIONS]} required />
-            <TextInput label="教室" value={courseForm.classroom} onChange={(value) => setCourseForm((prev) => ({ ...prev, classroom: value }))} />
+            <SelectField label="キャンパス" value={courseForm.campus} onChange={(value) => setCourseForm((prev) => ({ ...prev, campus: value }))} options={[...CAMPUS_OPTIONS]} required />
+            <TextField label="教室" value={courseForm.classroom} onChange={(value) => setCourseForm((prev) => ({ ...prev, classroom: value }))} />
           </div>
 
           {error && <p className="mt-4 rounded-md bg-destructive/10 p-3 text-sm font-medium text-destructive">{error}</p>}
@@ -221,78 +223,3 @@ export default function NewCoursePage() {
   );
 }
 
-function TextInput({
-  label,
-  value,
-  onChange,
-  required = false,
-  inputMode,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  required?: boolean;
-  inputMode?: "numeric";
-}) {
-  return (
-    <label className="block">
-      <FieldLabel label={label} required={required} />
-      <input
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        required={required}
-        inputMode={inputMode}
-        className="h-11 w-full rounded-md border border-input bg-background px-3 text-base outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-      />
-    </label>
-  );
-}
-
-function SelectInput({
-  label,
-  value,
-  onChange,
-  options,
-  required = false,
-  getLabel,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  options: readonly string[];
-  required?: boolean;
-  getLabel?: (value: string) => string;
-}) {
-  return (
-    <label className="block">
-      <FieldLabel label={label} required={required} />
-      <select
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        required={required}
-        className="h-11 w-full rounded-md border border-input bg-background px-3 text-base outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-      >
-        {options.map((option) => (
-          <option key={option} value={option}>
-            {getLabel ? getLabel(option) : option}
-          </option>
-        ))}
-      </select>
-    </label>
-  );
-}
-
-function FieldLabel({ label, required }: { label: string; required: boolean }) {
-  return (
-    <span className="mb-1 flex items-center gap-2 text-sm font-semibold text-slate-700">
-      {label}
-      <span
-        className={`rounded-sm px-1.5 py-0.5 text-[10px] font-bold ${
-          required ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
-        }`}
-      >
-        {required ? "必須" : "任意"}
-      </span>
-    </span>
-  );
-}
