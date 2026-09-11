@@ -142,7 +142,7 @@ posts 側の import を `@/components/ui/form` に書き換える。中途半端
 
 | # | 内容 | #113衝突 | リスク |
 |---|---|---|---|
-| P0 | `lib/api.ts` 拡張 + `hooks/` 4種の追加（既存コードは未変更、純粋な追加） | なし | 低 |
+| P0 | 既存 lint エラー2件の修正（別コミット）+ `lib/api.ts` 拡張 + `hooks/` 4種の追加（既存コードは未変更、純粋な追加） | なし | 低 |
 | P1 | 共通UI部品の抽出・昇格（posts の描画結果は不変であること） | なし | 中 |
 | P2 | courses 5ページの移行（重複の中心） | なし | 中 |
 | P3 | posts 一覧の移行 | なし | **高** |
@@ -163,7 +163,10 @@ posts 側の import を `@/components/ui/form` に書き換える。中途半端
    - `src/constants/calendarEvents.ts:512,515` — `prefer-const`（`--fix` で自動修正可能）
    - その他 warning 8件（`no-img-element` ×3、`react-hooks/exhaustive-deps` ×1 等）
 
-   合格条件は「lint がクリーン」ではなく **「既存エラー2件以外の新規エラーを出さず、warning を増やさないこと」** とする。
+   **P0 冒頭でこの既存エラー2件を `eslint --fix` で解消し、以降は「`npm run lint` がエラー0件」を合格条件とする。**
+   この修正はリファクタ差分と混ぜず、単独コミットにする。
+   warning 8件（`no-img-element` ×3、`react-hooks/exhaustive-deps` 等）は挙動を変えるリスクがあるため本作業のスコープ外とし、
+   **件数を増やさないこと**のみを条件とする。
 2. `docker compose up` で主要フローを手動確認
    （**注意**: 本作業は worktree 内で行うため、元のチェックアウトで docker compose が起動中だと
    ポート3000/3001が衝突する。手動確認時はどちらか一方のみを起動すること）
