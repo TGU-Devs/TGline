@@ -63,9 +63,9 @@ export default function NewCoursePage() {
   const {
     isAuthenticated,
     showLoginModal,
-    openLoginModal,
     closeLoginModal,
     requireAuth,
+    markUnauthenticated,
   } = useAuthGuard();
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -124,7 +124,7 @@ export default function NewCoursePage() {
       router.push(`/courses/${created.id}`);
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
-        openLoginModal();
+        markUnauthenticated();
         return;
       }
       setError(err instanceof Error ? err.message : "エラーが発生しました");

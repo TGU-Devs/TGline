@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useUser } from "@/contexts/UserContext";
 
 export const useAuthGuard = () => {
-    const { user, isLoading } = useUser();
+    const { user, isLoading, setUser } = useUser();
     const [showLoginModal, setShowLoginModal] = useState(false);
 
     const isAuthenticated = isLoading ? null : Boolean(user);
@@ -19,6 +19,11 @@ export const useAuthGuard = () => {
     const openLoginModal = useCallback(() => setShowLoginModal(true), []);
     const closeLoginModal = useCallback(() => setShowLoginModal(false), []);
 
+    const markUnauthenticated = useCallback(() => {
+        setUser(null);
+        setShowLoginModal(true);
+    }, [setUser]);
+
     const requireAuth = useCallback(() => {
         if (isAuthenticated === true) return true;
         if (isAuthenticated === false) setShowLoginModal(true);
@@ -31,5 +36,6 @@ export const useAuthGuard = () => {
         openLoginModal,
         closeLoginModal,
         requireAuth,
+        markUnauthenticated,
     };
 };

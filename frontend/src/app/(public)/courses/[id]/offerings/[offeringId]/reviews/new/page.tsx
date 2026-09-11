@@ -56,6 +56,7 @@ export default function NewOfferingReviewPage() {
     openLoginModal,
     closeLoginModal,
     requireAuth,
+    markUnauthenticated,
   } = useAuthGuard();
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -131,7 +132,7 @@ export default function NewOfferingReviewPage() {
       router.push(`/courses/${courseId}/offerings/${offeringId}`);
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
-        openLoginModal();
+        markUnauthenticated();
         return;
       }
       setFormError(err instanceof Error ? err.message : "エラーが発生しました");
