@@ -26,7 +26,7 @@
 | `FieldLabel` 完全同一定義 ×3 | `courses/new:285`, `courses/[id]/offerings/new:301`, `.../reviews/new:252` |
 | `TextInput`/`SelectInput` と `OfferingInput`/`OfferingSelect` | 名前が違うだけの同一実装 |
 | `Metric` / `ScoreSummary` ×2 | `courses/[id]:243,255`, `courses/[id]/offerings/[offeringId]:194,206` |
-| 開講情報フォーム11フィールド | `courses/new` と `offerings/new` に丸ごと二重定義（最大の重複） |
+| 開講情報フォームのフィールド定義 | `courses/new` と `offerings/new` で中身が重複（ただしレイアウト・並び順は別物。4.3 参照） |
 
 ### 2.2 データ取得の定型コード散在
 
@@ -131,8 +131,15 @@ posts 側の `FormInput` / `FormTextarea` とは名前が衝突しないため�
 
 **`src/components/features/courses/components/`**
 
-`Metric` / `ScoreSummary` / `ReviewScore` / `ReviewMeta` / `RatingStars`（重複解消）、
-`CourseCard` / `CourseFilters` / **`OfferingFormFields`**（2.1 の最大重複を解消）
+`Metric` / `ScoreSummary`（完全同一の重複を解消）、`CourseCard` / `CourseFilters`（`courses/page.tsx` の薄化用）
+
+**`OfferingFormFields` は作らない（2.1 の記載を訂正）。**
+実装を読んだ結果、`courses/new` と `offerings/new` で重複しているのは**フィールドの中身だけ**であり、
+グリッドクラス（`gap-4 md:grid-cols-2` / `gap-3 sm:grid-cols-2`）、セクション分け（2セクション+区切り線 / 単一グリッド）、
+フィールドの並び順、入力欄の背景色（`bg-background` / `bg-card`）がいずれも異なる。
+共通化にはどちらかのレイアウトへ寄せる（＝見た目の変更、スコープ外）か、
+順序・グループ化・クラスをすべて props 化する（＝削減する重複より複雑になる）必要がある。
+よってフィールド単位の重複解消（`ui/form/`）に留める。
 
 ### 4.4 ページの薄化
 
