@@ -299,10 +299,21 @@ grep -rn "^function \(FieldLabel\|TextInput\|SelectInput\|OfferingInput\|Offerin
 
 ```
 grep -c 'surface="card"' 'src/app/(public)/courses/[id]/offerings/new/page.tsx'
-grep -c '<TextField \|<SelectField ' 'src/app/(public)/courses/[id]/offerings/new/page.tsx'
+grep -cE '<(TextField|SelectField)$|<(TextField|SelectField) ' 'src/app/(public)/courses/[id]/offerings/new/page.tsx'
 ```
 
-期待: **2つの数値が一致すること**。一致しなければ `surface="card"` の付け忘れがある。
+期待: **2つの数値が一致すること**（実測 11 == 11）。一致しなければ `surface="card"` の付け忘れがある。
+
+要素数のパターンは行末（`$`）も許容する必要がある。この JSX は props が複数行に分かれており、
+`<TextField ` のように末尾スペースを要求するパターンでは1件もマッチしない。
+
+あわせて `courses/new` 側も確認する:
+
+```
+grep -c 'surface=' 'src/app/(public)/courses/new/page.tsx'
+```
+
+期待: **0**（このページは既定の `background` を使うため `surface` を渡さない）。
 
 - [ ] **Step 10: lint と build を確認する**
 
