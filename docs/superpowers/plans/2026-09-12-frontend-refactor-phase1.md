@@ -842,6 +842,18 @@ NEXT_PUBLIC_API_URL=http://localhost:3001 NEXT_PUBLIC_GOOGLE_CLIENT_ID=dummy npm
 11 の挙動が許容できない場合は `useAuthGuard` のマウント時に `refreshUser()` を呼ぶ必要があるが、
 それは API 呼び出しが増える設計変更であり、Phase 1 のスコープ外として見送っている。
 
+**401 検知時のレイアウト切り替え（最終レビューの指摘で追加）**:
+
+401 を検知すると `markUnauthenticated()` が `UserContext.setUser(null)` を呼ぶ。
+これはアプリ全体の状態なので、`(public)/layout.tsx` が認証済みレイアウト（サイドバー）から
+匿名レイアウト（上部ナビ）へ切り替わる。旧実装の `setIsAuthenticated(false)` はページローカル
+だったため、ここは**意図した挙動変更**である。
+
+12. 上記11の状態（セッション失効後に送信して401）で、モーダルが出ると同時に
+    サイドバーが上部ナビに変わること。ログイン状態の表示が残り続けないこと
+13. モーダルを閉じてから再度送信ボタンを押しても、**再び POST が飛ばない**こと
+    （旧実装の挙動。最終レビューで回帰が見つかり `markUnauthenticated` で修正した箇所）
+
 - [ ] **Step 9: コミット**
 
 `frontend/src/hooks/useAuthGuard.ts` と `frontend/src/app/(public)/courses` をステージしてコミットする。メッセージ:
