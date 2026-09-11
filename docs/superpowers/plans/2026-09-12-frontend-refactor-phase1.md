@@ -916,10 +916,21 @@ JSX 内の使用箇所も新しい名前に合わせる（移行前の変数名�
 - [ ] **Step 6: 旧名の参照が残っていないことを確認する**
 
 ```
-grep -rn "FormInput\|FormTextarea\|FormActions\|ErrorUi" src
+grep -rn "FormInput\|FormTextarea\|FormActions" src
 ```
 
 期待: **出力なし**
+
+`ErrorUi` は別扱いになる:
+
+```
+grep -rn "ErrorUi" src
+```
+
+期待: **`src/app/(private)/posts/[id]/page.tsx` の2行のみ**（13行目の import と91行目の使用）。
+このファイルは `feature/#113` が変更中のため触らない（Global Constraints）。
+Step 4 の再エクスポートによって import パスは有効なまま動作する。
+`edit/page.tsx` 側の `ErrorUi` は Step 5 で `PostNotFound` に変わるので、ここには出てこない。
 
 - [ ] **Step 7: 描画結果が変わっていないことを確認する**
 
