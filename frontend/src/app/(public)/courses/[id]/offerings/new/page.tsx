@@ -22,7 +22,7 @@ import Loading from "@/components/ui/Loading";
 import { Button } from "@/components/ui/button";
 import SelectField from "@/components/ui/form/SelectField";
 import TextField from "@/components/ui/form/TextField";
-import { apiFetch } from "@/lib/api";
+import { ApiError, apiFetch, apiJson } from "@/lib/api";
 
 type OfferingForm = {
   teacher_name: string;
@@ -125,42 +125,39 @@ export default function NewCourseOfferingPage() {
       setIsSubmitting(true);
       const requiresDepartment = course.category !== "教養科目";
 
-      const res = await apiFetch(`/api/courses/${courseId}/course_offerings`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          course_offering: {
-            teacher_name: form.teacher_name,
-            academic_year: form.academic_year.trim() ? Number(form.academic_year) : null,
-            semester: form.semester,
-            day_of_week: form.day_of_week || null,
-            delivery_method: form.delivery_method,
-            target_grade: form.target_grade,
-            faculty: requiresDepartment ? form.faculty : null,
-            department: requiresDepartment ? form.department : null,
-            period: form.period ? Number(form.period) : null,
-            campus: form.campus,
-            classroom: form.classroom,
+      await apiJson(
+        `/api/courses/${courseId}/course_offerings`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        }),
-      });
+          body: JSON.stringify({
+            course_offering: {
+              teacher_name: form.teacher_name,
+              academic_year: form.academic_year.trim() ? Number(form.academic_year) : null,
+              semester: form.semester,
+              day_of_week: form.day_of_week || null,
+              delivery_method: form.delivery_method,
+              target_grade: form.target_grade,
+              faculty: requiresDepartment ? form.faculty : null,
+              department: requiresDepartment ? form.department : null,
+              period: form.period ? Number(form.period) : null,
+              campus: form.campus,
+              classroom: form.classroom,
+            },
+          }),
+        },
+        "開講情報の追加に失敗しました",
+      );
 
-      if (res.status === 401) {
+      router.push(`/courses/${courseId}`);
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
         setIsAuthenticated(false);
         setShowLoginModal(true);
         return;
       }
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => null);
-        throw new Error(data?.error || data?.errors?.join?.(" / ") || "開講情報の追加に失敗しました");
-      }
-
-      router.push(`/courses/${courseId}`);
-    } catch (err) {
       setFormError(err instanceof Error ? err.message : "エラーが発生しました");
     } finally {
       setIsSubmitting(false);

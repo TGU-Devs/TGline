@@ -22,7 +22,7 @@ import SelectField from "@/components/ui/form/SelectField";
 import TextField from "@/components/ui/form/TextField";
 
 import type { Course } from "@/components/features/courses/types";
-import { apiFetch } from "@/lib/api";
+import { ApiError, apiFetch, apiJson } from "@/lib/api";
 
 type CourseForm = {
   name: string;
@@ -102,47 +102,43 @@ export default function NewCoursePage() {
       setError(null);
       setIsCreating(true);
 
-      const res = await apiFetch("/api/courses", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const created = await apiJson<Course>(
+        "/api/courses",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            course: {
+              name: courseForm.name,
+              category: courseForm.category,
+            },
+            course_offering: {
+              teacher_name: courseForm.teacher_name,
+              academic_year: courseForm.academic_year.trim() ? Number(courseForm.academic_year) : null,
+              semester: courseForm.semester,
+              day_of_week: courseForm.day_of_week || null,
+              delivery_method: courseForm.delivery_method,
+              period: courseForm.period ? Number(courseForm.period) : null,
+              target_grade: courseForm.target_grade,
+              faculty: requiresDepartment ? courseForm.faculty : null,
+              department: requiresDepartment ? courseForm.department : null,
+              campus: courseForm.campus,
+              classroom: courseForm.classroom,
+            },
+          }),
         },
-        credentials: "include",
-        body: JSON.stringify({
-          course: {
-            name: courseForm.name,
-            category: courseForm.category,
-          },
-          course_offering: {
-            teacher_name: courseForm.teacher_name,
-            academic_year: courseForm.academic_year.trim() ? Number(courseForm.academic_year) : null,
-            semester: courseForm.semester,
-            day_of_week: courseForm.day_of_week || null,
-            delivery_method: courseForm.delivery_method,
-            period: courseForm.period ? Number(courseForm.period) : null,
-            target_grade: courseForm.target_grade,
-            faculty: requiresDepartment ? courseForm.faculty : null,
-            department: requiresDepartment ? courseForm.department : null,
-            campus: courseForm.campus,
-            classroom: courseForm.classroom,
-          },
-        }),
-      });
+        "授業の作成に失敗しました",
+      );
 
-      if (res.status === 401) {
+      router.push(`/courses/${created.id}`);
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
         setIsAuthenticated(false);
         setShowLoginModal(true);
         return;
       }
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => null);
-        throw new Error(data?.error || data?.errors?.join?.(" / ") || "授業の作成に失敗しました");
-      }
-
-      const created = (await res.json()) as Course;
-      router.push(`/courses/${created.id}`);
-    } catch (err) {
       setError(err instanceof Error ? err.message : "エラーが発生しました");
     } finally {
       setIsCreating(false);

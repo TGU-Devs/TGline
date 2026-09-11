@@ -18,7 +18,7 @@ import ErrorUI from "@/components/ui/ErrorUI";
 import Loading from "@/components/ui/Loading";
 import { Button } from "@/components/ui/button";
 import FieldLabel from "@/components/ui/form/FieldLabel";
-import { apiFetch } from "@/lib/api";
+import { ApiError, apiFetch, apiJson } from "@/lib/api";
 
 const scoreFields = ["rating", "difficulty", "workload", "grading"] as const;
 
@@ -119,40 +119,37 @@ export default function NewOfferingReviewPage() {
       setFormError(null);
       setIsSubmitting(true);
 
-      const res = await apiFetch(`/api/courses/${courseId}/reviews`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          course_review: {
-            course_offering_id: offeringId,
-            rating: form.rating,
-            difficulty: form.difficulty,
-            workload: form.workload,
-            grading: form.grading,
-            exam_presence: form.exam_presence,
-            attendance_check: form.attendance_check,
-            textbook_required: form.textbook_required === "true",
-            comment: form.comment,
+      await apiJson(
+        `/api/courses/${courseId}/reviews`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        }),
-      });
+          body: JSON.stringify({
+            course_review: {
+              course_offering_id: offeringId,
+              rating: form.rating,
+              difficulty: form.difficulty,
+              workload: form.workload,
+              grading: form.grading,
+              exam_presence: form.exam_presence,
+              attendance_check: form.attendance_check,
+              textbook_required: form.textbook_required === "true",
+              comment: form.comment,
+            },
+          }),
+        },
+        "レビュー投稿に失敗しました",
+      );
 
-      if (res.status === 401) {
+      router.push(`/courses/${courseId}/offerings/${offeringId}`);
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
         setIsAuthenticated(false);
         setShowLoginModal(true);
         return;
       }
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => null);
-        throw new Error(data?.error || "レビュー投稿に失敗しました");
-      }
-
-      router.push(`/courses/${courseId}/offerings/${offeringId}`);
-    } catch (err) {
       setFormError(err instanceof Error ? err.message : "エラーが発生しました");
     } finally {
       setIsSubmitting(false);
