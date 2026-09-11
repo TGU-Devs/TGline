@@ -795,7 +795,16 @@ const {
 grep -rn "users/me" src
 ```
 
-期待: `src/contexts/UserContext.tsx` の1件のみ。courses 配下に残っていたら移行漏れ。
+期待: **courses 配下に1件も残っていないこと。** 残っていたら移行漏れ。
+
+courses 以外には以下が残るが、いずれも Phase 1 のスコープ外なので正常:
+
+| ファイル | 扱い |
+|---|---|
+| `contexts/UserContext.tsx` | 正規の取得元。変更しない |
+| `app/(private)/settings/page.tsx` | `feature/#113` が変更中のため触れない（Global Constraints） |
+| `app/(private)/settings/security/delete-account/page.tsx` | Phase 2 以降で `useAuthGuard` 化を検討 |
+| `components/features/posts/hooks/useCurrentUser.ts` | Phase 2 以降で `UserContext` への統合を検討 |
 
 - [ ] **Step 7: lint と build を確認する**
 
@@ -818,6 +827,20 @@ NEXT_PUBLIC_API_URL=http://localhost:3001 NEXT_PUBLIC_GOOGLE_CLIENT_ID=dummy npm
 
 **リロード直後**:
 7. ページ読み込み中に送信ボタンが `disabled` になっていること（`isAuthenticated === null` の間）
+
+**セッション失効（この移行で挙動が変わる唯一の経路。必ず確認すること）**:
+
+`UserContext` は `hasLoadedRef` によりプロバイダ生存中に1度しか `/api/users/me` を取得しない。
+移行前は各ページがマウントのたびに再取得していたため、セッション失効を毎回検知できた。
+移行後はリロードするまでキャッシュされた認証状態が使われる。
+
+8. ログイン状態で `/courses/new` を開く（モーダルは出ない）
+9. **リロードせずに**別タブでログアウトする、または cookie を削除する
+10. SPA 内のリンクで `/courses` → `/courses/new` と移動する
+11. 期待: マウント時にはモーダルが**出ない**（移行前は出ていた）。送信すると401でモーダルが出る
+
+11 の挙動が許容できない場合は `useAuthGuard` のマウント時に `refreshUser()` を呼ぶ必要があるが、
+それは API 呼び出しが増える設計変更であり、Phase 1 のスコープ外として見送っている。
 
 - [ ] **Step 9: コミット**
 
