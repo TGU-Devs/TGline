@@ -509,10 +509,10 @@ const generateSemesterEvents = (
     startDays: Record<string, Date>,
     termPrefix: string,
 ): CalendarEvent[] => {
-    let generatedEvents: CalendarEvent[] = [];
+    const generatedEvents: CalendarEvent[] = [];
 
     Object.entries(startDays).forEach(([day, startDay]) => {
-        let currentDate = new Date(startDay);
+        const currentDate = new Date(startDay);
         let classCount = 1;
 
         while (classCount <= MAX_WEEKS) {
