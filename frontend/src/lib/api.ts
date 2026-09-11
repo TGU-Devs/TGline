@@ -43,5 +43,9 @@ export const apiJson = async <T>(
         throw new ApiError(await extractApiError(res, fallbackMessage), res.status);
     }
 
+    if (res.status === 204 || res.headers.get("content-length") === "0") {
+        return undefined as T;
+    }
+
     return (await res.json()) as T;
 };

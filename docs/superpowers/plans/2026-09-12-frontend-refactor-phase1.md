@@ -1014,8 +1014,8 @@ posts/[id]/page.tsx は feature/#113 が変更中のため触らず、form/Error
 
 - [ ] `npm run lint` がエラー0件・warning 8件（baseline から増えていない）
 - [ ] `npm run build` が成功する
-- [ ] `grep -rn "^function \(FieldLabel\|TextInput\|SelectInput\|OfferingInput\|OfferingSelect\|Metric\|ScoreSummary\)" src` が空
-- [ ] `grep -rn "users/me" src` が `UserContext.tsx` の1件のみ
+- [ ] `grep -rn "^function \(FieldLabel\|TextInput\|SelectInput\|OfferingInput\|OfferingSelect\|Metric\|ScoreSummary\)" src/app` が空（`src/app/` 配下にページローカルの重複定義が残っていないこと。`Metric.tsx`/`ScoreSummary.tsx` 自身のトップレベル定義は `components/features/courses/components/` 配下の意図した最終形のため対象外）
+- [ ] `grep -rn "users/me" src` が `UserContext.tsx`・`settings/page.tsx`・`settings/security/delete-account/page.tsx`・`components/features/posts/hooks/useCurrentUser.ts` の4件のみ（courses 配下のページには1件も残っていないこと）
 - [ ] 各タスクの手動確認項目がすべて通っている
 
 ## Phase 1 で意図的に行わないこと
