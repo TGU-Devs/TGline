@@ -950,10 +950,14 @@ JSX 内の使用箇所も新しい名前に合わせる（移行前の変数名�
 - [ ] **Step 6: 旧名の参照が残っていないことを確認する**
 
 ```
-grep -rn "FormInput\|FormTextarea\|FormActions" src
+grep -rnE '\b(FormInput|FormTextarea)\b|(^|[^t])\bFormActions\b' src
 ```
 
 期待: **出力なし**
+
+単純に `FormActions` を grep してはいけない。新しい名前 `PostFormActions` が
+`FormActions` を部分文字列として含むため、正しく改名できていても6件ヒットしてしまう。
+上のパターンは `PostFormActions` の一部としての出現を除外している。
 
 `ErrorUi` は別扱いになる:
 
