@@ -61,13 +61,33 @@
 
 ## 4. 設計
 
-### 4.1 既存資産の尊重（重要）
+### 4.1 既存資産の実地調査（重要・当初想定を訂正）
 
-`features/posts/components/form/` には既に `FormInput` / `FormTextarea` / `Error` / `FormActions` が存在する。
-新規に `ui/form/` をゼロから作ると**それ自体が新たな重複になる**。
+当初は「`features/posts/components/form/` の既存部品を共有層へ昇格させる」方針を立てたが、
+実装を読んだ結果**これらは汎用プリミティブではなかった**ため、方針を訂正する。
 
-方針: **posts の既存フォーム部品を共有層へ昇格させ、courses 側をそれに寄せる。**
-昇格時に posts 固有の前提（クラス名・props）があれば汎用化するが、posts 側の描画結果は変えない。
+| ファイル | 実態 |
+|---|---|
+| `FormInput` | ラベル「タイトル」・`maxLength={100}`・`id="title"`・placeholder がハードコード。実質 PostTitleField |
+| `FormTextarea` | ラベル「本文」・`maxLength={10000}`・`rows={12}` 固定。実質 PostBodyField |
+| `Error`（`ErrorUi`） | フォーム用エラーではなく、「一覧に戻る」リンク付きの全画面エラー。配置が誤っている |
+| `FormActions` | ボタン文言「投稿する」「保存する」固定。posts 専用 |
+
+さらに posts と courses は入力欄のスタイルが異なる。
+
+- posts: `px-4 py-2 border rounded-lg`、ラベルに `※必須` をインライン表示
+- courses: `h-11 rounded-md`、`FieldLabel` が必須/任意のバッジを表示
+
+**この2系統を1つのスタイルに統一することは「見た目の変更」であり、本作業のスコープ外。**
+
+訂正後の方針:
+
+1. `ui/form/` の共通部品は **courses 側の重複から抽出する**（posts からの昇格はしない）
+2. posts の form 部品は **posts 固有であることが分かる名前に整理する**（純粋な移動・改名。描画結果は変えない）
+3. posts と courses のスタイル統一は行わない
+
+同様に、`ui/ErrorUI`（再試行ボタン付き）と posts の `Error`（一覧に戻るリンク）は
+**挙動の異なる別コンポーネント**であり、統合は UX 変更になるためスコープ外とする。
 
 ### 4.2 共有レイヤー
 
@@ -90,23 +110,26 @@
 
 ### 4.3 共通UI部品
 
-`src/components/ui/form/`（posts から昇格 + courses から抽出）
+**`src/components/ui/form/`（courses の重複から抽出。新規作成）**
 
-既存名を優先し、新規命名は最小限にする。移行先の名前を以下に確定する。
-
-| 移行先（`ui/form/`） | 由来 |
+| 新規部品 | 統合元 |
 |---|---|
-| `FormInput` | `features/posts/.../FormInput` を昇格。courses の `TextInput` / `OfferingInput` を吸収 |
-| `FormTextarea` | `features/posts/.../FormTextarea` を昇格 |
-| `FormError` | `features/posts/.../Error` を昇格（名称を明確化） |
-| `FormActions` | `features/posts/.../FormActions` を昇格 |
-| `FormSelect` | 新規。courses の `SelectInput` / `OfferingSelect` を統合 |
-| `FieldLabel` | 新規。重複3定義を統合 |
+| `FieldLabel` | `courses/new:285` / `offerings/new:301` / `reviews/new:252` の同一定義3つ |
+| `TextField` | `courses/new` の `TextInput` と `offerings/new` の `OfferingInput`（同一実装） |
+| `SelectField` | `courses/new` の `SelectInput` と `offerings/new` の `OfferingSelect`（同一実装） |
 
-`features/posts/components/form/` の移行元ファイルは**再エクスポートを残さず削除**し、
-posts 側の import を `@/components/ui/form` に書き換える。中途半端な二重経路を作らない。
+posts 側の `FormInput` / `FormTextarea` とは名前が衝突しないため、posts は無改修で共存できる。
 
-`src/components/features/courses/components/`
+**`src/components/features/posts/components/` の整理（純粋な移動・改名、描画結果は不変）**
+
+| 現在 | 移動後 |
+|---|---|
+| `form/FormInput.tsx` | `form/PostTitleField.tsx` |
+| `form/FormTextarea.tsx` | `form/PostBodyField.tsx` |
+| `form/FormActions.tsx` | `form/PostFormActions.tsx` |
+| `form/Error.tsx`（`ErrorUi`） | `shared/PostNotFound.tsx` |
+
+**`src/components/features/courses/components/`**
 
 `Metric` / `ScoreSummary` / `ReviewScore` / `ReviewMeta` / `RatingStars`（重複解消）、
 `CourseCard` / `CourseFilters` / **`OfferingFormFields`**（2.1 の最大重複を解消）
