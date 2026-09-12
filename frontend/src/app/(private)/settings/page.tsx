@@ -1,14 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { useUser } from "@/contexts/UserContext";
 import { useStatusToast } from "@/hooks/useStatusToast";
+import useUnsavedChangesGuard from "@/hooks/useUnsavedChangesGuard";
 
 import Loading from "@/components/ui/Loading";
 import ErrorUI from "@/components/ui/ErrorUI";
 import Toast from "@/components/ui/Toast";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 import Main from "@/components/ui/PageMain";
 import BackButton from "@/components/features/posts/components/shared/BackButton";
 import Header from "@/components/features/settings/Header";
@@ -30,6 +32,7 @@ import {
     Moon,
     Shield,
     AlertTriangle,
+    AlertCircle,
 } from "lucide-react";
 import { FormValues, Errors } from "@/components/features/settings/types";
 import { apiFetch } from "@/lib/api";
@@ -105,12 +108,12 @@ const SettingsPage = () => {
         },
     ];
 
-    const saveHandler = async (e: React.FormEvent) => {
-        e.preventDefault();
+    // 未保存確認モーダルからも呼ぶため、保存処理は成否を返す関数として切り出す
+    const saveSettings = async (): Promise<boolean> => {
         const errors = validateForm(formValues);
         if (Object.keys(errors).length > 0) {
             setFormErrors(errors);
-            return;
+            return false;
         }
         setFormErrors({});
 
@@ -137,6 +140,7 @@ const SettingsPage = () => {
                 setSelectedFile(null);
                 setIsAvatarDeleted(false);
                 setTimeout(() => setShowSaveToast(false), 3000);
+                return true;
             } else {
                 console.error("ユーザーデータの更新に失敗:", res.status);
 
@@ -149,14 +153,44 @@ const SettingsPage = () => {
 
                 setShowErrorToast(true);
                 setTimeout(() => setShowErrorToast(false), 4000);
+                return false;
             }
         } catch (error) {
             console.error("ユーザーデータの更新中にエラーが発生:", error);
             setErrorMessage("ネットワークエラーが発生しました。");
             setShowErrorToast(true);
             setTimeout(() => setShowErrorToast(false), 4000);
+            return false;
         }
     };
+
+    const saveHandler = async (e: React.FormEvent) => {
+        e.preventDefault();
+        await saveSettings();
+    };
+
+    // 保存対象（表示名・自己紹介・アバター）が user の現在値から動いているか。
+    // テーマ・通知設定はまだAPIに送っていないので未保存判定には含めない。
+    // 通知設定が保存対象になったら、ここに比較を追加すること。
+    const isDirty = useMemo(() => {
+        if (!user) return false;
+
+        return (
+            formValues.display_name !== (user.display_name || "") ||
+            (formValues.description || "") !== (user.description || "") ||
+            selectedFile !== null ||
+            isAvatarDeleted
+        );
+    }, [user, formValues, selectedFile, isAvatarDeleted]);
+
+    const {
+        isConfirmOpen,
+        isSaving,
+        requestNavigation,
+        cancel,
+        discardAndNavigate,
+        saveAndNavigate,
+    } = useUnsavedChangesGuard({ isDirty, onSave: saveSettings });
 
     const validateForm = (values: FormValues) => {
         const errors: Errors = {};
@@ -218,6 +252,7 @@ const SettingsPage = () => {
                 <BackButton
                         fallbackUrl={`/users/${profileUserId}`}
                         label="プロフィールに戻る"
+                        onBeforeNavigate={requestNavigation}
                     />
                 </div>
             )}
@@ -261,6 +296,19 @@ const SettingsPage = () => {
             />
 
             <Footer />
+
+            <ConfirmModal
+                open={isConfirmOpen}
+                icon={AlertCircle}
+                title="変更を保存しますか？"
+                description="保存していない変更があります。保存せずに移動すると変更は失われます。"
+                confirmLabel="保存して移動"
+                onConfirm={saveAndNavigate}
+                secondaryLabel="保存せず移動"
+                onSecondary={discardAndNavigate}
+                onCancel={cancel}
+                isProcessing={isSaving}
+            />
         </Main>
     );
 };
