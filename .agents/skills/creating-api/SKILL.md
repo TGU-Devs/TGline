@@ -1,3 +1,8 @@
+---
+name: creating-api
+description: Rails API に新しいリソース（Model / Controller / Route）を追加し、フロントエンドから apiFetch で呼び出すときの実装手順。新しい API エンドポイントを追加するときに使う。
+---
+
 # Rails API リソース追加手順
 
 TGline に新しい API リソースを追加するときの実装手順。
@@ -18,7 +23,7 @@ Next.js Route Handlers による API プロキシは作成しない。
 3. `backend/config/routes.rb` の `namespace :api` 配下にRouteを追加する
 4. フロントエンドから `apiFetch` でRailsのパスを直接呼び出す
 5. Railsレスポンスと一致するTypeScript型を定義する
-6. `prompts/skills/updating-openapi/instruction.md` に従ってOpenAPIを更新する
+6. `updating-openapi` スキルに従って OpenAPI を更新する
 
 ## Frontend例
 
