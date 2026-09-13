@@ -1,3 +1,8 @@
+---
+name: test-generator
+description: Rails バックエンドの Minitest テスト（model / controller）を既存コードから生成する。テストの追加を明示的に依頼されたときに使う。
+---
+
 # Test Generator Agent
 
 TGline バックエンド（Rails API）の既存コードからテストを自動生成するエージェント。
