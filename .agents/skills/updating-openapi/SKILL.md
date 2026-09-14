@@ -1,3 +1,8 @@
+---
+name: updating-openapi
+description: backend/swagger/v1/swagger.yaml を Rails API の実装と同期する手順。コントローラのアクション追加・変更、routes.rb の変更、モデルのバリデーション変更をしたら必ず使う。
+---
+
 # OpenAPI 仕様更新スキル
 
 Rails API にエンドポイントを追加・変更・削除した際に、OpenAPI 仕様（`backend/swagger/v1/swagger.yaml`）を同期するためのスキル。
@@ -166,4 +171,4 @@ python3 -c "import yaml; yaml.safe_load(open('backend/swagger/v1/swagger.yaml'))
 - **OpenAPI 仕様**: `backend/swagger/v1/swagger.yaml`
 - **rswag 設定**: `backend/config/initializers/rswag_api.rb`, `backend/config/initializers/rswag_ui.rb`
 - **ルーティング**: `backend/config/routes.rb`
-- **API 作成スキル**: `prompts/skills/creating-api/instruction.md`（新規リソース追加時は両方を参照）
+- **API 作成スキル**: `creating-api` スキル（新規リソース追加時は両方を参照）
