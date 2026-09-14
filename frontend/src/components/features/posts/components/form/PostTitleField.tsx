@@ -1,10 +1,10 @@
-type FormInputProps = {
+type PostTitleFieldProps = {
     title: string;
     setTitle: (title: string) => void;
     error?: string;
 };
 
-const FormInput = ({ title, setTitle, error }: FormInputProps) => {
+const PostTitleField = ({ title, setTitle, error }: PostTitleFieldProps) => {
     return (
         <div>
             <label
@@ -42,5 +42,4 @@ const FormInput = ({ title, setTitle, error }: FormInputProps) => {
     );
 };
 
-export default FormInput;
-    
+export default PostTitleField;

@@ -6,7 +6,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useFormValidate } from "@/components/features/posts/hooks/useFormValidate";
 
 import Loading from "@/components/ui/Loading";
-import ErrorUi from "@/components/features/posts/components/form/Error";
+import PostNotFound from "@/components/features/posts/components/shared/PostNotFound";
 import TopButton from "@/components/features/posts/components/shared/TopButton";
 import Form from "@/components/features/posts/components/form/Form";
 
@@ -124,7 +124,7 @@ export default function PostEditPage() {
     }
 
     if (error || !post) {
-        return <ErrorUi error={error || "投稿が見つかりません"} />;
+        return <PostNotFound error={error || "投稿が見つかりません"} />;
     }
 
     return (

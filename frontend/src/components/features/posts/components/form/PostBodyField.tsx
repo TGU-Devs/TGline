@@ -1,10 +1,10 @@
-type FormTextareaProps = {
+type PostBodyFieldProps = {
     body: string;
     setBody: (body: string) => void;
     error?: string;
 };
 
-const FormTextarea = ({ body, setBody, error }: FormTextareaProps) => {
+const PostBodyField = ({ body, setBody, error }: PostBodyFieldProps) => {
     return (
         <div>
             <label
@@ -42,4 +42,4 @@ const FormTextarea = ({ body, setBody, error }: FormTextareaProps) => {
     );
 };
 
-export default FormTextarea;
+export default PostBodyField;

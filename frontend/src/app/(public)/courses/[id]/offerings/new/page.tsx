@@ -20,7 +20,10 @@ import type { Course } from "@/components/features/courses/types";
 import ErrorUI from "@/components/ui/ErrorUI";
 import Loading from "@/components/ui/Loading";
 import { Button } from "@/components/ui/button";
-import { apiFetch } from "@/lib/api";
+import SelectField from "@/components/ui/form/SelectField";
+import TextField from "@/components/ui/form/TextField";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
+import { ApiError, apiFetch, apiJson } from "@/lib/api";
 
 type OfferingForm = {
   teacher_name: string;
@@ -56,10 +59,16 @@ export default function NewCourseOfferingPage() {
   const courseId = params.id;
 
   const [course, setCourse] = useState<Course | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const {
+    isAuthenticated,
+    showLoginModal,
+    openLoginModal,
+    closeLoginModal,
+    requireAuth,
+    markUnauthenticated,
+  } = useAuthGuard();
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [form, setForm] = useState<OfferingForm>(initialOfferingForm);
@@ -69,10 +78,7 @@ export default function NewCourseOfferingPage() {
       setError(null);
       setIsLoading(true);
 
-      const [courseRes, meRes] = await Promise.all([
-        apiFetch(`/api/courses/${courseId}`),
-        apiFetch("/api/users/me"),
-      ]);
+      const courseRes = await apiFetch(`/api/courses/${courseId}`);
 
       if (!courseRes.ok) {
         throw new Error("授業情報の取得に失敗しました");
@@ -80,7 +86,6 @@ export default function NewCourseOfferingPage() {
 
       const courseData = (await courseRes.json()) as Course;
       setCourse(courseData);
-      setIsAuthenticated(meRes.ok);
     } catch (err) {
       setError(err instanceof Error ? err.message : "エラーが発生しました");
     } finally {
@@ -91,12 +96,6 @@ export default function NewCourseOfferingPage() {
   useEffect(() => {
     fetchPageData();
   }, [fetchPageData]);
-
-  useEffect(() => {
-    if (isAuthenticated === false) {
-      setShowLoginModal(true);
-    }
-  }, [isAuthenticated]);
 
   const handleFacultyChange = (faculty: string) => {
     const departments = departmentsForFaculty(faculty);
@@ -110,12 +109,7 @@ export default function NewCourseOfferingPage() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (isAuthenticated === false) {
-      setShowLoginModal(true);
-      return;
-    }
-
-    if (isAuthenticated === null) return;
+    if (!requireAuth()) return;
     if (!course) return;
 
     try {
@@ -123,42 +117,38 @@ export default function NewCourseOfferingPage() {
       setIsSubmitting(true);
       const requiresDepartment = course.category !== "教養科目";
 
-      const res = await apiFetch(`/api/courses/${courseId}/course_offerings`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          course_offering: {
-            teacher_name: form.teacher_name,
-            academic_year: form.academic_year.trim() ? Number(form.academic_year) : null,
-            semester: form.semester,
-            day_of_week: form.day_of_week || null,
-            delivery_method: form.delivery_method,
-            target_grade: form.target_grade,
-            faculty: requiresDepartment ? form.faculty : null,
-            department: requiresDepartment ? form.department : null,
-            period: form.period ? Number(form.period) : null,
-            campus: form.campus,
-            classroom: form.classroom,
+      await apiJson(
+        `/api/courses/${courseId}/course_offerings`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        }),
-      });
-
-      if (res.status === 401) {
-        setIsAuthenticated(false);
-        setShowLoginModal(true);
-        return;
-      }
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => null);
-        throw new Error(data?.error || data?.errors?.join?.(" / ") || "開講情報の追加に失敗しました");
-      }
+          body: JSON.stringify({
+            course_offering: {
+              teacher_name: form.teacher_name,
+              academic_year: form.academic_year.trim() ? Number(form.academic_year) : null,
+              semester: form.semester,
+              day_of_week: form.day_of_week || null,
+              delivery_method: form.delivery_method,
+              target_grade: form.target_grade,
+              faculty: requiresDepartment ? form.faculty : null,
+              department: requiresDepartment ? form.department : null,
+              period: form.period ? Number(form.period) : null,
+              campus: form.campus,
+              classroom: form.classroom,
+            },
+          }),
+        },
+        "開講情報の追加に失敗しました",
+      );
 
       router.push(`/courses/${courseId}`);
     } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
+        markUnauthenticated();
+        return;
+      }
       setFormError(err instanceof Error ? err.message : "エラーが発生しました");
     } finally {
       setIsSubmitting(false);
@@ -198,84 +188,95 @@ export default function NewCourseOfferingPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-border bg-card p-5 shadow-sm">
           <div className="grid gap-3 sm:grid-cols-2">
-            <OfferingInput
+            <TextField
               label="教授名"
               value={form.teacher_name}
               onChange={(value) => setForm((prev) => ({ ...prev, teacher_name: value }))}
               required
+              surface="card"
             />
-            <OfferingInput
+            <TextField
               label="開講年度"
               value={form.academic_year}
               onChange={(value) => setForm((prev) => ({ ...prev, academic_year: value }))}
               inputMode="numeric"
+              surface="card"
             />
-            <OfferingSelect
+            <SelectField
               label="学期"
               value={form.semester}
               onChange={(value) => setForm((prev) => ({ ...prev, semester: value }))}
               options={SEMESTER_OPTIONS.map((option) => option.value)}
               getLabel={(value) => SEMESTER_OPTIONS.find((option) => option.value === value)?.label ?? value}
               required
+              surface="card"
             />
-            <OfferingSelect
+            <SelectField
               label="曜日"
               value={form.day_of_week}
               onChange={(value) => setForm((prev) => ({ ...prev, day_of_week: value }))}
               options={DAY_OF_WEEK_OPTIONS.map((option) => option.value)}
               getLabel={(value) => DAY_OF_WEEK_OPTIONS.find((option) => option.value === value)?.label ?? value}
+              surface="card"
             />
-            <OfferingSelect
+            <SelectField
               label="授業形態"
               value={form.delivery_method}
               onChange={(value) => setForm((prev) => ({ ...prev, delivery_method: value }))}
               options={DELIVERY_METHOD_OPTIONS.map((option) => option.value)}
               getLabel={(value) => DELIVERY_METHOD_OPTIONS.find((option) => option.value === value)?.label ?? value}
               required
+              surface="card"
             />
-            <OfferingInput
+            <TextField
               label="時限"
               value={form.period}
               onChange={(value) => setForm((prev) => ({ ...prev, period: value }))}
               inputMode="numeric"
+              surface="card"
             />
             {requiresDepartment ? (
               <>
-                <OfferingSelect
+                <SelectField
                   label="学部"
                   value={form.faculty}
                   onChange={handleFacultyChange}
                   options={FACULTY_DEPARTMENT_OPTIONS.map((option) => option.faculty)}
                   required
+                  surface="card"
                 />
-                <OfferingSelect
+                <SelectField
                   label="学科"
                   value={form.department}
                   onChange={(value) => setForm((prev) => ({ ...prev, department: value }))}
                   options={departmentOptions}
                   required
+                  surface="card"
                 />
               </>
             ) : null}
-            <OfferingSelect
+            <SelectField
               label="対象学年"
               value={form.target_grade}
               onChange={(value) => setForm((prev) => ({ ...prev, target_grade: value }))}
               options={TARGET_GRADE_OPTIONS.map((option) => option.value)}
               getLabel={(value) => TARGET_GRADE_OPTIONS.find((option) => option.value === value)?.label ?? value}
               required
+              surface="card"
             />
-            <OfferingSelect
+            <SelectField
               label="キャンパス"
               value={form.campus}
               onChange={(value) => setForm((prev) => ({ ...prev, campus: value }))}
               options={[...CAMPUS_OPTIONS]}
               required
+              surface="card"
             />
-            <OfferingInput
+            <TextField
               label="教室"
               value={form.classroom}
               onChange={(value) => setForm((prev) => ({ ...prev, classroom: value }))}
+              surface="card"
             />
           </div>
 
@@ -284,7 +285,7 @@ export default function NewCourseOfferingPage() {
           <Button
             type={isAuthenticated === false ? "button" : "submit"}
             disabled={isSubmitting || isAuthenticated === null}
-            onClick={isAuthenticated === false ? () => setShowLoginModal(true) : undefined}
+            onClick={isAuthenticated === false ? openLoginModal : undefined}
             className="h-11 w-full rounded-md"
           >
             <Plus className="size-4" />
@@ -293,79 +294,7 @@ export default function NewCourseOfferingPage() {
         </form>
       </div>
 
-      <LoginPromptModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
+      <LoginPromptModal isOpen={showLoginModal} onClose={closeLoginModal} />
     </main>
-  );
-}
-
-function FieldLabel({ label, required }: { label: string; required: boolean }) {
-  return (
-    <span className="mb-1 flex items-center gap-2 text-sm font-semibold text-slate-700">
-      {label}
-      <span className={`rounded-sm px-1.5 py-0.5 text-[10px] font-bold ${required ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
-        {required ? "必須" : "任意"}
-      </span>
-    </span>
-  );
-}
-
-function OfferingInput({
-  label,
-  value,
-  onChange,
-  required = false,
-  inputMode,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  required?: boolean;
-  inputMode?: "numeric";
-}) {
-  return (
-    <label className="block">
-      <FieldLabel label={label} required={required} />
-      <input
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        required={required}
-        inputMode={inputMode}
-        className="h-11 w-full rounded-md border border-input bg-card px-3 text-base outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-      />
-    </label>
-  );
-}
-
-function OfferingSelect({
-  label,
-  value,
-  onChange,
-  options,
-  required = false,
-  getLabel,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  options: readonly string[];
-  required?: boolean;
-  getLabel?: (value: string) => string;
-}) {
-  return (
-    <label className="block">
-      <FieldLabel label={label} required={required} />
-      <select
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        required={required}
-        className="h-11 w-full rounded-md border border-input bg-card px-3 text-base outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-      >
-        {options.map((option) => (
-          <option key={option} value={option}>
-            {getLabel ? getLabel(option) : option}
-          </option>
-        ))}
-      </select>
-    </label>
   );
 }
