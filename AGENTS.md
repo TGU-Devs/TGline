@@ -28,8 +28,8 @@ docker compose down -v        # DBボリュームも削除
 - 開発用ログイン: admin@tgu.ac.jp / admin123（シードデータ）
 
 ### CI
-- フロントエンドCI: PR時に実行、Node 22、`npm run build`（ダミー環境変数使用）
-- バックエンドCIは未設定
+- フロントエンドCI（`ci-frontend.yml`）: `frontend/**` 変更時のPRで実行。Node 24、`npm run build`（ダミー環境変数使用）
+- バックエンドCI（`backend-tests.yml`）: `backend/**` 変更時のPRとmainへのpushで実行。PostgreSQL 15サービス上で `bin/rails db:test:prepare` → `bin/rails test`
 
 ## アーキテクチャ
 
