@@ -1,0 +1,22 @@
+{
+  "folders": [
+    {
+      "name": "backend",
+      "path": "backend"
+    },
+    {
+      "name": "TGU",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "backend": true
+    },
+    "git.openRepositoryInParentFolders": "never",
+    "terminal.integrated.cwd": "${workspaceFolder:TGU}",
+    "rubyLsp.rubyVersionManager": {
+      "identifier": "rbenv"
+    }
+  }
+}
