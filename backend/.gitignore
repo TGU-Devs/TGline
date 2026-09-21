@@ -33,3 +33,6 @@
 /config/master.key
 
 backend/.env
+
+# Ruby LSP generated bundle
+/.ruby-lsp/
