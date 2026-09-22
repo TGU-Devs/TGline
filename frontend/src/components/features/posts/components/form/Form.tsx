@@ -1,10 +1,10 @@
 import { X } from "lucide-react";
 
-import FormInput from "./FormInput";
-import FormTextarea from "./FormTextarea";
+import PostTitleField from "./PostTitleField";
+import PostBodyField from "./PostBodyField";
 import TagSelector from "./TagSelector";
 import ImageSelector from "./ImageSelector";
-import FormActions from "./FormActions";
+import PostFormActions from "./PostFormActions";
 import { getPostImageUrl } from "../../utils/imageUrl";
 import type { PostImage } from "../../types";
 
@@ -66,10 +66,10 @@ const Form = ({
 
             <form onSubmit={handleSubmit} className="space-y-6" noValidate>
                 {/* タイトル */}
-                <FormInput title={title} setTitle={setTitle} error={formErrors.title} />
+                <PostTitleField title={title} setTitle={setTitle} error={formErrors.title} />
 
                 {/* 本文 */}
-                <FormTextarea body={body} setBody={setBody} error={formErrors.body} />
+                <PostBodyField body={body} setBody={setBody} error={formErrors.body} />
 
                 {/* タグ選択 */}
                 <TagSelector
@@ -120,7 +120,7 @@ const Form = ({
                 />
 
                 {/* ボタン */}
-                <FormActions
+                <PostFormActions
                     newPost={newPost}
                     isSubmitting={isSubmitting}
                     cancelUrl={cancelUrl}

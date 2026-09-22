@@ -12,3 +12,6 @@ frontend/.env
 
 # Node
 node_modules/
+
+# Superpowers SDD scratch
+.superpowers/

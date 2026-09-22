@@ -4,17 +4,17 @@ import { Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
-type FormActionsProps = {
+type PostFormActionsProps = {
     newPost: boolean;
     isSubmitting: boolean;
     cancelUrl: string;
 };
 
-const FormActions = ({
+const PostFormActions = ({
     newPost,
     isSubmitting,
     cancelUrl,
-}: FormActionsProps) => {
+}: PostFormActionsProps) => {
     const router = useRouter();
     return (
         <div className="flex flex-col-reverse sm:flex-row gap-3 sm:gap-4 justify-end">
@@ -45,4 +45,4 @@ const FormActions = ({
     );
 };
 
-export default FormActions;
+export default PostFormActions;
