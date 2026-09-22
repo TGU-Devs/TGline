@@ -5,7 +5,6 @@ class CreateNotifications < ActiveRecord::Migration[7.2]
       t.bigint :actor_id, null: false # 通知を送信したユーザーのID
       t.string :notifiable_type, null: false # 通知対象のモデル名
       t.bigint :notifiable_id, null: false # 通知対象のモデルのID
-      t.integer :kind, null: false # 通知の種類 (画面表示用)
       t.datetime :read_at # 通知を既読にした日時
 
       t.timestamps

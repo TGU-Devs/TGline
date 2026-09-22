@@ -150,8 +150,8 @@ const NotificationsPage = () => {
     const clickHandler = async (notification: Notification) => {
         await markAsRead(notification.id);
 
-        if (notification.post_id) {
-            router.push(`/posts/${notification.post_id}?from=notifications`);
+        if (notification.post) {
+            router.push(`/posts/${notification.post.id}?from=notifications`);
         }
     };
 

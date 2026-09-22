@@ -9,8 +9,11 @@ module Api
 
       notifications = Notification
         .for_recipient(current_user)
-        .includes(:notifiable, actor: { avatar_attachment: :blob })
-      notifications = filter_by_read_status(notifications)
+        .includes(notifiable: :post, actor: { avatar_attachment: :blob })
+      if params.key?(:read)
+        read_status = ActiveModel::Type::Boolean.new.cast(params[:read])
+        notifications = notifications.with_read_status(read_status)
+      end
       notifications = notifications
         .limit(per_page + 1)
         .offset((page - 1) * per_page)
@@ -23,7 +26,7 @@ module Api
       }
     end
 
-    # PATCH /api/notifications/:id
+    # PATCH /api/notifications/:id 通知一件を既読化
     def update
       unless notification_params.key?(:read)
         return render json: { error: "read is required" }, status: :unprocessable_entity
@@ -48,42 +51,24 @@ module Api
       params.require(:notification).permit(:read)
     end
 
-    def filter_by_read_status(notifications)
-      return notifications unless params.key?(:read)
-
-      if ActiveModel::Type::Boolean.new.cast(params[:read])
-        notifications.where.not(read_at: nil)
-      else
-        notifications.unread
-      end
-    end
-
     def notification_response(notification)
+      post = notification.notifiable&.post
+
       {
         id: notification.id,
-        kind: notification.kind,
+        type: notification.notification_type,
         read: notification.read?,
-        message: notification_message(notification),
         actor: notification.actor && {
           id: notification.actor.id,
           display_name: notification.actor.display_name,
           avatar: avatar_response(notification.actor)
         },
-        post_id: notification.notifiable&.post_id,
+        post: post && {
+          id: post.id,
+          title: post.title
+        },
         created_at: notification.created_at.iso8601
       }
-    end
- # バックエンド側でメッセージ文言まで作るのは必要ない気がする...
-    def notification_message(notification)
-      name = notification.actor&.display_name || "誰か"
-      title = notification.notifiable&.post&.title
-      post_part = title.present? ? "「#{title}」" : ""
-
-      if notification.like?
-        "#{name}があなたの投稿#{post_part}にいいねしました"
-      else
-        "#{name}があなたの投稿#{post_part}にコメントしました"
-      end
     end
   end
 end

@@ -45,10 +45,10 @@ class User < ApplicationRecord
     email_verified_at.present?
   end
 
-  def wants_email_for?(kind)
+  def email_notification_enabled_for?(notification_type)
     return false unless notify_email
 
-    case kind.to_s
+    case notification_type.to_s
     when "like" then notify_email_like
     when "comment" then notify_email_comment
     else false

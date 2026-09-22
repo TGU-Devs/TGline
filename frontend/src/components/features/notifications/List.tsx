@@ -16,7 +16,7 @@ type ListProps = {
 };
 
 // 通知の種類ごとの設定
-const KIND_CONFIG = {
+const TYPE_CONFIG = {
     like: {
         label: "いいね",
         Icon: Heart,
@@ -55,13 +55,11 @@ const List = ({ visibleNotifications, activeTab, isLoadingMore, hasNextPage, pag
     return (
         <div className="space-y-3">
                     {visibleNotifications.map((notification) => {
-                        const config = KIND_CONFIG[notification.kind];
-                        const actorName = notification.actor?.display_name;
-                        const restMessage =
-                            actorName &&
-                            notification.message.startsWith(actorName)
-                                ? notification.message.slice(actorName.length)
-                                : null;
+                        const config = TYPE_CONFIG[notification.type];
+                        const actorName = notification.actor?.display_name || "誰か";
+                        const postPart = notification.post?.title
+                            ? `「${notification.post.title}」`
+                            : "";
 
                         return (
                             <button
@@ -82,7 +80,7 @@ const List = ({ visibleNotifications, activeTab, isLoadingMore, hasNextPage, pag
                                     <div className="relative shrink-0">
                                         <UserAvatar
                                             avatar={notification.actor?.avatar}
-                                            name={actorName || "匿名"}
+                                            name={actorName}
                                             size={44}
                                             className="rounded-full ring-2 ring-white shadow-sm"
                                         />
@@ -101,16 +99,10 @@ const List = ({ visibleNotifications, activeTab, isLoadingMore, hasNextPage, pag
                                                     : "text-slate-800"
                                             }`}
                                         >
-                                            {restMessage !== null ? (
-                                                <>
-                                                    <span className="font-bold text-slate-900">
-                                                        {actorName}
-                                                    </span>
-                                                    {restMessage}
-                                                </>
-                                            ) : (
-                                                notification.message
-                                            )}
+                                            <span className="font-bold text-slate-900">
+                                                {actorName}
+                                            </span>
+                                            {`があなたの投稿${postPart}に${config.label}しました`}
                                         </p>
 
                                         <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -125,7 +117,7 @@ const List = ({ visibleNotifications, activeTab, isLoadingMore, hasNextPage, pag
                                                     now,
                                                 )}
                                             </span>
-                                            {!notification.post_id && (
+                                            {!notification.post && (
                                                 <span className="text-xs text-slate-400">
                                                     元の投稿は削除されています
                                                 </span>
@@ -137,7 +129,7 @@ const List = ({ visibleNotifications, activeTab, isLoadingMore, hasNextPage, pag
                                         {!notification.read && (
                                             <span className="w-2.5 h-2.5 rounded-full bg-sky-500" />
                                         )}
-                                        {notification.post_id && (
+                                        {notification.post && (
                                             <ChevronRight
                                                 size={18}
                                                 className="text-slate-300 group-hover:text-sky-500 group-hover:translate-x-0.5 transition-all"

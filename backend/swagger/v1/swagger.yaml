@@ -1740,14 +1740,11 @@ components:
       properties:
         id:
           type: integer
-        kind:
+        type:
           type: string
           enum: [like, comment]
         read:
           type: boolean
-        message:
-          type: string
-          example: 太郎があなたの投稿「ミクロ経済学の課題」にいいねしました
         actor:
           type: object
           nullable: true
@@ -1767,9 +1764,14 @@ components:
                   type: string
                 byte_size:
                   type: integer
-        post_id:
-          type: integer
+        post:
+          type: object
           nullable: true
+          properties:
+            id:
+              type: integer
+            title:
+              type: string
         created_at:
           type: string
           format: date-time

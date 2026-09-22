@@ -1,14 +1,13 @@
 import type { UserAvatar } from "@/types/user";
 
-type NotificationKind = "like" | "comment";
+type NotificationType = "like" | "comment";
 
 type Notification = {
     id: number;
-    kind: NotificationKind;
+    type: NotificationType;
     read: boolean;
-    message: string;
     actor: { id: number; display_name: string; avatar: UserAvatar | null } | null;
-    post_id: number | null;
+    post: { id: number; title: string } | null;
     created_at: string;
 };
 

@@ -132,7 +132,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_07_000001) do
     t.bigint "actor_id", null: false
     t.string "notifiable_type", null: false
     t.bigint "notifiable_id", null: false
-    t.integer "kind", null: false
     t.datetime "read_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

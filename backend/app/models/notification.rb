@@ -1,13 +1,10 @@
 class Notification < ApplicationRecord
     NOTIFIABLE_TYPES = %w[Like Comment].freeze
-    KINDS = { like: 0, comment: 1 }.freeze
 
     belongs_to :recipient, class_name: "User"
     belongs_to :actor, class_name: "User"
     belongs_to :notifiable, polymorphic: true
       
-    enum :kind, KINDS
-  
     validates :notifiable_type, inclusion: { in: NOTIFIABLE_TYPES }
     validates :notifiable_id, uniqueness: { scope: [:notifiable_type, :recipient_id] }
 
@@ -17,7 +14,16 @@ class Notification < ApplicationRecord
     scope :unread, -> { where(read_at: nil) } 
     #ユーザーの通知の取得
     scope :for_recipient, ->(user) { where(recipient_id: user.id).order(created_at: :desc) } 
-  
+    scope :with_read_status, ->(read) { read ? where.not(read_at: nil) : unread }
+
+    def notification_type
+      notifiable_type.underscore
+    end
+
+    def like?
+      notifiable_type == "Like"
+    end
+
     #通知が既読かどうかの判定
     def read? 
       read_at.present?
@@ -34,8 +40,7 @@ class Notification < ApplicationRecord
       create!(
         recipient: like.post.user, #通知を受け取るユーザー
         actor: like.user, #通知を送信したユーザー
-        notifiable: like, #通知対象のモデル
-        kind: :like #通知の種類
+        notifiable: like #通知対象のモデル
       )
     end
 
@@ -45,8 +50,7 @@ class Notification < ApplicationRecord
       create!(
         recipient: comment.post.user, #通知を受け取るユーザー
         actor: comment.user, #通知を送信したユーザー
-        notifiable: comment, #通知対象のモデル
-        kind: :comment #通知の種類
+        notifiable: comment #通知対象のモデル
       )
     end
 
@@ -59,7 +63,7 @@ class Notification < ApplicationRecord
 
     #通知メールの送信
     def deliver_notification_email
-      return unless recipient.wants_email_for?(kind)
+      return unless recipient.email_notification_enabled_for?(notification_type)
 
       NotificationMailer.notify(self).deliver_now
     rescue StandardError => e
