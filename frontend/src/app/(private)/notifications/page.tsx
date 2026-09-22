@@ -100,8 +100,10 @@ const NotificationsPage = () => {
         setUnreadCount((count) => Math.max(0, count - 1));
 
         try {
-            const res = await apiFetch(`/api/notifications/${id}/read`, {
-                method: "POST",
+            const res = await apiFetch(`/api/notifications/${id}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ notification: { read: true } }),
             });
             if (!res.ok) {
                 throw new Error("既読にできませんでした");
@@ -130,8 +132,10 @@ const NotificationsPage = () => {
         setUnreadCount(0);
 
         try {
-            const res = await apiFetch("/api/notifications/read_all", {
-                method: "POST",
+            const res = await apiFetch("/api/notification_inbox", {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ notification_inbox: { read: true } }),
             });
             if (!res.ok) {
                 throw new Error("すべて既読にできませんでした");

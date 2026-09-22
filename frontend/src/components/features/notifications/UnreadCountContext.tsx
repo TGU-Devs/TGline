@@ -32,14 +32,16 @@ export const UnreadCountProvider = ({
 
     const fetchUnreadCount = useCallback(async () => {
         try {
-            const res = await apiFetch("/api/notifications/unread_count");
+            const res = await apiFetch("/api/notification_inbox");
             if (!res.ok) {
                 setUnreadCount(0);
                 return;
             }
 
             const data = await res.json();
-            setUnreadCount(typeof data.count === "number" ? data.count : 0);
+            setUnreadCount(
+                typeof data.unread_count === "number" ? data.unread_count : 0,
+            );
         } catch {
             setUnreadCount(0);
         }

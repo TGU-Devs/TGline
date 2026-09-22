@@ -834,6 +834,11 @@ paths:
             type: integer
             default: 1
           description: ページ番号
+        - name: read
+          in: query
+          schema:
+            type: boolean
+          description: trueで既読、falseで未読の通知のみに絞り込む
       responses:
         '200':
           description: 成功
@@ -844,49 +849,33 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
-  /api/notifications/unread_count:
-    get:
+  /api/notifications/{id}:
+    patch:
       tags: [Notification]
-      summary: 未読通知数を取得
-      operationId: getUnreadNotificationCount
+      summary: 通知の既読状態を更新
+      operationId: updateNotification
       security:
         - cookieAuth: []
-      responses:
-        '200':
-          description: 成功
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnreadNotificationCount'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-
-  /api/notifications/read_all:
-    post:
-      tags: [Notification]
-      summary: 未読通知をすべて既読にする
-      operationId: readAllNotifications
-      security:
-        - cookieAuth: []
-      responses:
-        '204':
-          description: 成功
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-
-  /api/notifications/{id}/read:
-    post:
-      tags: [Notification]
-      summary: 通知を既読にする
-      operationId: readNotification
-      security:
-        - cookieAuth: []
-      description: 自分宛の通知のみ既読にできる。
+      description: 自分宛の通知のみ更新できる。
       parameters:
         - $ref: '#/components/parameters/NotificationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [notification]
+              properties:
+                notification:
+                  type: object
+                  required: [read]
+                  properties:
+                    read:
+                      type: boolean
       responses:
         '200':
-          description: 成功
+          description: 更新成功
           content:
             application/json:
               schema:
@@ -895,6 +884,62 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           description: 通知が見つからない
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: readが指定されていない
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/notification_inbox:
+    get:
+      tags: [Notification]
+      summary: 通知受信箱を取得
+      operationId: getNotificationInbox
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationInbox'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    patch:
+      tags: [Notification]
+      summary: 通知受信箱を更新
+      operationId: updateNotificationInbox
+      security:
+        - cookieAuth: []
+      description: 現在のユーザーの未読通知をすべて既読にする。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [notification_inbox]
+              properties:
+                notification_inbox:
+                  type: object
+                  required: [read]
+                  properties:
+                    read:
+                      type: boolean
+                      enum: [true]
+      responses:
+        '204':
+          description: 更新成功
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          description: readがtrueでない
           content:
             application/json:
               schema:
@@ -1740,10 +1785,10 @@ components:
           type: boolean
           description: 次のページが存在するか
 
-    UnreadNotificationCount:
+    NotificationInbox:
       type: object
       properties:
-        count:
+        unread_count:
           type: integer
           description: 未読通知の総数
 

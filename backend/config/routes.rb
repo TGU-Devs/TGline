@@ -57,14 +57,7 @@ Rails.application.routes.draw do
     end
 
     # 通知関連
-    resources :notifications, only: [:index] do
-      collection do
-        get :unread_count
-        post :read_all
-      end
-      member do
-        post :read
-      end
-    end
+    resources :notifications, only: [:index, :update]
+    resource :notification_inbox, only: [:show, :update] #ユーザーごとに1つの対象には単数形の resource を使う
   end
 end
