@@ -30,7 +30,7 @@
 | フロントエンド | Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS 4, shadcn/ui |
 | バックエンド | Ruby on Rails 7.2 (API-only), Devise + JWT |
 | データベース | PostgreSQL 15 |
-| インフラ | Docker / Docker Compose（開発）, Railway（本番） |
+| インフラ | Docker / Docker Compose（開発DB・動作確認）, Railway（本番） |
 | CI | GitHub Actions（フロントエンドビルド検証） |
 
 ### API通信
@@ -78,26 +78,30 @@ TGU/
 │   └── lib/                 # JWT, Google Auth サービス
 │
 ├── docs/                    # ドキュメント
-│   ├── API.md               # API 仕様書
 │   ├── ER図.md              # データベース定義
 │   ├── SETUP.md             # 環境構築ガイド
 │   └── SECURITY_AUDIT.md    # セキュリティ監査レポート
 │
 ├── docker-compose.yml       # 開発用 Docker Compose
 ├── docker-compose.prod.yml  # 本番用 Docker Compose
-├── .env.local               # 開発用環境変数（コミット済み）
+├── .env.local.example       # 開発用環境変数テンプレート
+├── .env.local               # 開発用環境変数（gitignore）
 ├── .env.template            # 本番用テンプレート
 └── CLAUDE.md                # AI エージェント向けガイド
 ```
 
 ## クイックスタート
 
-**前提条件**: Docker Desktop がインストールされていること
+**前提条件**: Docker Desktop、nvm、rbenvがインストールされていること
 
 ```bash
 git clone <リポジトリURL>
 cd TGU
-docker compose up --build    # 初回（5-10分）
+cp .env.local.example .env.local
+nvm install
+cd backend && rbenv install -s 3.3.6 && cd ..
+./bin/setup-local
+./bin/dev
 ```
 
 - フロントエンド: http://localhost:3000
@@ -110,7 +114,7 @@ docker compose up --build    # 初回（5-10分）
 | ドキュメント | 内容 |
 |-------------|------|
 | [docs/SETUP.md](docs/SETUP.md) | 環境構築・起動・トラブルシューティング |
-| [docs/API.md](docs/API.md) | バックエンド API 仕様 |
+| [Swagger UI](http://localhost:3001/api-docs) | バックエンド API 仕様 |
 | [docs/ER図.md](docs/ER図.md) | データベース ER 定義 |
 | [CLAUDE.md](CLAUDE.md) | AI エージェント向け開発ガイド |
 
@@ -118,7 +122,8 @@ docker compose up --build    # 初回（5-10分）
 
 | ファイル | 用途 | Git管理 |
 |---------|------|---------|
-| `.env.local` | 開発環境用（Docker Compose が参照） | コミット済み |
+| `.env.local.example` | 開発環境用テンプレート | コミット済み |
+| `.env.local` | 開発環境用 | **gitignore** |
 | `.env.template` | 本番用テンプレート | コミット済み |
 
 ## 本番環境
