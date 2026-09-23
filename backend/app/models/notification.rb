@@ -8,7 +8,7 @@ class Notification < ApplicationRecord
     validates :notifiable_type, inclusion: { in: NOTIFIABLE_TYPES }
     validates :notifiable_id, uniqueness: { scope: [:notifiable_type, :recipient_id] }
 
-    after_create_commit :deliver_notification_email
+    after_create_commit :enqueue_comment_notification_email, unless: :like?
   
     #未読通知の取得
     scope :unread, -> { where(read_at: nil) } 
@@ -61,12 +61,8 @@ class Notification < ApplicationRecord
 
     private
 
-    #通知メールの送信
-    def deliver_notification_email
-      return unless recipient.email_notification_enabled_for?(notification_type)
-
-      NotificationMailer.notify(self).deliver_now
-    rescue StandardError => e
-      Rails.logger.error("Notification email failed: #{e.message}")
+    #コメント通知メールをSidekiqへ登録
+    def enqueue_comment_notification_email
+      CommentNotificationEmailJob.perform_later(id)
     end
   end

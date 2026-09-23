@@ -30,6 +30,7 @@
 | フロントエンド | Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS 4, shadcn/ui |
 | バックエンド | Ruby on Rails 7.2 (API-only), Devise + JWT |
 | データベース | PostgreSQL 15 |
+| 非同期処理 | Active Job + Sidekiq 8 + Redis 7 |
 | インフラ | Docker / Docker Compose（開発DB・動作確認）, Railway（本番） |
 | CI | GitHub Actions（フロントエンドビルド検証） |
 
@@ -39,6 +40,7 @@
 
 ```text
 ブラウザ → Rails API → PostgreSQL
+                    └→ Redis → Sidekiq worker → Resend
 ```
 
 開発環境では `http://localhost:3001`、本番環境では `https://api.tgline.dev` を使用する。
@@ -94,6 +96,8 @@ TGU/
 
 **前提条件**: Docker Desktop、nvm、rbenvがインストールされていること
 
+開発用スクリプトは `backend/bin` ではなく、リポジトリ直下の `bin` にある。以下のコマンドは、特に記載がない限り `TGU` ディレクトリで実行する。
+
 ```bash
 git clone <リポジトリURL>
 cd TGU
@@ -102,6 +106,16 @@ nvm install
 cd backend && rbenv install -s 3.3.6 && cd ..
 ./bin/setup-local
 ./bin/dev
+```
+
+普段は `./bin/dev` だけでPostgreSQL、Redis、Rails、Next.js、Sidekiqがすべて起動する。Rails consoleを別ターミナルで開く場合は次を実行する。
+
+```bash
+# TGUディレクトリから
+./bin/rails-local console
+
+# backendディレクトリにいる場合
+../bin/rails-local console
 ```
 
 - フロントエンド: http://localhost:3000
@@ -128,4 +142,4 @@ cd backend && rbenv install -s 3.3.6 && cd ..
 
 ## 本番環境
 
-Railway にフロントエンド・バックエンド・PostgreSQL をそれぞれデプロイ。
+Railway にフロントエンド、バックエンド、Sidekiq worker、PostgreSQL、Redisをそれぞれデプロイする。

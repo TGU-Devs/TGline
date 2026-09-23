@@ -14,12 +14,7 @@ class User < ApplicationRecord
   has_many :created_courses, class_name: "Course", foreign_key: :created_by_id, dependent: :nullify
   has_many :notifications, foreign_key: :recipient_id, dependent: :destroy
 
-  def password_required?
-    provider.blank? && super
-  end
-
   validate :password_complexity, if: :password_required?
-
   validates :display_name, presence: true, length: { maximum: 20 }
   validates :role, presence: true, inclusion: { in: %w[user admin] }
   validates :description, length: { maximum: 200 }, allow_nil: true
@@ -31,6 +26,10 @@ class User < ApplicationRecord
 
   def soft_delete
     update(deleted_at: Time.current)
+  end
+
+  def password_required?
+    provider.blank? && super
   end
 
   def deleted?

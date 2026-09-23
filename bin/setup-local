@@ -4,7 +4,7 @@ set -euo pipefail
 project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$project_root/bin/load-local-env"
 
-docker compose -f "$project_root/docker-compose.yml" up -d db
+docker compose -f "$project_root/docker-compose.yml" up -d db redis
 
 cd "$project_root/backend"
 bundle install

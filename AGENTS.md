@@ -86,3 +86,4 @@ docker compose up --build
 API仕様は `backend/swagger/v1/swagger.yaml` で一元管理し、`docs/API.md` は作成・更新しない
 フロントエンドの `package-lock.json` はGit管理し、初回セットアップとCIでは `npm ci`、依存追加・更新では `npm install`を使う
 既存の設計や構成を反転させる変更を提案する前に、関連するGit履歴・PRを確認して元の意図とトレードオフを把握する
+メール内のロゴ画像にはCID inline attachmentを使わない。Gmailで添付ファイルとして表示されるため、公開HTTPS URLのPNGを参照する

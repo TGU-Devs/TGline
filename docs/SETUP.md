@@ -2,7 +2,7 @@
 
 開発環境は次の2方式から選べる。
 
-| 方式 | Next.js | Rails | PostgreSQL | 用途 |
+| 方式 | Next.js | Rails / Sidekiq | PostgreSQL / Redis | 用途 |
 |---|---|---|---|---|
 | ローカル開発（推奨） | ローカル | ローカル | Docker | 日常の開発、高速なホットリロード |
 | 全サービスDocker | Docker | Docker | Docker | 環境差異の確認、Docker構成の検証 |
@@ -15,6 +15,48 @@
 | Rails API | http://localhost:3001 |
 | Swagger UI | http://localhost:3001/api-docs |
 | PostgreSQL | localhost:5432 |
+| Redis | localhost:6379 |
+
+## コマンドを実行する場所
+
+開発用スクリプトはすべてリポジトリルートの `TGU/bin` にある。`backend/bin` にはRails標準のスクリプトしかないため、`backend` ディレクトリで `bin/dev` や `bin/rails-local` を実行しても見つからない。
+
+基本的には、リポジトリルートへ戻って実行する。
+
+```bash
+# 現在 backend にいる場合
+cd ..
+
+# PostgreSQL、Redis、Rails、Next.js、Sidekiqをまとめて起動
+./bin/dev
+```
+
+別ターミナルでRails consoleを開く場合も、リポジトリルートから実行する。
+
+```bash
+./bin/rails-local console
+```
+
+`backend` ディレクトリにいるまま実行したい場合は、ひとつ上の `bin` を指定する。
+
+```bash
+../bin/rails-local console
+../bin/dev
+```
+
+### 起動コマンド早見表
+
+| やりたいこと | `TGU` で実行するコマンド |
+|---|---|
+| 全サービスをまとめて起動 | `./bin/dev` |
+| PostgreSQL・Redisだけ起動 | `docker compose up -d db redis` |
+| Rails APIだけ起動 | `./bin/dev-backend` |
+| Next.jsだけ起動 | `./bin/dev-frontend` |
+| Sidekiqだけ起動 | `./bin/dev-worker` |
+| Rails consoleを開く | `./bin/rails-local console` |
+| DBマイグレーション | `./bin/rails-local db:migrate` |
+
+通常の開発では `./bin/dev` を1つ起動すればよく、Rails consoleだけ別ターミナルで `./bin/rails-local console` を実行する。
 
 ## 共通準備
 
@@ -47,15 +89,16 @@ npm install <package-name>
 
 ## A. ローカル開発（推奨）
 
-Next.jsとRailsはMac上で実行し、PostgreSQL 15だけをDockerで起動する。
+Next.js、Rails、SidekiqはMac上で実行し、PostgreSQL 15とRedis 7をDockerで起動する。
 
 ```text
 Next.js（ローカル） → Rails（ローカル） → PostgreSQL（Docker）
+                                 └→ Redis（Docker） → Sidekiq（ローカル）
 ```
 
 ### A-1. 前提条件
 
-- Docker Desktop（PostgreSQL用）
+- Docker Desktop（PostgreSQL・Redis用）
 - nvm
 - Node.js 22（ルートの `.nvmrc`）
 - rbenv + ruby-build
@@ -95,7 +138,7 @@ cd ..
 
 このスクリプトは次を実行する。
 
-1. PostgreSQLコンテナを起動
+1. PostgreSQL・Redisコンテナを起動
 2. `bundle install`
 3. `rails db:prepare`
 4. `rails db:seed`
@@ -116,16 +159,17 @@ cd ..
 ./bin/dev
 ```
 
-`bin/dev` はDBコンテナを起動し、RailsとNext.jsをローカルプロセスとして起動する。`Ctrl+C` でRailsとNext.jsは停止するが、DBコンテナは終了しない。
+`bin/dev` はPostgreSQL・Redisコンテナを起動し、Rails、Next.js、Sidekiqをローカルプロセスとして起動する。`Ctrl+C` でローカルプロセスは停止するが、DB・Redisコンテナは終了しない。
 
 Next.jsの開発サーバーはTurbopackを標準で使用する。Turbopack固有の問題を切り分ける場合のみ、`frontend` で `npm run dev:webpack` を使用する。
 
-ログを分けたい場合は、3つのターミナルで起動できる。
+ログを分けたい場合は、4つのターミナルで起動できる。
 
 ```bash
-docker compose up -d db
+docker compose up -d db redis
 ./bin/dev-backend
 ./bin/dev-frontend
+./bin/dev-worker
 ```
 
 ### A-5. Railsコマンド
@@ -143,6 +187,7 @@ Railsには `.env.local` の読み込みと、DBホストを `db` から `127.0.
 - 新しいターミナルでNode.jsが切り替わっていない場合は `nvm use` を実行する。
 - `ruby -v` が3.3.6でない場合は、rbenvの初期化と `rbenv version` を確認する。
 - RailsからDocker内のDBへは `127.0.0.1:5432` で接続する。`bin/load-local-env` が `DATABASE_HOST` を上書きする。
+- RailsとSidekiqからDocker内のRedisへは `127.0.0.1:6379` で接続する。`bin/load-local-env` が `REDIS_URL` を上書きする。
 - `frontend/node_modules` はホスト上に作成されるため、エディタのTypeScript言語サーバーからも参照できる。
 - Macのローカル開発では定期ポーリングを強制しない。Docker開発のファイル監視設定は `docker-compose.yml` の環境変数に限定する。
 - 依存が壊れたり `Module not found` が出たりした場合は、`frontend` で `npm ci` を実行する。
@@ -153,10 +198,11 @@ Railsには `.env.local` の読み込みと、DBホストを `db` から `127.0.
 
 ## B. 全サービスDocker
 
-Next.js、Rails、PostgreSQLをすべてDocker Composeで起動する。ローカルにNode.jsやRubyを用意しない場合や、Docker構成自体を検証する場合に使う。
+Next.js、Rails、Sidekiq、PostgreSQL、RedisをすべてDocker Composeで起動する。ローカルにNode.jsやRubyを用意しない場合や、Docker構成自体を検証する場合に使う。
 
 ```text
 Next.js（Docker） → Rails（Docker） → PostgreSQL（Docker）
+                               └→ Redis（Docker） → Sidekiq（Docker）
 ```
 
 ### B-1. 前提条件
@@ -174,10 +220,11 @@ docker compose up --build
 
 起動時に次が実行される。
 
-1. PostgreSQLの起動
-2. Railsの `bundle install`、`db:prepare`、`db:seed`
-3. Next.jsの `npm install`
-4. RailsとNext.jsの開発サーバー起動
+1. PostgreSQL・Redisの起動
+2. RailsとSidekiqの `bundle install`
+3. Railsの `db:prepare`、`db:seed`
+4. Next.jsの `npm install`
+5. Rails、Sidekiq、Next.jsの起動
 
 ### B-3. 2回目以降
 
@@ -199,6 +246,9 @@ docker compose logs -f
 docker compose exec backend bundle exec rails console
 docker compose exec backend bundle exec rails db:migrate
 docker compose exec backend bundle exec rails db:seed
+
+# Sidekiq
+docker compose logs -f worker
 
 # Frontend
 docker compose exec frontend npm install <package-name>
@@ -231,6 +281,19 @@ docker compose down -v
 
 - メールアドレス: `admin@tgu.ac.jp`
 - パスワード: `admin123`
+
+## RailwayのSidekiq worker
+
+本番ではBackendとは別に、同じリポジトリを参照するSidekiq workerサービスを作成する。
+
+- Root Directory: `/backend`
+- Config File: `/backend/railway.worker.toml`
+- Public Networking: 無効
+- `REDIS_URL`: Railway Redisサービスの接続URLを参照
+- Database、Rails、Resend関連の環境変数: Backendサービスと同じ値を設定
+- `SIDEKIQ_CONCURRENCY`: 初期値は `5`
+
+BackendサービスはHTTP APIを処理し、workerサービスはRedisの `mailers`、`default` キューを常時処理する。workerにはHTTPヘルスチェックを設定しない。
 
 ## トラブルシューティング
 
