@@ -12,13 +12,9 @@ class User < ApplicationRecord
   has_many :comments, dependent: :destroy
   has_many :course_reviews, dependent: :destroy
   has_many :created_courses, class_name: "Course", foreign_key: :created_by_id, dependent: :nullify
-
-  def password_required?
-    provider.blank? && super
-  end
+  has_many :notifications, foreign_key: :recipient_id, dependent: :destroy
 
   validate :password_complexity, if: :password_required?
-
   validates :display_name, presence: true, length: { maximum: 20 }
   validates :role, presence: true, inclusion: { in: %w[user admin] }
   validates :description, length: { maximum: 200 }, allow_nil: true
@@ -32,6 +28,10 @@ class User < ApplicationRecord
     update(deleted_at: Time.current)
   end
 
+  def password_required?
+    provider.blank? && super
+  end
+
   def deleted?
     deleted_at.present?
   end
@@ -42,6 +42,16 @@ class User < ApplicationRecord
 
   def email_verified?
     email_verified_at.present?
+  end
+
+  def email_notification_enabled_for?(notification_type)
+    return false unless notify_email
+
+    case notification_type.to_s
+    when "like" then notify_email_like
+    when "comment" then notify_email_comment
+    else false
+    end
   end
 
   def generate_email_verification_token!

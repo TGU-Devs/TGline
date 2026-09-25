@@ -5,21 +5,21 @@
 
 ## プロジェクト概要
 
-東北学院大学向けの学内情報共有掲示板アプリ。Twitterライクな投稿で、授業・就活・サークル等の情報を共有する。Next.js フロントエンド + Rails APIバックエンド構成で、Docker で完全コンテナ化。
+東北学院大学向けの学内情報共有掲示板アプリ。Twitterライクな投稿で、授業・就活・サークル等の情報を共有する。Next.js フロントエンド + Rails APIバックエンド構成。通常開発はNext.jsとRailsをローカル、PostgreSQLをDockerで実行する。
 
 ## 開発環境
 
-開発はすべてDocker上で動作。ローカルにRuby/RailsやNode.jsのインストールは不要。
+通常開発はNode.js 22（nvm）とRuby 3.3.6（rbenv）をローカルで実行し、PostgreSQL 15だけをDockerで起動する。
 
 ```bash
-# 全サービス起動（db, backend, frontend）
-docker compose up --build     # 初回
-docker compose up             # 2回目以降
-docker compose up -d          # バックグラウンド
+# 初回セットアップ
+./bin/setup-local
 
-# 停止
-docker compose down           # データ保持
-docker compose down -v        # DBボリュームも削除
+# db（Docker）+ backend/frontend（ローカル）を起動
+./bin/dev
+
+# Dockerで全サービスを確認する場合
+docker compose up --build
 ```
 
 **アクセス先:**
@@ -61,11 +61,13 @@ docker compose down -v        # DBボリュームも削除
 - `frontend/src/components/ui/` — shadcn/ui プリミティブ
 - `backend/app/controllers/api/` — Rails APIコントローラ
 - `backend/app/models/` — ActiveRecordモデル（バリデーション含む）
-- `backend/swagger/v1/swagger.yaml` — OpenAPI 仕様（API の正）
+- `backend/swagger/v1/swagger.yaml` — API仕様の正本（Swagger / OpenAPI）
+- `.cursor/cursor.md` — v0の詳細仕様書
 
 ## 環境変数
 
-- `.env.local` — 開発用（コミット済み、docker-compose.ymlが参照）
+- `.env.local.example` — 開発用テンプレート
+- `.env.local` — 開発用（gitignore対象、ローカル起動スクリプとdocker-compose.ymlが参照）
 - `.env` — 本番用（gitignore対象）
 - `.env.template` — 本番用テンプレート
 

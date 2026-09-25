@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "$project_root/bin/load-local-env"
+
+cd "$project_root/backend"
+exec bundle exec sidekiq -C config/sidekiq.yml

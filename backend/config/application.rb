@@ -34,5 +34,8 @@ module Backend
 
     # レートリミット（rack-attack）
     config.middleware.use Rack::Attack
+
+    # Active JobのジョブをRedisへ永続化し、Sidekiqで処理する
+    config.active_job.queue_adapter = :sidekiq
   end
 end

@@ -1,13 +1,22 @@
-import { PcCase, Mail, Megaphone, Lock, Trash2 } from "lucide-react";
+import { Mail, Megaphone, Heart, MessageCircle, Lock, Trash2 } from "lucide-react";
 
 const NOTIFICATION_OPTIONS = [
-    { id: "desktop", label: "デスクトップ通知", Icon: PcCase, checked: false },
-    { id: "email", label: "メール通知", Icon: Mail, checked: false },
+    {
+        id: "email",
+        label: "メール通知",
+        Icon: Mail,
+        checked: false,
+        children: [
+            { id: "email_like", label: "いいね", Icon: Heart, checked: false },
+            { id: "email_comment", label: "コメント", Icon: MessageCircle, checked: false },
+        ],
+    },
     {
         id: "announcement",
         label: "お知らせ通知",
         Icon: Megaphone,
         checked: false,
+        comingSoon: true,
     },
 ];
 

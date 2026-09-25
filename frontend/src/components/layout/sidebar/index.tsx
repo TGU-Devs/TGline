@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useUser } from "@/contexts/UserContext";
+import { useUnreadCount } from "@/components/features/notifications/UnreadCountContext";
 
 import { useMemo } from "react";
 import { Home, Settings, Bell, Calendar, MessageSquare, ExternalLink, Shield, BookOpen } from "lucide-react";
@@ -25,13 +26,18 @@ const Sidebar = () => {
     const pathname = usePathname();
 
     const { user: currentUser, isLoading } = useUser();
+    const { unreadCount } = useUnreadCount();
 
     const menuList = useMemo(() => {
+        const items = baseMenuList.map((item) =>
+            item.path === "/notifications" ? { ...item, badge: unreadCount } : item,
+        );
+
         if (currentUser?.role === "admin") {
-            return [...baseMenuList, { name: "管理", path: "/admin", icon: Shield }];
+            return [...items, { name: "管理", path: "/admin", icon: Shield }];
         }
-        return baseMenuList;
-    }, [currentUser?.role]);
+        return items;
+    }, [currentUser?.role, unreadCount]);
 
     return (
         <>

@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+docker compose -f "$project_root/docker-compose.yml" up -d db redis
+
+backend_pid=""
+frontend_pid=""
+worker_pid=""
+
+cleanup() {
+  trap - EXIT INT TERM
+  [[ -n "$backend_pid" ]] && kill "$backend_pid" 2>/dev/null || true
+  [[ -n "$frontend_pid" ]] && kill "$frontend_pid" 2>/dev/null || true
+  [[ -n "$worker_pid" ]] && kill "$worker_pid" 2>/dev/null || true
+  [[ -n "$backend_pid" ]] && wait "$backend_pid" 2>/dev/null || true
+  [[ -n "$frontend_pid" ]] && wait "$frontend_pid" 2>/dev/null || true
+  [[ -n "$worker_pid" ]] && wait "$worker_pid" 2>/dev/null || true
+}
+
+trap cleanup EXIT INT TERM
+
+"$project_root/bin/dev-backend" &
+backend_pid=$!
+
+"$project_root/bin/dev-frontend" &
+frontend_pid=$!
+
+"$project_root/bin/dev-worker" &
+worker_pid=$!
+
+while kill -0 "$backend_pid" 2>/dev/null && kill -0 "$frontend_pid" 2>/dev/null && kill -0 "$worker_pid" 2>/dev/null; do
+  sleep 1
+done
+
+set +e
+if ! kill -0 "$backend_pid" 2>/dev/null; then
+  wait "$backend_pid"
+  exit_code=$?
+elif ! kill -0 "$frontend_pid" 2>/dev/null; then
+  wait "$frontend_pid"
+  exit_code=$?
+else
+  wait "$worker_pid"
+  exit_code=$?
+fi
+set -e
+
+exit "$exit_code"

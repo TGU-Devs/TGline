@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# .env.localを読み込む
+# DATABASE_HOSTをローカル接続用の127.0.0.1へ変更Railsコマンドを実行
+
+project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+env_file="$project_root/.env.local"
+
+if [[ ! -f "$env_file" ]]; then
+  echo ".env.local is missing. Copy .env.local.example and set the required values." >&2
+  exit 1
+fi
+
+set -a
+source "$env_file"
+set +a
+
+# Docker Compose内ではdbホストを使うが、ローカルRailsからは公開ポートへ接続する。
+export DATABASE_HOST=127.0.0.1
+export REDIS_URL=redis://127.0.0.1:6379/0
