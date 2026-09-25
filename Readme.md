@@ -82,7 +82,7 @@ TGU/
 ├── docs/                    # ドキュメント
 │   ├── ER図.md              # データベース定義
 │   ├── SETUP.md             # 環境構築ガイド
-│   └── SECURITY_AUDIT.md    # セキュリティ監査レポート
+│   └── 認証認可.md          # 認証・認可の設計
 │
 ├── docker-compose.yml       # 開発用 Docker Compose
 ├── docker-compose.prod.yml  # 本番用 Docker Compose
@@ -130,6 +130,7 @@ cd backend && rbenv install -s 3.3.6 && cd ..
 | [docs/SETUP.md](docs/SETUP.md) | 環境構築・起動・トラブルシューティング |
 | [Swagger UI](http://localhost:3001/api-docs) | バックエンド API 仕様 |
 | [docs/ER図.md](docs/ER図.md) | データベース ER 定義 |
+| [docs/認証認可.md](docs/認証認可.md) | 認証・認可の設計 |
 | [CLAUDE.md](CLAUDE.md) | AI エージェント向け開発ガイド |
 
 ## 環境変数

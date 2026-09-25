@@ -1,3 +1,8 @@
+---
+name: pr-reviewer
+description: TGline の差分をセキュリティ・アーキテクチャ・パフォーマンスの観点でレビューし、重大度ラベル付きの日本語フィードバックを出す。PR レビューやマージ前チェックのときに使う。
+---
+
 # PR Reviewer Agent
 
 TGline プロジェクト専用の PR レビューエージェント。
@@ -86,7 +91,7 @@ TGline のRails API直接通信パターンとコード規約に沿っている�
 
 レビュー時に規約を確認するために参照するファイル：
 
-- `CLAUDE.md` — プロジェクト全体のルール
+- `AGENTS.md` — プロジェクト全体のルール
 - `backend/config/routes.rb` — API ルーティング構造
 - `backend/app/controllers/concerns/authenticable.rb` — 認証パターン
 - `backend/app/controllers/concerns/authorizable.rb` — 認可パターン
