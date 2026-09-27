@@ -9,7 +9,6 @@ one:
   actor: two
   notifiable_type: Like
   notifiable_id: 1
-  kind: 0
 # column: value
 #
 two:
@@ -17,5 +16,4 @@ two:
   actor: one
   notifiable_type: Comment
   notifiable_id: 1
-  kind: 1
 # column: value
