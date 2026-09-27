@@ -1,12 +1,12 @@
 # ===================================
 # Stage 1: Build
 # ===================================
-FROM node:23-bookworm AS builder
+FROM node:22-bookworm AS builder
 
 WORKDIR /app
 
-COPY package.json ./
-RUN npm install
+COPY package.json package-lock.json ./
+RUN npm ci
 
 COPY . .
 
@@ -22,7 +22,7 @@ RUN npm run build
 # ===================================
 # Stage 2: Run
 # ===================================
-FROM node:23-bookworm AS runner
+FROM node:22-bookworm AS runner
 
 WORKDIR /app
 

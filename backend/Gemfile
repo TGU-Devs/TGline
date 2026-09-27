@@ -19,6 +19,9 @@ gem 'google-id-token'
 # Email delivery
 gem 'resend'
 
+# Background jobs
+gem "sidekiq", "~> 8.0"
+
 # Rate limiting
 gem 'rack-attack'
 
@@ -67,4 +70,3 @@ group :development, :test do
   # N+1クエリ検知
   gem "bullet"
 end
-

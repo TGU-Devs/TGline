@@ -11,6 +11,14 @@ services:
         volumes:
             - db_data:/var/lib/postgresql/data
 
+    redis:
+        image: redis:7-alpine
+        ports:
+            - "127.0.0.1:6379:6379"
+        command: redis-server --appendonly yes --maxmemory-policy noeviction
+        volumes:
+            - redis_data:/data
+
     backend:
         build:
             context: ./backend
@@ -22,8 +30,11 @@ services:
             - "3001:3000" # [ホスト側]:[コンテナ側]
         env_file:
             - .env.local
+        environment:
+            REDIS_URL: redis://redis:6379/0
         depends_on:
             - db
+            - redis
         command: > # ボリュームマウント後にbundle installを実行し、ホストとコンテナの状態が一致するようにする
             bash -c "
               until pg_isready -h db -p 5432 -U postgres; do
@@ -37,6 +48,22 @@ services:
               bundle exec rails db:seed
               bundle exec rails server -b 0.0.0.0 -p 3000
             "
+
+    worker:
+        build:
+            context: ./backend
+            dockerfile: Dockerfile.dev
+        volumes:
+            - ./backend:/app
+            - backend_worker_bundle:/usr/local/bundle
+        env_file:
+            - .env.local
+        environment:
+            REDIS_URL: redis://redis:6379/0
+        depends_on:
+            - db
+            - redis
+        command: bash -c "bundle install && bundle exec sidekiq -C config/sidekiq.yml"
 
     frontend:
         build:
@@ -61,6 +88,7 @@ services:
 
 volumes:
     db_data:
+    redis_data:
     frontend_next:
     backend_bundle:
-
+    backend_worker_bundle:

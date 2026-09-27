@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "$project_root/bin/load-local-env"
+
+docker compose -f "$project_root/docker-compose.yml" up -d db redis
+
+cd "$project_root/backend"
+bundle install
+bundle exec rails db:prepare
+bundle exec rails db:seed
+
+cd "$project_root/frontend"
+npm ci
+
+echo "Local setup completed. Run ./bin/dev to start Rails and Next.js."

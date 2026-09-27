@@ -6,6 +6,9 @@
 - display_name
 - description (nullable)
 - role
+- notify_email (boolean, default true, NOT NULL)
+- notify_email_like (boolean, default true, NOT NULL)
+- notify_email_comment (boolean, default true, NOT NULL)
 - deleted_at
 
 ※ Devise を使用するため、実際のテーブルには以下も含まれる
@@ -75,11 +78,33 @@
 
 ---
 
+## notifications
+
+- id (PK)
+- recipient_id (FK -> users.id, NOT NULL)  # 通知を受け取るユーザー
+- actor_id (FK -> users.id, NOT NULL)      # いいね／コメントしたユーザー
+- notifiable_type (string, NOT NULL)       # Like / Comment
+- notifiable_id (bigint, NOT NULL)
+- kind (integer, NOT NULL)                 # enum: like=0 / comment=1
+- read_at (datetime, nullable)             # 未読時は null
+- created_at
+- updated_at
+
+制約:
+- UNIQUE(notifiable_type, notifiable_id, recipient_id)
+
+※ 自分の投稿へのいいね／コメントでは行を作らない  
+※ いいね取り消し・コメント削除時は対応する通知も削除する
+
+---
+
 ## リレーションまとめ
 
 - users has many posts
 - users has many comments
 - users has many likes
+- users has many notifications (as recipient)
+- users has many notifications (as actor)
 
 - posts belongs to user
 - posts has many comments
@@ -91,6 +116,10 @@
 
 - likes belongs to user
 - likes belongs to post
+
+- notifications belongs to recipient (users)
+- notifications belongs to actor (users)
+- notifications belongs to notifiable (polymorphic: Like or Comment)
 
 - tags has many posts through post_tags
 

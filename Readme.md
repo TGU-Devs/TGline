@@ -30,7 +30,8 @@
 | フロントエンド | Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS 4, shadcn/ui |
 | バックエンド | Ruby on Rails 7.2 (API-only), Devise + JWT |
 | データベース | PostgreSQL 15 |
-| インフラ | Docker / Docker Compose（開発）, Railway（本番） |
+| 非同期処理 | Active Job + Sidekiq 8 + Redis 7 |
+| インフラ | Docker / Docker Compose（開発DB・動作確認）, Railway（本番） |
 | CI | GitHub Actions（フロントエンドビルド検証） |
 
 ### API通信
@@ -39,6 +40,7 @@
 
 ```text
 ブラウザ → Rails API → PostgreSQL
+                    └→ Redis → Sidekiq worker → Resend
 ```
 
 開発環境では `http://localhost:3001`、本番環境では `https://api.tgline.dev` を使用する。
@@ -84,19 +86,36 @@ TGU/
 │
 ├── docker-compose.yml       # 開発用 Docker Compose
 ├── docker-compose.prod.yml  # 本番用 Docker Compose
-├── .env.local               # 開発用環境変数（コミット済み）
+├── .env.local.example       # 開発用環境変数テンプレート
+├── .env.local               # 開発用環境変数（gitignore）
 ├── .env.template            # 本番用テンプレート
 └── CLAUDE.md                # AI エージェント向けガイド
 ```
 
 ## クイックスタート
 
-**前提条件**: Docker Desktop がインストールされていること
+**前提条件**: Docker Desktop、nvm、rbenvがインストールされていること
+
+開発用スクリプトは `backend/bin` ではなく、リポジトリ直下の `bin` にある。以下のコマンドは、特に記載がない限り `TGU` ディレクトリで実行する。
 
 ```bash
 git clone <リポジトリURL>
 cd TGU
-docker compose up --build    # 初回（5-10分）
+cp .env.local.example .env.local
+nvm install
+cd backend && rbenv install -s 3.3.6 && cd ..
+./bin/setup-local
+./bin/dev
+```
+
+普段は `./bin/dev` だけでPostgreSQL、Redis、Rails、Next.js、Sidekiqがすべて起動する。Rails consoleを別ターミナルで開く場合は次を実行する。
+
+```bash
+# TGUディレクトリから
+./bin/rails-local console
+
+# backendディレクトリにいる場合
+../bin/rails-local console
 ```
 
 - フロントエンド: http://localhost:3000
@@ -109,7 +128,7 @@ docker compose up --build    # 初回（5-10分）
 | ドキュメント | 内容 |
 |-------------|------|
 | [docs/SETUP.md](docs/SETUP.md) | 環境構築・起動・トラブルシューティング |
-| [Swagger UI](http://localhost:3001/api-docs) | バックエンド API 仕様（実体: `backend/swagger/v1/swagger.yaml`） |
+| [Swagger UI](http://localhost:3001/api-docs) | バックエンド API 仕様 |
 | [docs/ER図.md](docs/ER図.md) | データベース ER 定義 |
 | [docs/認証認可.md](docs/認証認可.md) | 認証・認可の設計 |
 | [CLAUDE.md](CLAUDE.md) | AI エージェント向け開発ガイド |
@@ -118,9 +137,10 @@ docker compose up --build    # 初回（5-10分）
 
 | ファイル | 用途 | Git管理 |
 |---------|------|---------|
-| `.env.local` | 開発環境用（Docker Compose が参照） | コミット済み |
+| `.env.local.example` | 開発環境用テンプレート | コミット済み |
+| `.env.local` | 開発環境用 | **gitignore** |
 | `.env.template` | 本番用テンプレート | コミット済み |
 
 ## 本番環境
 
-Railway にフロントエンド・バックエンド・PostgreSQL をそれぞれデプロイ。
+Railway にフロントエンド、バックエンド、Sidekiq worker、PostgreSQL、Redisをそれぞれデプロイする。

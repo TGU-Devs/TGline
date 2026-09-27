@@ -55,5 +55,9 @@ Rails.application.routes.draw do
       resource :likes, only: [:create, :destroy]
       resources :comments, only: [:index, :create, :destroy]
     end
+
+    # 通知関連
+    resources :notifications, only: [:index, :update]
+    resource :notification_inbox, only: [:show, :update] #ユーザーごとに1つの対象には単数形の resource を使う
   end
 end
