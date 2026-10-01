@@ -1,0 +1,19 @@
+overwrite: true
+generates:
+  src/lib/graphql/studyApiGeneratedTypes.ts:
+    schema: ../backend/graphql/study_api/schema.graphql
+    documents: src/**/*.graphql.ts
+    plugins:
+      - typescript
+    config:
+      skipTypename: true
+  src/:
+    schema: ../backend/graphql/study_api/schema.graphql
+    documents: src/**/*.graphql.ts
+    preset: near-operation-file
+    presetConfig:
+      baseTypesPath: ~@/lib/graphql/studyApiGeneratedTypes
+    plugins:
+      - typescript-operations
+    config:
+      skipTypename: true
