@@ -2,7 +2,6 @@
 
 import { DoorOpen } from "lucide-react";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 
 type LogoutButtonProps = {
@@ -10,7 +9,6 @@ type LogoutButtonProps = {
 };
 
 const LogoutButton = ({ isDesktop }: LogoutButtonProps) => {
-    const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
 
     const handleLogout = async () => {
@@ -23,8 +21,9 @@ const LogoutButton = ({ isDesktop }: LogoutButtonProps) => {
 
             // 204 No Content または 200 OK の場合は成功
             if (response.ok || response.status === 204) {
-                // ログアウト成功後、ログインページへリダイレクト
-                router.push("/login");
+                // React の認証状態と Next.js のクライアントキャッシュを破棄するため、
+                // ログアウト後はトップページへ完全遷移する
+                window.location.replace("/");
             } else {
                 console.error("ログアウトに失敗しました");
             }
