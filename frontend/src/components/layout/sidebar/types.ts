@@ -4,4 +4,5 @@ export type MenuItem = {
     name: string;
     path: string;
     icon: LucideIcon;
+    badge?: number;
 };

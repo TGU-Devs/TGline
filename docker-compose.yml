@@ -38,6 +38,19 @@ services:
               bundle exec rails server -b 0.0.0.0 -p 3000
             "
 
+    worker:
+        build:
+            context: ./backend
+            dockerfile: Dockerfile.dev
+        volumes:
+            - ./backend:/app
+            - backend_worker_bundle:/usr/local/bundle
+        env_file:
+            - .env.local
+        depends_on:
+            - db
+        command: bash -c "bundle install && bundle exec rails db:prepare && bin/jobs"
+
     frontend:
         build:
             context: ./frontend
@@ -63,4 +76,4 @@ volumes:
     db_data:
     frontend_next:
     backend_bundle:
-
+    backend_worker_bundle:

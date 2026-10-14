@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
 class PasswordResetMailer < ApplicationMailer
-  layout false
-  default from: ENV.fetch("MAILER_FROM_ADDRESS", "noreply@tgline.example.com")
-
   def reset_email(user, raw_token)
     @user = user
     @reset_url = "#{ENV.fetch('FRONTEND_URL', 'http://localhost:3000')}/reset-password?token=#{raw_token}"

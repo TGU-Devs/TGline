@@ -16,6 +16,8 @@ type Notification = {
     label: string;
     Icon: LucideIcon;
     checked: boolean;
+    comingSoon?: boolean;
+    children?: Notification[];
 };
 
 type ThemeOption = {

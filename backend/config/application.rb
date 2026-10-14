@@ -34,5 +34,8 @@ module Backend
 
     # レートリミット（rack-attack）
     config.middleware.use Rack::Attack
+
+    # Active JobのジョブをPostgreSQLへ永続化し、Solid Queueで処理する
+    config.active_job.queue_adapter = :solid_queue
   end
 end

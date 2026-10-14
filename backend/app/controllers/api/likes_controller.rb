@@ -7,12 +7,19 @@ module Api
     # POST /api/posts/:post_id/likes
     def create
       like = current_user.likes.build(post: @post)
+      reached_email_threshold = false
 
-      if like.save
-        head :created
-      else
-        head :unprocessable_entity
+      Like.transaction do
+        @post.lock!
+        like.save!
+        Notification.create_for_like!(like)
+        reached_email_threshold = @post.likes.count == LikeMilestoneEmailJob::THRESHOLD
       end
+
+      LikeMilestoneEmailJob.perform_later(@post.id) if reached_email_threshold
+      head :created
+    rescue ActiveRecord::RecordInvalid
+      head :unprocessable_entity
     end
 
     # DELETE /api/posts/:post_id/likes
@@ -20,7 +27,11 @@ module Api
       like = current_user.likes.find_by(post: @post)
       return head :not_found unless like
 
-      like.destroy
+      Like.transaction do
+        @post.lock!
+        Notification.destroy_for_like_or_comment!(like)
+        like.destroy!
+      end
       head :no_content
     end
 

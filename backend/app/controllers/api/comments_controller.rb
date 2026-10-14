@@ -15,11 +15,13 @@ module Api
     def create
       comment = current_user.comments.build(comment_params.merge(post: @post))
 
-      if comment.save
-        render json: comment_response(comment), status: :created
-      else
-        render json: { errors: comment.errors }, status: :unprocessable_entity
+      Comment.transaction do
+        comment.save!
+        Notification.create_for_comment!(comment)
       end
+      render json: comment_response(comment), status: :created
+    rescue ActiveRecord::RecordInvalid => e
+      render json: { errors: e.record.errors }, status: :unprocessable_entity
     end
 
     # DELETE /api/posts/:post_id/comments/:id
@@ -29,7 +31,10 @@ module Api
 
       return unless authorize_owner_or_admin!(comment)
 
-      comment.soft_delete
+      Comment.transaction do
+        Notification.destroy_for_like_or_comment!(comment)
+        comment.soft_delete
+      end
       head :no_content
     end
 
