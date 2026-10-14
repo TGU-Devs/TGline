@@ -23,7 +23,7 @@ const LogoutButton = ({ isDesktop }: LogoutButtonProps) => {
             if (response.ok || response.status === 204) {
                 // React の認証状態と Next.js のクライアントキャッシュを破棄するため、
                 // ログアウト後はトップページへ完全遷移する
-                window.location.replace("/");
+                window.location.replace("/?status=logged_out");
             } else {
                 console.error("ログアウトに失敗しました");
             }
