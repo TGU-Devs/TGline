@@ -61,7 +61,7 @@ class Notification < ApplicationRecord
 
     private
 
-    #コメント通知メールをSidekiqへ登録
+    # コメント通知メールをSolid Queueへ登録
     def enqueue_comment_notification_email
       CommentNotificationEmailJob.perform_later(id)
     end

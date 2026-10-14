@@ -3,7 +3,7 @@ set -euo pipefail
 
 project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-docker compose -f "$project_root/docker-compose.yml" up -d db redis
+docker compose -f "$project_root/docker-compose.yml" up -d db
 
 backend_pid=""
 frontend_pid=""

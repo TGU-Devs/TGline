@@ -16,4 +16,3 @@ set +a
 
 # Docker Compose内ではdbホストを使うが、ローカルRailsからは公開ポートへ接続する。
 export DATABASE_HOST=127.0.0.1
-export REDIS_URL=redis://127.0.0.1:6379/0

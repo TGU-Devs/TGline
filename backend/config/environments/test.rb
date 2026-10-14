@@ -43,7 +43,7 @@ Rails.application.configure do
   # ActionMailer::Base.deliveries array.
   config.action_mailer.delivery_method = :test
 
-  # テスト実行時はRedisへ接続しない
+  # テスト実行時はSolid Queueへ接続しない
   config.active_job.queue_adapter = :test
 
   # Unlike controllers, the mailer instance doesn't have any context about the
