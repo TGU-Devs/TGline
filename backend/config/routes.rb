@@ -21,6 +21,7 @@ Rails.application.routes.draw do
       post "sign_up", to: "registrations#create"
       post "sign_in", to: "sessions#create"
       post "google_sign_in", to: "google_sessions#create"
+      post "refresh", to: "refresh_tokens#create"
       delete "sign_out", to: "sessions#destroy"
       get "me", to: "me#show"
       patch "me", to: "me#update"

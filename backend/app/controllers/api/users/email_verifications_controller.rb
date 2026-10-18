@@ -43,12 +43,10 @@ module Api
           email_verification_sent_at: nil
         )
 
-        token = JwtService.encode(user.id)
-        set_auth_cookie(token)
+        start_authentication_session(user)
 
         render json: {
-          message: "メール認証が完了しました",
-          token: token
+          message: "メール認証が完了しました"
         }, status: :ok
       end
 

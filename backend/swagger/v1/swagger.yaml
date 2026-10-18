@@ -82,15 +82,10 @@ paths:
       responses:
         '201':
           description: 登録成功
-          headers:
-            Set-Cookie:
-              description: JWT httpOnly cookie
-              schema:
-                type: string
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthResponse'
+                $ref: '#/components/schemas/RegistrationResponse'
         '422':
           description: バリデーションエラー
           content:
@@ -127,7 +122,7 @@ paths:
           description: サインイン成功
           headers:
             Set-Cookie:
-              description: JWT httpOnly cookie
+              description: Access Token・Refresh TokenのhttpOnly cookie
               schema:
                 type: string
           content:
@@ -149,6 +144,31 @@ paths:
       responses:
         '204':
           description: サインアウト成功（cookieを削除）
+
+  /api/users/refresh:
+    post:
+      tags: [Authentication]
+      summary: Access Tokenを更新
+      operationId: refreshAccessToken
+      description: |
+        Refresh Tokenを使ってAccess Tokenを再発行し、Refresh Tokenも同時にローテーションする。
+        Refresh Tokenの絶対有効期限は最初のログインから30日間で、更新時に延長しない。
+      security:
+        - refreshCookieAuth: []
+      responses:
+        '204':
+          description: 更新成功
+          headers:
+            Set-Cookie:
+              description: 新しいAccess TokenとRefresh TokenのhttpOnly cookie
+              schema:
+                type: string
+        '401':
+          description: Refresh Tokenが無効または期限切れ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /api/users/google_sign_in:
     post:
@@ -174,7 +194,7 @@ paths:
           description: サインイン成功
           headers:
             Set-Cookie:
-              description: JWT httpOnly cookie
+              description: Access Token・Refresh TokenのhttpOnly cookie
               schema:
                 type: string
           content:
@@ -320,7 +340,7 @@ paths:
                       description: 大文字・小文字・数字を含む8文字以上
       responses:
         '200':
-          description: 変更成功
+          description: 変更成功（全端末の認証セッションを失効）
           content:
             application/json:
               schema:
@@ -328,7 +348,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: パスワードを変更しました
+                    example: パスワードを変更しました。再度ログインしてください
         '401':
           description: 現在のパスワードが間違っている
           content:
@@ -403,7 +423,7 @@ paths:
           description: リセット成功（自動サインイン）
           headers:
             Set-Cookie:
-              description: JWT httpOnly cookie
+              description: Access Token・Refresh TokenのhttpOnly cookie
               schema:
                 type: string
           content:
@@ -1518,7 +1538,12 @@ components:
       type: apiKey
       in: cookie
       name: jwt_token
-      description: httpOnly JWT cookie（サインイン時に自動設定）
+      description: 15分間有効なAccess Tokenを格納するhttpOnly cookie
+    refreshCookieAuth:
+      type: apiKey
+      in: cookie
+      name: refresh_token
+      description: 30日間の絶対期限内でAccess Token更新に使用するhttpOnly cookie
 
   parameters:
     PostId:
@@ -1585,6 +1610,14 @@ components:
     # ----------------------------------------------------------
     # Auth
     # ----------------------------------------------------------
+    RegistrationResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        requires_email_verification:
+          type: boolean
+
     AuthResponse:
       type: object
       properties:
@@ -1601,9 +1634,6 @@ components:
             role:
               type: string
               enum: [user, admin]
-        token:
-          type: string
-          description: JWT（cookieにも設定される）
         message:
           type: string
 

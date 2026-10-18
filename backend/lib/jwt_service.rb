@@ -1,9 +1,7 @@
 class JwtService
   SECRET_KEY = Rails.application.secret_key_base
 
-  # TODO: 今はAccessTokenだけしか実装していないので今後リフレッシュトークンも使う。
-
-  EXPIRATION_TIME = 7.days
+  EXPIRATION_TIME = 15.minutes
 
   def self.encode(user_id)
     payload = {

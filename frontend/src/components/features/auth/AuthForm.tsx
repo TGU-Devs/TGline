@@ -70,6 +70,8 @@ const initFormValues = {
 const AuthForm = ({ isRegister }: AuthFormProps) => {
     const searchParams = useSearchParams();
     const isVerificationSent = !isRegister && searchParams.get("verification") === "sent";
+    const isPasswordChanged = !isRegister && searchParams.get("status") === "password_changed";
+    const isSessionExpired = !isRegister && searchParams.get("status") === "session_expired";
     const [formValues, setFormValues] = useState(initFormValues);
     const [formErrors, setFormErrors] = useState<Errors>({});
     const [isLoading, setIsLoading] = useState(false);
@@ -353,6 +355,16 @@ const AuthForm = ({ isRegister }: AuthFormProps) => {
         <div className="bg-card/80 backdrop-blur-lg p-6 rounded-xl shadow-lg border border-border/50 w-full max-w-md">
             <form className="space-y-4" onSubmit={(e) => submitHandler(e)}>
                 <h1 className="text-center font-bold text-xl text-foreground">{isRegister ? "新規登録" : "ログイン"}</h1>
+                {isPasswordChanged && (
+                    <div className="bg-primary/10 border border-primary/30 text-primary px-4 py-3 rounded-lg text-sm">
+                        パスワードを変更しました。新しいパスワードで再度ログインしてください。
+                    </div>
+                )}
+                {isSessionExpired && (
+                    <div className="bg-muted border border-border text-muted-foreground px-4 py-3 rounded-lg text-sm">
+                        セッションの有効期限が切れました。再度ログインしてください。
+                    </div>
+                )}
                 {isRegister && (
                     <div className="flex flex-col">
                         <label htmlFor="display_name" className="font-medium text-sm text-foreground mb-1">ユーザー名</label>

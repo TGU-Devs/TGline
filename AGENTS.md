@@ -42,7 +42,7 @@ docker compose up --build
 
 ### バックエンド: Rails API-only（`/backend`）
 - **ルーティング**: すべて `/api` 名前空間配下 — `config/routes.rb` 参照
-- **認証**: Devise + JWT（有効期限7日、v0ではリフレッシュトークンなし）
+- **認証**: Devise + JWT（アクセストークン15分、リフレッシュトークン30日。HttpOnly Cookieで管理し、更新時にローテーション）
 - **Google OAuth**: クライアントサイドSSO → RailsがIDトークンを検証
 - **論理削除**: Posts, Comments, Users は `deleted_at` カラムで論理削除（物理削除しない）
 - **モデル**: User, Post, Comment, Like, Tag, PostTag
@@ -59,19 +59,8 @@ docker compose up --build
 - `frontend/src/lib/api.ts` — Rails API直接通信用クライアント
 - `frontend/src/components/features/` — 機能別コンポーネント（auth, posts等）
 - `frontend/src/components/ui/` — shadcn/ui プリミティブ
-- `backend/app/controllers/api/` — Rails APIコントローラ
-- `backend/app/models/` — ActiveRecordモデル（バリデーション含む）
 - `backend/swagger/v1/swagger.yaml` — API仕様の正本（Swagger / OpenAPI）
-- `.cursor/cursor.md` — v0の詳細仕様書
 
-## 環境変数
-
-- `.env.local.example` — 開発用テンプレート
-- `.env.local` — 開発用（gitignore対象、ローカル起動スクリプとdocker-compose.ymlが参照）
-- `.env` — 本番用（gitignore対象）
-- `.env.template` — 本番用テンプレート
-
-主要変数: `DATABASE_HOST`, `DATABASE_PASSWORD`, `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_GOOGLE_CLIENT_ID`, `COOKIE_DOMAIN`
 
 ## Skills
 
@@ -82,6 +71,7 @@ Codex は `.agents/skills/` を直接読み、Claude Code は `.claude/skills/` 
 | スキル | 用途 |
 |--------|------|
 | `creating-api` | Rails API に新しいリソースを追加する手順 |
+| `rails-implementation` | Railsバックエンドの責務配置をRails標準と既存構成に沿って判断する |
 | `updating-openapi` | `swagger.yaml` を実装と同期する手順 |
 | `pr-reviewer` | 差分のセキュリティ・アーキテクチャレビュー |
 | `test-generator` | Minitest テストの生成 |
@@ -97,7 +87,6 @@ Codex は `.agents/skills/` を直接読み、Claude Code は `.claude/skills/` 
 - **本番には実ユーザーとデータがある。** ローカルと同じ感覚で本番に触らない
 - 3人とも Rails / Next.js を学習しながら開発している。
   変更の理由・影響範囲・前提知識を省略せず説明すること。「既知」として飛ばさない
-- copilot-swe-agent / claude[bot] も PR を出す
 
 ## 開発方針
 
@@ -106,6 +95,8 @@ Codex は `.agents/skills/` を直接読み、Claude Code は `.claude/skills/` 
 - **テストはバックエンド（Rails / Minitest）のみ。** フロントエンドのテストは書かない
 - バックエンドのテストもエージェントが自動では追加しない。
   依頼されたときに `test-generator` スキルで生成する
+- Railsのドメインロジックは、まず責務を持つActive Recordモデルへ置く。
+  汎用的な `*Service` 層を先に設けず、モデルの責務が実際に複雑化してから、具体的な責務名を持つオブジェクトへの抽出を検討する
 - **静的ツール・構文チェック・ビルドは実行しない。** 動作検証は各自が手元で行う
 - **例外：本番DBに影響する操作** — マイグレーション、スキーマ変更、データ削除、
   `db:seed` の本番実行は、実行前に必ず確認を取り、ロールバック手段を併記すること

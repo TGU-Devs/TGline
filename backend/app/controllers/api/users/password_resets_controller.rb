@@ -35,8 +35,8 @@ module Api
         )
 
         if user.errors.empty?
-          token = JwtService.encode(user.id)
-          set_auth_cookie(token)
+          revoke_all_authentication_sessions(user)
+          start_authentication_session(user)
 
           render json: {
             user: {
@@ -44,8 +44,7 @@ module Api
               email: user.email,
               display_name: user.display_name,
               role: user.role
-            },
-            token: token
+            }
           }, status: :ok
         else
           render json: { errors: user.errors.full_messages }, status: :unprocessable_entity

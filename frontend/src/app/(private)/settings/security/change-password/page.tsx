@@ -80,7 +80,7 @@ const ChangePasswordPage = () => {
                 });
 
                 if (res.ok) {
-                    router.push("/settings?status=password_changed");
+                    router.push("/login?status=password_changed");
                 } else if (res.status === 401) {
                     setErrors({ current_password: "現在のパスワードが正しくありません" });
                 } else {

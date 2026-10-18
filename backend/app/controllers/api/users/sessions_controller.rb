@@ -20,12 +20,10 @@ module Api
             }, status: :forbidden
           end
 
-          token = JwtService.encode(user.id)
-          set_auth_cookie(token)
+          start_authentication_session(user)
 
           render json: {
             user: user_response(user),
-            token: token,
             message: 'サインインに成功しました!'
           }, status: :ok
         else
@@ -34,7 +32,8 @@ module Api
       end
 
       def destroy
-        clear_auth_cookie
+        revoke_authentication_session(cookies[:refresh_token])
+        clear_auth_cookies
 
         head :no_content
       end

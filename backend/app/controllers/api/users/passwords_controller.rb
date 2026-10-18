@@ -13,7 +13,9 @@ module Api
         end
 
         if current_user.update(password: password_params[:new_password])
-          render json: { message: "パスワードを変更しました" }, status: :ok
+          revoke_all_authentication_sessions(current_user)
+          clear_auth_cookies
+          render json: { message: "パスワードを変更しました。再度ログインしてください" }, status: :ok
         else
           render json: { errors: current_user.errors }, status: :unprocessable_entity
         end
