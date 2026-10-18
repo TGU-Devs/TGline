@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { useUser } from "@/contexts/UserContext";
-import { useStatusToast } from "@/hooks/useStatusToast";
 import useUnsavedChangesGuard from "@/hooks/useUnsavedChangesGuard";
 
 import Loading from "@/components/ui/Loading";
@@ -89,13 +88,6 @@ const SettingsPage = () => {
             });
         }
     }, [user]);
-
-    const { showToast: showPasswordChangedToast } = useStatusToast(
-        "/settings",
-        {
-            password_changed: { message: "パスワードを変更しました。" },
-        },
-    );
 
     const themeOptions = [
         {
@@ -262,12 +254,6 @@ const SettingsPage = () => {
                 icon={AlertTriangle}
                 message={errorMessage}
                 bg="bg-red-500"
-            />
-            <Toast
-                showToast={showPasswordChangedToast}
-                icon={CheckCircle2}
-                message="パスワードを変更しました。"
-                bg="bg-emerald-500"
             />
             {fromProfile && profileUserId && (
                 <div className="mb-6">

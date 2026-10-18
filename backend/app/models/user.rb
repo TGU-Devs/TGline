@@ -13,6 +13,7 @@ class User < ApplicationRecord
   has_many :course_reviews, dependent: :destroy
   has_many :created_courses, class_name: "Course", foreign_key: :created_by_id, dependent: :nullify
   has_many :notifications, foreign_key: :recipient_id, dependent: :destroy
+  has_many :authentication_sessions, dependent: :destroy
 
   validate :password_complexity, if: :password_required?
   validates :display_name, presence: true, length: { maximum: 20 }

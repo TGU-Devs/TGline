@@ -42,7 +42,7 @@ docker compose up --build
 
 ### バックエンド: Rails API-only（`/backend`）
 - **ルーティング**: すべて `/api` 名前空間配下 — `config/routes.rb` 参照
-- **認証**: Devise + JWT（有効期限7日、v0ではリフレッシュトークンなし）
+- **認証**: Devise + JWT（アクセストークン15分、リフレッシュトークン30日。HttpOnly Cookieで管理し、更新時にローテーション）
 - **Google OAuth**: クライアントサイドSSO → RailsがIDトークンを検証
 - **論理削除**: Posts, Comments, Users は `deleted_at` カラムで論理削除（物理削除しない）
 - **モデル**: User, Post, Comment, Like, Tag, PostTag
@@ -106,6 +106,8 @@ Codex は `.agents/skills/` を直接読み、Claude Code は `.claude/skills/` 
 - **テストはバックエンド（Rails / Minitest）のみ。** フロントエンドのテストは書かない
 - バックエンドのテストもエージェントが自動では追加しない。
   依頼されたときに `test-generator` スキルで生成する
+- Railsのドメインロジックは、まず責務を持つActive Recordモデルへ置く。
+  汎用的な `*Service` 層を先に設けず、モデルの責務が実際に複雑化してから、具体的な責務名を持つオブジェクトへの抽出を検討する
 - **静的ツール・構文チェック・ビルドは実行しない。** 動作検証は各自が手元で行う
 - **例外：本番DBに影響する操作** — マイグレーション、スキーマ変更、データ削除、
   `db:seed` の本番実行は、実行前に必ず確認を取り、ロールバック手段を併記すること

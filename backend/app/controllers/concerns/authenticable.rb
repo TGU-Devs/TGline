@@ -39,26 +39,56 @@ module Authenticable
     render json: { error: 'unauthorized' }, status: :unauthorized
   end
 
-  def set_auth_cookie(token)
-    cookies[:jwt_token] = auth_cookie_options.merge(
-      value: token,
-      expires: 7.days.from_now
+  def start_authentication_session(user)
+    revoke_authentication_session(cookies[:refresh_token]) if cookies[:refresh_token].present?
+    authentication_session, refresh_token = AuthenticationSession.start_for!(user)
+    set_auth_cookies(authentication_session, refresh_token)
+  end
+
+  def set_auth_cookies(authentication_session, refresh_token)
+    access_token = JwtService.encode(authentication_session.user_id)
+
+    cookies[:jwt_token] = shared_cookie_options.merge(
+      value: access_token,
+      expires: authentication_session.expires_at
+    )
+    cookies[:refresh_token] = refresh_cookie_options.merge(
+      value: refresh_token,
+      expires: authentication_session.expires_at
     )
   end
 
-  def clear_auth_cookie
-    cookies.delete(:jwt_token, auth_cookie_options)
+  def clear_auth_cookies
+    cookies.delete(:jwt_token, shared_cookie_options)
+    cookies.delete(:refresh_token, refresh_cookie_options)
+  end
+
+  def revoke_authentication_session(raw_refresh_token)
+    AuthenticationSession.revoke_by_refresh_token(raw_refresh_token)
+  end
+
+  def revoke_all_authentication_sessions(user)
+    AuthenticationSession.revoke_all_for(user)
   end
 
   private
 
-  def auth_cookie_options
+  def shared_cookie_options
     {
       httponly: true,
       secure: Rails.env.production?,
       same_site: :lax,
       domain: ENV['COOKIE_DOMAIN'].presence
     }.compact
+  end
+
+  def refresh_cookie_options
+    {
+      httponly: true,
+      secure: Rails.env.production?,
+      same_site: :lax,
+      path: "/api/users"
+    }
   end
 
   def extract_token

@@ -21,7 +21,8 @@ module Api
           return
         end
 
-        clear_auth_cookie
+        revoke_all_authentication_sessions(current_user)
+        clear_auth_cookies
 
         head :no_content
       end
