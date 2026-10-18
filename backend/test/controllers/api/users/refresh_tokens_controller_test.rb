@@ -36,7 +36,7 @@ module Api
       end
 
       test "リフレッシュトークンがなければ認証を拒否する" do
-        cookies.delete(:refresh_token)
+        cookies.delete("refresh_token")
 
         post "/api/users/refresh"
 
