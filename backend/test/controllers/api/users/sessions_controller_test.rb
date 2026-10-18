@@ -5,7 +5,7 @@ require "test_helper"
 module Api
   module Users
     class SessionsControllerTest < ActionDispatch::IntegrationTest
-      test "sets authentication cookies and returns user when credentials are valid" do
+      test "正しい認証情報なら認証Cookieを設定してユーザー情報を返す" do
         user = create_test_user
 
         assert_difference -> { AuthenticationSession.count }, 1 do
@@ -27,7 +27,7 @@ module Api
         assert cookies[:refresh_token].present?
       end
 
-      test "returns unauthorized when password is invalid" do
+      test "パスワードが不正なら認証を拒否する" do
         user = create_test_user
 
         assert_no_difference -> { AuthenticationSession.count } do
@@ -45,7 +45,7 @@ module Api
         assert_equal "メールアドレスまたはパスワードが正しくありません", body["error"]
       end
 
-      test "returns forbidden when user email is not verified" do
+      test "メールアドレスが未確認なら認証を拒否する" do
         user = create_test_user(email_verified_at: nil)
 
         post "/api/users/sign_in", params: {
@@ -61,7 +61,7 @@ module Api
         assert_equal true, body["requires_email_verification"]
       end
 
-      test "returns forbidden for google provider account" do
+      test "Googleアカウントならパスワード認証を拒否する" do
         user = create_test_user(provider: "google", uid: "google-#{SecureRandom.uuid}")
 
         post "/api/users/sign_in", params: {
@@ -77,7 +77,7 @@ module Api
         assert_equal "このメールアドレスはGoogleアカウントで登録されています。Googleログインを使用してください。", body["error"]
       end
 
-      test "revokes current authentication session and clears cookies on sign out" do
+      test "サインアウト時に現在の認証セッションを失効させCookieを削除する" do
         user = create_test_user
         post "/api/users/sign_in", params: {
           session: {
@@ -85,7 +85,7 @@ module Api
             password: "Password1"
           }
         }, as: :json
-        authentication_session = user.authentication_sessions.find_by!
+        authentication_session = user.authentication_sessions.sole
 
         delete "/api/users/sign_out"
 

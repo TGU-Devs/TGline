@@ -5,7 +5,7 @@ require "test_helper"
 module Api
   module Users
     class PasswordsControllerTest < ActionDispatch::IntegrationTest
-      test "changes password and revokes all authentication sessions" do
+      test "パスワード変更時にすべての認証セッションを失効させる" do
         user = create_test_user
         post "/api/users/sign_in", params: {
           session: {
@@ -13,7 +13,7 @@ module Api
             password: "Password1"
           }
         }, as: :json
-        current_session = user.authentication_sessions.find_by!
+        current_session = user.authentication_sessions.sole
         other_session, = AuthenticationSession.start_for!(user)
 
         patch "/api/users/password", params: {

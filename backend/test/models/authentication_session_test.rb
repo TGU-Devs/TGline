@@ -8,7 +8,7 @@ class AuthenticationSessionTest < ActiveSupport::TestCase
     @user = create_test_user
   end
 
-  test "start_for creates a session and returns a raw refresh token" do
+  test "セッションを作成し生のリフレッシュトークンを返す" do
     authentication_session = nil
     refresh_token = nil
 
@@ -22,7 +22,7 @@ class AuthenticationSessionTest < ActiveSupport::TestCase
     assert_in_delta 30.days.from_now.to_f, authentication_session.expires_at.to_f, 2
   end
 
-  test "rotate updates the same session and invalidates the previous refresh token" do
+  test "同じセッションのリフレッシュトークンをローテーションし以前のトークンを無効にする" do
     authentication_session, refresh_token = AuthenticationSession.start_for!(@user)
     rotated_session = nil
     new_refresh_token = nil
@@ -39,7 +39,7 @@ class AuthenticationSessionTest < ActiveSupport::TestCase
     end
   end
 
-  test "rotate rejects an expired session" do
+  test "期限切れの認証セッションではローテーションできない" do
     refresh_token = SecureRandom.urlsafe_base64(48)
     @user.authentication_sessions.create!(
       refresh_token_digest: Digest::SHA256.hexdigest(refresh_token),
@@ -51,7 +51,7 @@ class AuthenticationSessionTest < ActiveSupport::TestCase
     end
   end
 
-  test "rotate rejects a revoked session" do
+  test "失効済みの認証セッションではローテーションできない" do
     authentication_session, refresh_token = AuthenticationSession.start_for!(@user)
     authentication_session.revoke!
 
@@ -60,7 +60,7 @@ class AuthenticationSessionTest < ActiveSupport::TestCase
     end
   end
 
-  test "revoke_all_for revokes all active sessions for the user" do
+  test "ユーザーの有効な認証セッションをすべて失効させる" do
     first_session, = AuthenticationSession.start_for!(@user)
     second_session, = AuthenticationSession.start_for!(@user)
 
