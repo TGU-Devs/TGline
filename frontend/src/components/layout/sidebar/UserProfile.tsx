@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import { SquarePen } from "lucide-react";
 import UserAvatar from "@/components/UserAvatar";
 
 import { User } from "@/types/user";
@@ -38,13 +37,6 @@ const UserProfile = ({ currentUser, isLoading }: UserProfileProps) => {
                             </p>
                         )}
                     </div>
-                </Link>
-                <Link
-                    href="/posts/new"
-                    className="flex items-center justify-center w-full p-3 bg-primary text-primary-foreground font-medium rounded-xl cursor-pointer hover:bg-primary/90 transition-colors"
-                >
-                    <SquarePen className="w-5 h-5 mr-2" />
-                    新規投稿
                 </Link>
             </div>
         </div>
