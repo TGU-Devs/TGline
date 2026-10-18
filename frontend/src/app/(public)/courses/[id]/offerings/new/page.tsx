@@ -2,11 +2,11 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, CalendarDays, Plus } from "lucide-react";
+import { CalendarDays, Plus } from "lucide-react";
 
 import LoginPromptModal from "@/components/features/auth/LoginPromptModal";
+import CourseBreadcrumbs from "@/components/features/courses/CourseBreadcrumbs";
 import {
   CAMPUS_OPTIONS,
   DAY_OF_WEEK_OPTIONS,
@@ -179,13 +179,13 @@ export default function NewCourseOfferingPage() {
   return (
     <main className="min-h-screen bg-background py-4 sm:py-8">
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
-        <Link
-          href={`/courses/${course.id}`}
-          className="mb-4 inline-flex min-h-11 items-center gap-2 rounded-md px-2 text-sm font-medium text-muted-foreground transition hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-        >
-          <ArrowLeft className="size-4" />
-          授業詳細へ戻る
-        </Link>
+        <CourseBreadcrumbs
+          items={[
+            { label: "授業一覧", href: "/courses" },
+            { label: course.name, href: `/courses/${course.id}` },
+            { label: "開講情報を追加" },
+          ]}
+        />
 
         <section className="mb-5 rounded-lg border border-border bg-card p-5 shadow-sm">
           <p className="mb-2 inline-flex items-center gap-2 text-sm font-semibold text-primary">

@@ -4,9 +4,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ArrowLeft, BookOpen, Edit3, MessageSquare, Star } from "lucide-react";
+import { BookOpen, Edit3, MessageSquare, Star } from "lucide-react";
 
 import LoginPromptModal from "@/components/features/auth/LoginPromptModal";
+import CourseBreadcrumbs from "@/components/features/courses/CourseBreadcrumbs";
 import {
   formatCourseOfferingOption,
   reviewStats,
@@ -91,14 +92,15 @@ export default function CourseOfferingDetailPage() {
   return (
     <main className="min-h-screen bg-background py-4 sm:py-8">
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
-        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <Link
-            href={`/courses/${course.id}`}
-            className="inline-flex min-h-11 items-center gap-2 rounded-md px-2 text-sm font-medium text-muted-foreground transition hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-          >
-            <ArrowLeft className="size-4" />
-            授業詳細へ戻る
-          </Link>
+        <CourseBreadcrumbs
+          items={[
+            { label: "授業一覧", href: "/courses" },
+            { label: course.name, href: `/courses/${course.id}` },
+            { label: `${offering.teacher_name}先生の開講情報` },
+          ]}
+        />
+
+        <div className="mb-4 flex justify-end">
           {user ? (
             <Button asChild className="h-11 rounded-md">
               <Link href={`/courses/${course.id}/offerings/${offering.id}/reviews/new`}>

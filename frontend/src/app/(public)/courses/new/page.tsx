@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, BookOpen, Building2, MapPin, Plus } from "lucide-react";
+import { BookOpen, Building2, MapPin, Plus } from "lucide-react";
 
 import LoginPromptModal from "@/components/features/auth/LoginPromptModal";
+import CourseBreadcrumbs from "@/components/features/courses/CourseBreadcrumbs";
 import {
   CAMPUS_OPTIONS,
   COURSE_CATEGORY_OPTIONS,
@@ -150,13 +150,12 @@ export default function NewCoursePage() {
   return (
     <main className="min-h-screen bg-background py-4 sm:py-8">
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
-        <Link
-          href="/courses"
-          className="mb-4 inline-flex min-h-11 items-center gap-2 rounded-md px-2 text-sm font-medium text-muted-foreground transition hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-        >
-          <ArrowLeft className="size-4" />
-          授業一覧へ戻る
-        </Link>
+        <CourseBreadcrumbs
+          items={[
+            { label: "授業一覧", href: "/courses" },
+            { label: "授業追加" },
+          ]}
+        />
 
         <div className="mb-5">
           <p className="mb-2 inline-flex items-center gap-2 text-sm font-semibold text-primary">

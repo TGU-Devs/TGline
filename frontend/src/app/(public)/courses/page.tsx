@@ -13,19 +13,15 @@ import { Button } from "@/components/ui/button";
 import { useUser } from "@/contexts/UserContext";
 import {
   formatAverage,
-  formatDayOfWeek,
-  formatDeliveryMethod,
-  formatSemester,
   formatTargetGrade,
 } from "@/components/features/courses/labels";
 import {
   COURSE_CATEGORY_OPTIONS,
   FACULTY_DEPARTMENT_OPTIONS,
   TARGET_GRADE_OPTIONS,
-  departmentsForFaculty,
 } from "@/components/features/courses/options";
 
-import type { Course, CourseOffering, CoursesResponse } from "@/components/features/courses/types";
+import type { Course, CoursesResponse } from "@/components/features/courses/types";
 import { apiFetch } from "@/lib/api";
 
 export default function CoursesPage() {
@@ -42,16 +38,13 @@ export default function CoursesPage() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
   const [faculty, setFaculty] = useState(() => searchParams.get("faculty") ?? "");
-  const [department, setDepartment] = useState(() => searchParams.get("department") ?? "");
   const [category, setCategory] = useState(() => searchParams.get("category") ?? "");
   const [targetGrade, setTargetGrade] = useState(() => searchParams.get("target_grade") ?? "");
 
   const currentQuery = searchParams.get("q") ?? "";
   const currentFaculty = searchParams.get("faculty") ?? "";
-  const currentDepartment = searchParams.get("department") ?? "";
   const currentCategory = searchParams.get("category") ?? "";
   const currentTargetGrade = searchParams.get("target_grade") ?? "";
-  const departmentOptions = departmentsForFaculty(faculty);
 
   const fetchCourses = useCallback(
     async (targetPage = 1) => {
@@ -66,7 +59,6 @@ export default function CoursesPage() {
         const params = new URLSearchParams();
         if (currentQuery) params.set("q", currentQuery);
         if (currentFaculty) params.set("faculty", currentFaculty);
-        if (currentDepartment) params.set("department", currentDepartment);
         if (currentCategory) params.set("category", currentCategory);
         if (currentTargetGrade) params.set("target_grade", currentTargetGrade);
         params.set("page", String(targetPage));
@@ -90,32 +82,30 @@ export default function CoursesPage() {
         setIsLoadingMore(false);
       }
     },
-    [currentCategory, currentDepartment, currentFaculty, currentQuery, currentTargetGrade],
+    [currentCategory, currentFaculty, currentQuery, currentTargetGrade],
   );
 
   const selectedFilters = useMemo(() => {
     return [
       currentFaculty,
-      currentDepartment,
       currentCategory,
       currentTargetGrade && formatTargetGrade(currentTargetGrade),
     ].filter(
       (filter): filter is string => Boolean(filter),
     );
-  }, [currentCategory, currentDepartment, currentFaculty, currentTargetGrade]);
+  }, [currentCategory, currentFaculty, currentTargetGrade]);
 
   useEffect(() => {
     setQuery(currentQuery);
     setFaculty(currentFaculty);
-    setDepartment(currentDepartment);
     setCategory(currentCategory);
     setTargetGrade(currentTargetGrade);
     fetchCourses(1);
-  }, [currentCategory, currentDepartment, currentFaculty, currentQuery, currentTargetGrade, fetchCourses]);
+  }, [currentCategory, currentFaculty, currentQuery, currentTargetGrade, fetchCourses]);
 
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams();
 
     if (query.trim()) {
       params.set("q", query.trim());
@@ -127,12 +117,6 @@ export default function CoursesPage() {
       params.set("faculty", faculty.trim());
     } else {
       params.delete("faculty");
-    }
-
-    if (department.trim()) {
-      params.set("department", department.trim());
-    } else {
-      params.delete("department");
     }
 
     if (category.trim()) {
@@ -147,14 +131,13 @@ export default function CoursesPage() {
       params.delete("target_grade");
     }
 
-    params.delete("page");
-    router.replace(`/courses?${params.toString()}`, { scroll: false });
+    const search = params.toString();
+    router.replace(search ? `/courses?${search}` : "/courses", { scroll: false });
   };
 
   const handleClear = () => {
     setQuery("");
     setFaculty("");
-    setDepartment("");
     setCategory("");
     setTargetGrade("");
     router.replace("/courses", { scroll: false });
@@ -198,7 +181,7 @@ export default function CoursesPage() {
         </div>
 
         <form onSubmit={handleSearch} className="mb-6 rounded-lg border border-border bg-card p-4 shadow-sm">
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-6">
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
             <label className="block">
               <span className="mb-1 block text-xs font-semibold text-muted-foreground">キーワード</span>
               <div className="relative">
@@ -216,33 +199,13 @@ export default function CoursesPage() {
               <span className="mb-1 block text-xs font-semibold text-muted-foreground">学部</span>
               <select
                 value={faculty}
-                onChange={(event) => {
-                  setFaculty(event.target.value);
-                  setDepartment("");
-                }}
+                onChange={(event) => setFaculty(event.target.value)}
                 className="h-11 w-full rounded-md border border-input bg-background px-3 text-base outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
               >
                 <option value="">すべて</option>
                 {FACULTY_DEPARTMENT_OPTIONS.map((option) => (
                   <option key={option.faculty} value={option.faculty}>
                     {option.faculty}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="block">
-              <span className="mb-1 block text-xs font-semibold text-muted-foreground">学科</span>
-              <select
-                value={department}
-                onChange={(event) => setDepartment(event.target.value)}
-                disabled={!faculty}
-                className="h-11 w-full rounded-md border border-input bg-background px-3 text-base outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-muted"
-              >
-                <option value="">すべて</option>
-                {departmentOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
                   </option>
                 ))}
               </select>
@@ -328,20 +291,10 @@ export default function CoursesPage() {
                   {course.name}
                 </h2>
 
-                <div className="mt-4 min-h-28 space-y-2 text-sm leading-5">
+                <div className="mt-4 text-sm leading-5">
                   <p className="font-medium text-slate-700">
                     {formatCourseTarget(course)}
                   </p>
-                  <p className="text-slate-700">
-                    {course.primary_course_offering?.teacher_name
-                      ? `${course.primary_course_offering.teacher_name}先生`
-                      : "担当教員未登録"}
-                  </p>
-                  {course.primary_course_offering && (
-                    <p className="line-clamp-2 text-muted-foreground">
-                      {formatCourseOfferingSummary(course.primary_course_offering)}
-                    </p>
-                  )}
                 </div>
 
                 <div className="mt-auto flex items-end justify-between gap-3 border-t border-border pt-4">
@@ -384,18 +337,6 @@ export default function CoursesPage() {
   );
 }
 
-function formatCourseOfferingSummary(offering: CourseOffering) {
-  const labels = [
-    offering.academic_year ? `${offering.academic_year}年度` : "",
-    offering.semester && offering.semester !== "other" ? formatSemester(offering.semester) : "",
-    offering.day_of_week && offering.day_of_week !== "other_day" ? formatDayOfWeek(offering.day_of_week) : "",
-    visibleLabel(formatDeliveryMethod(offering.delivery_method)),
-    visibleLabel(formatTargetGrade(offering.target_grade)),
-  ];
-
-  return labels.filter(Boolean).join("・");
-}
-
 function formatCourseTarget(course: Course) {
   const offering = course.primary_course_offering;
 
@@ -430,8 +371,4 @@ function RatingStars({ rating }: { rating: number | null }) {
       })}
     </span>
   );
-}
-
-function visibleLabel(value: string) {
-  return value === "-" ? "" : value;
 }

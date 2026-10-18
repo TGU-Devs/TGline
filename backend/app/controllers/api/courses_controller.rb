@@ -148,7 +148,7 @@ module Api
     end
 
     def filtered_course_offerings
-      offerings = CourseOffering.joins(:course)
+      offerings = CourseOffering.all
       offerings = offerings.where(academic_year: params[:academic_year]) if params[:academic_year].present?
       offerings = offerings.where(semester: params[:semester]) if params[:semester].present?
       offerings = filter_offerings_by_target(offerings)
@@ -159,11 +159,9 @@ module Api
     def filter_offerings_by_target(offerings)
       return offerings unless params[:faculty].present? || params[:department].present?
 
-      matching = offerings
-      matching = matching.where(faculty: params[:faculty]) if params[:faculty].present?
-      matching = matching.where(department: params[:department]) if params[:department].present?
-
-      offerings.where(courses: { category: "教養科目" }).or(matching)
+      offerings = offerings.where(faculty: params[:faculty]) if params[:faculty].present?
+      offerings = offerings.where(department: params[:department]) if params[:department].present?
+      offerings
     end
 
     def filter_offerings_by_grade(offerings)

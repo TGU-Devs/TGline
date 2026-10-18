@@ -1008,10 +1008,12 @@ paths:
           in: query
           schema:
             type: string
+          description: 対象学部の完全一致。学部を持たない教養科目は含めない
         - name: department
           in: query
           schema:
             type: string
+          description: 対象学科の完全一致
         - name: target_grade
           in: query
           schema:

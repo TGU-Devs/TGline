@@ -5,7 +5,6 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import {
-  ArrowLeft,
   CalendarDays,
   ChevronRight,
   Cloud,
@@ -16,6 +15,7 @@ import {
 } from "lucide-react";
 
 import LoginPromptModal from "@/components/features/auth/LoginPromptModal";
+import CourseBreadcrumbs from "@/components/features/courses/CourseBreadcrumbs";
 import { courseOfferingBadges } from "@/components/features/courses/display";
 import {
   formatAverage,
@@ -96,13 +96,12 @@ export default function CourseDetailPage() {
   return (
     <main className="min-h-screen bg-background py-4 sm:py-8">
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
-        <Link
-          href="/courses"
-          className="mb-4 inline-flex min-h-11 items-center gap-2 rounded-md px-2 text-sm font-medium text-muted-foreground transition hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-        >
-          <ArrowLeft className="size-4" />
-          授業一覧へ戻る
-        </Link>
+        <CourseBreadcrumbs
+          items={[
+            { label: "授業一覧", href: "/courses" },
+            { label: course.name },
+          ]}
+        />
 
         <section className="mb-5 flex justify-end">
           <a

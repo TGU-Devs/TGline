@@ -2,11 +2,11 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
-import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Edit3, Star } from "lucide-react";
+import { Edit3, Star } from "lucide-react";
 
 import LoginPromptModal from "@/components/features/auth/LoginPromptModal";
+import CourseBreadcrumbs from "@/components/features/courses/CourseBreadcrumbs";
 import { formatCourseOfferingOption } from "@/components/features/courses/display";
 import { ratingLabels, ratingScaleHints } from "@/components/features/courses/labels";
 import {
@@ -169,13 +169,17 @@ export default function NewOfferingReviewPage() {
   return (
     <main className="min-h-screen bg-background py-4 sm:py-8">
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
-        <Link
-          href={`/courses/${course.id}/offerings/${offering.id}`}
-          className="mb-4 inline-flex min-h-11 items-center gap-2 rounded-md px-2 text-sm font-medium text-muted-foreground transition hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-        >
-          <ArrowLeft className="size-4" />
-          開講詳細へ戻る
-        </Link>
+        <CourseBreadcrumbs
+          items={[
+            { label: "授業一覧", href: "/courses" },
+            { label: course.name, href: `/courses/${course.id}` },
+            {
+              label: `${offering.teacher_name}先生の開講情報`,
+              href: `/courses/${course.id}/offerings/${offering.id}`,
+            },
+            { label: "口コミ投稿" },
+          ]}
+        />
 
         <section className="mb-5 rounded-lg border border-border bg-card p-5 shadow-sm">
           <p className="mb-2 inline-flex items-center gap-2 text-sm font-semibold text-primary">
