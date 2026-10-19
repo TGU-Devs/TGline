@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useUser } from "@/contexts/UserContext";
 import { Button } from "@/components/ui/button";
-import { Users, FileText, MessageCircle } from "lucide-react";
+import { Users, FileText, MessageCircle, Mail} from "lucide-react";
 import { apiFetch } from "@/lib/api";
 
 interface AdminStats {
@@ -150,10 +150,19 @@ export default function AdminPage() {
     <div className="min-h-screen bg-background py-4 sm:py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         {/* ヘッダー */}
-        <div className="mb-6 sm:mb-8">
+        <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
             管理ダッシュボード
           </h1>
+
+          <Button
+            type="button"
+            className="w-full sm:w-auto"
+            onClick={() => router.push("/admin/announcementform")}
+          >
+            <Mail className="h-4 w-4" />
+            メールを作成
+          </Button>
         </div>
 
         {/* 統計カード */}
