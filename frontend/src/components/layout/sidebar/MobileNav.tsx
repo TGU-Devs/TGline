@@ -107,7 +107,11 @@ const MobileNav = ({
                 </nav>
 
                 <div className="p-6 border-t border-sidebar-border">
-                    <Link href="/settings" onClick={toggleMenu} className="flex items-center space-x-3 mb-4 rounded-xl p-2 -m-2 hover:bg-sidebar-accent/10 transition-colors">
+                    <Link
+                        href={currentUser ? `/users/${currentUser.id}?from=sidebar` : "/settings"}
+                        onClick={toggleMenu}
+                        className="flex items-center space-x-3 mb-4 rounded-xl p-2 -m-2 hover:bg-sidebar-accent/10 transition-colors"
+                    >
                         <div className="w-10 h-10 shrink-0">
                             {currentUser ? (
                                 <UserAvatar

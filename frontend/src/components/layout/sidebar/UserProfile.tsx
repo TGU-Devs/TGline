@@ -13,7 +13,10 @@ const UserProfile = ({ currentUser, isLoading }: UserProfileProps) => {
     return (
         <div className="border-b border-sidebar-border">
             <div className="p-4">
-                <Link href="/settings" className="flex items-center gap-3 mb-4 rounded-xl p-2 -m-2 hover:bg-sidebar-accent/10 transition-colors">
+                <Link
+                    href={currentUser ? `/users/${currentUser.id}?from=sidebar` : "/settings"}
+                    className="flex items-center gap-3 mb-4 rounded-xl p-2 -m-2 hover:bg-sidebar-accent/10 transition-colors"
+                >
                     <div className="w-10 h-10 shrink-0">
                         {currentUser ? (
                             <UserAvatar
